@@ -21,6 +21,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL") or f"sqlite:///{DATA_DIR / 'leads.
 GOOGLE_CSE_API_KEY = os.environ.get("GOOGLE_CSE_API_KEY", "")
 GOOGLE_CSE_CX = os.environ.get("GOOGLE_CSE_CX", "")
 BING_SEARCH_API_KEY = os.environ.get("BING_SEARCH_API_KEY", "")
+SERPER_API_KEY = os.environ.get("SERPER_API_KEY", "")
+BRAVE_SEARCH_API_KEY = os.environ.get("BRAVE_SEARCH_API_KEY", "")
 
 # Directory-API provider (find candidate companies via a business directory)
 GOOGLE_PLACES_API_KEY = os.environ.get("GOOGLE_PLACES_API_KEY", "")

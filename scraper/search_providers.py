@@ -106,3 +106,66 @@ class BingSearchProvider:
                 snippet=item.get("snippet", ""),
                 query=query,
             )
+
+
+class SerperProvider:
+    """Serper.dev -- Google results via a single API key, no Google Cloud
+    project or billing setup required. Free tier includes a batch of
+    credits; get a key at https://serper.dev/.
+    """
+
+    name = "serper"
+    ENDPOINT = "https://google.serper.dev/search"
+
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or config.SERPER_API_KEY
+
+    def is_configured(self) -> bool:
+        return bool(self.api_key)
+
+    def search(self, query: str, num_results: int = 10) -> Iterator[SearchResult]:
+        if not self.is_configured():
+            logger.info("Serper not configured; skipping query %r", query)
+            return
+        headers = {"X-API-KEY": self.api_key, "Content-Type": "application/json"}
+        payload = {"q": query, "num": min(num_results, 100), "gl": "us", "hl": "en"}
+        resp = requests.post(self.ENDPOINT, headers=headers, json=payload, timeout=config.REQUEST_TIMEOUT_SECONDS)
+        resp.raise_for_status()
+        for item in resp.json().get("organic", []):
+            yield SearchResult(
+                url=item.get("link", ""),
+                title=item.get("title", ""),
+                snippet=item.get("snippet", ""),
+                query=query,
+            )
+
+
+class BraveSearchProvider:
+    """Brave Search API -- independent index, single API key, no Google
+    Cloud involvement. Get a key at https://brave.com/search/api/.
+    """
+
+    name = "brave"
+    ENDPOINT = "https://api.search.brave.com/res/v1/web/search"
+
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or config.BRAVE_SEARCH_API_KEY
+
+    def is_configured(self) -> bool:
+        return bool(self.api_key)
+
+    def search(self, query: str, num_results: int = 10) -> Iterator[SearchResult]:
+        if not self.is_configured():
+            logger.info("Brave Search not configured; skipping query %r", query)
+            return
+        headers = {"X-Subscription-Token": self.api_key, "Accept": "application/json"}
+        params = {"q": query, "count": min(num_results, 20), "country": "us"}
+        resp = requests.get(self.ENDPOINT, headers=headers, params=params, timeout=config.REQUEST_TIMEOUT_SECONDS)
+        resp.raise_for_status()
+        for item in resp.json().get("web", {}).get("results", []):
+            yield SearchResult(
+                url=item.get("url", ""),
+                title=item.get("title", ""),
+                snippet=item.get("description", ""),
+                query=query,
+            )

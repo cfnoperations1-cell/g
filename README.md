@@ -75,8 +75,13 @@ cp .env.example .env
 
 ### Getting API keys (only need one search provider to start)
 
-- **Google Custom Search** (recommended first choice, free tier = 100
-  queries/day):
+- **Serper.dev** (easiest -- start here): one API key, no Google Cloud
+  project, no billing setup. Sign up at https://serper.dev/, copy the key
+  into `SERPER_API_KEY`. Returns Google results.
+- **Brave Search API**: one API key, independent index, no Google Cloud.
+  https://brave.com/search/api/ -> `BRAVE_SEARCH_API_KEY`.
+- **Google Custom Search** (most setup: needs a Cloud project, the API
+  enabled, and a linked billing account; free tier = 100 queries/day):
   1. Go to https://programmablesearchengine.google.com/ and create a new
      search engine. Under "Sites to search", choose "Search the entire web".
   2. Copy its **Search engine ID** — that's `GOOGLE_CSE_CX`.
@@ -93,6 +98,25 @@ cp .env.example .env
 
 Any provider left blank is simply skipped at runtime (you'll see a log line
 saying so) — the agent still runs with whatever you've configured.
+
+### Peptide directory sites (thepeptidelist.com, peptidebase.io)
+
+Checked as discovery sources; **neither permits programmatic access to its
+listings**, so the agent does not crawl them:
+
+- `peptidebase.io` sits behind a Cloudflare challenge that returns 403 to
+  every non-browser request, including `/robots.txt`.
+- `thepeptidelist.com` serves its homepage and article pages but returns
+  `403 Your request was blocked` for `/providers` and every provider
+  profile. Its vendor data loads from `/api/`, which its own `robots.txt`
+  disallows, and its `llms.txt` asks that content not be used for "bulk
+  derivative datasets". The machine-readable mirror it does publish
+  (`/providers.md`) deliberately contains only category descriptions, not
+  the listings.
+
+Both are still useful to you *manually*: browse them yourself, and paste
+any company URLs worth pursuing into `scraper/seed_urls.txt` — the pipeline
+processes them from there.
 
 ### A note if you're running this inside a sandboxed cloud dev environment
 

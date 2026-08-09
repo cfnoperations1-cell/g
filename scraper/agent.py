@@ -19,12 +19,19 @@ import time
 from pathlib import Path
 from typing import Iterator, List, Optional, Tuple
 
+import requests
+
 import config
 from db import SessionLocal, init_db
 from models import Lead
 from scraper.directory_providers import GooglePlacesProvider
 from scraper.query_templates import QUERY_TEMPLATES
-from scraper.search_providers import BingSearchProvider, GoogleCustomSearchProvider
+from scraper.search_providers import (
+    BingSearchProvider,
+    BraveSearchProvider,
+    GoogleCustomSearchProvider,
+    SerperProvider,
+)
 from scraper.site_parser import SiteData, get_domain, parse_site
 
 logger = logging.getLogger(__name__)
@@ -82,15 +89,22 @@ def build_queries(peptide_keywords: List[str], max_queries: Optional[int], compa
 
 
 def candidate_urls_from_search(queries: List[str], per_query: int) -> Iterator[Tuple[str, str, str]]:
-    providers = [GoogleCustomSearchProvider(), BingSearchProvider()]
+    providers = [GoogleCustomSearchProvider(), SerperProvider(), BraveSearchProvider(), BingSearchProvider()]
     for provider in providers:
         if not provider.is_configured():
             logger.info("Skipping %s (not configured)", provider.name)
             continue
         for query in queries:
             logger.info("[%s] searching: %s", provider.name, query)
-            for result in provider.search(query, per_query):
-                yield result.url, query, provider.name
+            # A provider that is misconfigured on the vendor's side (bad key,
+            # API not enabled, quota exhausted) must not abort the whole run --
+            # the remaining providers may well be working.
+            try:
+                for result in provider.search(query, per_query):
+                    yield result.url, query, provider.name
+            except requests.RequestException as exc:
+                logger.warning("[%s] query failed, skipping this provider: %s", provider.name, exc)
+                break
 
 
 def candidate_urls_from_directory(queries: List[str], per_query: int) -> Iterator[Tuple[str, str, str]]:
@@ -100,8 +114,12 @@ def candidate_urls_from_directory(queries: List[str], per_query: int) -> Iterato
         return
     for query in queries:
         logger.info("[%s] searching: %s", provider.name, query)
-        for result in provider.search(query, per_query):
-            yield result.website, query, provider.name
+        try:
+            for result in provider.search(query, per_query):
+                yield result.website, query, provider.name
+        except requests.RequestException as exc:
+            logger.warning("[%s] query failed, skipping this provider: %s", provider.name, exc)
+            return
 
 
 def is_qualifying_lead(site_data: SiteData, allow_non_us: bool) -> Optional[str]:
