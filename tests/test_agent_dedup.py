@@ -3,7 +3,10 @@ from sqlalchemy.orm import sessionmaker
 
 from db import Base
 from models import Lead
-from scraper.agent import build_queries, is_qualifying_lead, upsert_lead
+import pytest
+
+from scraper.agent import DEFAULT_COMPANY_TYPES, build_queries, is_qualifying_lead, upsert_lead
+from scraper.query_templates import QUERY_TEMPLATES
 from scraper.site_parser import SiteData
 
 
@@ -62,14 +65,27 @@ def test_is_qualifying_lead_accepts_relevant_us_site():
     assert is_qualifying_lead(site, allow_non_us=False) is None
 
 
-def test_build_queries_covers_every_company_type():
-    queries = build_queries(["BPC-157"], max_queries=None)
+def test_build_queries_covers_every_requested_company_type():
+    queries = build_queries(["BPC-157"], max_queries=None, company_types=list(QUERY_TEMPLATES))
     assert any("research peptides supplier" in q for q in queries)
     assert any("compounding pharmacy" in q for q in queries)
     assert any("peptide manufacturer" in q for q in queries)
     assert any("peptides for sale" in q or "buy" in q for q in queries)
 
 
-def test_build_queries_respects_max_queries_and_samples_all_types():
-    queries = build_queries(["BPC-157", "NAD+"], max_queries=4)
+def test_build_queries_default_focus_excludes_pharmacy_and_lab():
+    queries = build_queries(["BPC-157"], max_queries=None, company_types=DEFAULT_COMPANY_TYPES)
+    assert any("research peptides supplier" in q for q in queries)
+    assert any("peptides for sale" in q or "buy" in q for q in queries)
+    assert not any("compounding pharmacy" in q for q in queries)
+    assert not any("peptide manufacturer" in q for q in queries)
+
+
+def test_build_queries_respects_max_queries_and_samples_requested_types():
+    queries = build_queries(["BPC-157", "NAD+"], max_queries=4, company_types=list(QUERY_TEMPLATES))
     assert len(queries) == 4
+
+
+def test_build_queries_rejects_unknown_company_type():
+    with pytest.raises(ValueError):
+        build_queries(["BPC-157"], max_queries=None, company_types=["not_a_real_type"])

@@ -34,6 +34,13 @@ tracked peptide keywords (`scraper/peptide_keywords.txt`) — otherwise it's
 skipped as irrelevant. By default, only leads that also look US-based are
 kept (see below); pass `--allow-non-us` to disable that filter.
 
+By default the agent only actively *searches* for `research_only` and
+`consumer_and_research` companies (B2C peptide brands and general peptide
+sellers) — compounding pharmacies and manufacturing labs are still
+correctly classified and saved if one happens to turn up, just not a
+search target by default. Pass `--company-types` to change this, e.g.
+`--company-types research_only,consumer_and_research,compounding_pharmacy`.
+
 ### US-presence detection
 
 There's no reliable universal "give me this company's country" signal from
@@ -107,6 +114,8 @@ Flags:
 - `--limit N` — stop after visiting N new candidate sites
 - `--allow-non-us` — also keep leads that don't look US-based (by default
   only US companies are kept)
+- `--company-types` — comma-separated list of company types to actively
+  search for (default: `research_only,consumer_and_research`)
 - `--dry-run` — print results without writing to the database
 - `-v` — verbose logging
 

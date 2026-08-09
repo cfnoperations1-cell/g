@@ -31,6 +31,12 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_KEYWORDS_FILE = Path(__file__).parent / "peptide_keywords.txt"
 
+# Default query focus: B2C peptide brands and general peptide companies.
+# Compounding pharmacies and manufacturing labs are still fully supported
+# (classify_company_type will still tag one correctly if you land on it),
+# just not actively searched for unless you pass --company-types.
+DEFAULT_COMPANY_TYPES = ["research_only", "consumer_and_research"]
+
 
 def load_keywords(path: Path) -> List[str]:
     if not path.exists():
@@ -38,13 +44,20 @@ def load_keywords(path: Path) -> List[str]:
     return [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
 
 
-def build_queries(peptide_keywords: List[str], max_queries: Optional[int]) -> List[str]:
+def build_queries(peptide_keywords: List[str], max_queries: Optional[int], company_types: List[str]) -> List[str]:
     """Build search queries from every (company type, template, keyword)
-    combination, interleaved round-robin across company types so a small
-    --max-queries budget still samples every target category."""
+    combination for the requested company types, interleaved round-robin
+    across those types so a small --max-queries budget still samples each
+    one evenly."""
+    unknown = set(company_types) - set(QUERY_TEMPLATES)
+    if unknown:
+        raise ValueError(f"Unknown company type(s): {sorted(unknown)}. Valid: {sorted(QUERY_TEMPLATES)}")
+
     per_type_queries = {
-        company_type: [template.format(peptide=keyword) for template in templates for keyword in peptide_keywords]
-        for company_type, templates in QUERY_TEMPLATES.items()
+        company_type: [
+            template.format(peptide=keyword) for template in QUERY_TEMPLATES[company_type] for keyword in peptide_keywords
+        ]
+        for company_type in company_types
     }
 
     interleaved: List[str] = []
@@ -123,6 +136,7 @@ def run(
     per_query: int,
     limit: Optional[int],
     max_queries: Optional[int],
+    company_types: List[str],
     allow_non_us: bool,
     dry_run: bool,
 ) -> dict:
@@ -132,8 +146,11 @@ def run(
         logger.error("No peptide keywords loaded from %s", keywords_file)
         return {}
 
-    queries = build_queries(peptide_keywords, max_queries)
-    logger.info("Built %d queries from %d peptide keywords", len(queries), len(peptide_keywords))
+    queries = build_queries(peptide_keywords, max_queries, company_types)
+    logger.info(
+        "Built %d queries from %d peptide keywords across company types: %s",
+        len(queries), len(peptide_keywords), ", ".join(company_types),
+    )
 
     candidates = list(candidate_urls_from_search(queries, per_query))
     candidates += list(candidate_urls_from_directory(queries, per_query))
@@ -201,6 +218,16 @@ def main() -> None:
         action="store_true",
         help="Also keep leads that don't appear to be US-based (by default only US companies are kept)",
     )
+    parser.add_argument(
+        "--company-types",
+        type=str,
+        default=",".join(DEFAULT_COMPANY_TYPES),
+        help=(
+            "Comma-separated company types to actively search for: "
+            "research_only, consumer_and_research, compounding_pharmacy, manufacturing_lab "
+            f"(default: {','.join(DEFAULT_COMPANY_TYPES)})"
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print results without writing to the CRM database")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
@@ -215,6 +242,7 @@ def main() -> None:
         per_query=args.per_query,
         limit=args.limit,
         max_queries=args.max_queries,
+        company_types=[t.strip() for t in args.company_types.split(",") if t.strip()],
         allow_non_us=args.allow_non_us,
         dry_run=args.dry_run,
     )
