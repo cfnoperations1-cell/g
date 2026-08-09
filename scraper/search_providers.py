@@ -58,6 +58,8 @@ class GoogleCustomSearchProvider:
                 "q": query,
                 "num": page_size,
                 "start": start,
+                "cr": "countryUS",
+                "gl": "us",
             }
             resp = requests.get(self.ENDPOINT, params=params, timeout=config.REQUEST_TIMEOUT_SECONDS)
             resp.raise_for_status()
@@ -93,7 +95,7 @@ class BingSearchProvider:
             logger.info("Bing Search not configured; skipping query %r", query)
             return
         headers = {"Ocp-Apim-Subscription-Key": self.api_key}
-        params = {"q": query, "count": min(num_results, 50)}
+        params = {"q": query, "count": min(num_results, 50), "mkt": "en-US", "cc": "US"}
         resp = requests.get(self.ENDPOINT, headers=headers, params=params, timeout=config.REQUEST_TIMEOUT_SECONDS)
         resp.raise_for_status()
         data = resp.json()

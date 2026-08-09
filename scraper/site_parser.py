@@ -18,6 +18,7 @@ import requests
 from bs4 import BeautifulSoup
 
 import config
+from scraper.classify import classify_company_type, contains_any_keyword, guess_us_presence
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,9 @@ class SiteData:
     phone: Optional[str] = None
     description: Optional[str] = None
     research_only_evidence: Optional[str] = None
+    company_type: Optional[str] = None
+    us_based: bool = False
+    state: Optional[str] = None
     pages_checked: List[str] = field(default_factory=list)
 
 
@@ -107,7 +111,7 @@ def find_research_only_evidence(text: str) -> Optional[str]:
     return None
 
 
-def parse_site(base_url: str) -> SiteData:
+def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> SiteData:
     domain = get_domain(base_url)
     data = SiteData(url=base_url, domain=domain)
     combined_text = []
@@ -158,5 +162,14 @@ def parse_site(base_url: str) -> SiteData:
             if phone_match:
                 data.phone = phone_match.group(0)
 
-    data.research_only_evidence = find_research_only_evidence(" ".join(combined_text))
+    full_text = " ".join(combined_text)
+    data.research_only_evidence = find_research_only_evidence(full_text)
+
+    is_us, state = guess_us_presence(full_text)
+    data.us_based = is_us
+    data.state = state
+
+    if peptide_keywords and contains_any_keyword(full_text, peptide_keywords):
+        data.company_type = classify_company_type(full_text, data.research_only_evidence)
+
     return data

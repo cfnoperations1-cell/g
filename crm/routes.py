@@ -1,11 +1,12 @@
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 from db import SessionLocal
-from models import Lead, LeadStatus
+from models import CompanyType, Lead, LeadStatus
 
 bp = Blueprint("leads", __name__)
 
 STATUS_CHOICES = [s.value for s in LeadStatus]
+COMPANY_TYPE_CHOICES = [t.value for t in CompanyType]
 
 
 @bp.route("/")
@@ -16,15 +17,25 @@ def index():
 @bp.route("/leads")
 def list_leads():
     status_filter = request.args.get("status", "")
+    type_filter = request.args.get("type", "")
     session = SessionLocal()
     try:
         query = session.query(Lead).order_by(Lead.created_at.desc())
         if status_filter:
             query = query.filter(Lead.status == status_filter)
+        if type_filter:
+            query = query.filter(Lead.company_type == type_filter)
         leads = query.all()
     finally:
         session.close()
-    return render_template("leads.html", leads=leads, status_choices=STATUS_CHOICES, current_status=status_filter)
+    return render_template(
+        "leads.html",
+        leads=leads,
+        status_choices=STATUS_CHOICES,
+        current_status=status_filter,
+        type_choices=COMPANY_TYPE_CHOICES,
+        current_type=type_filter,
+    )
 
 
 @bp.route("/leads/<int:lead_id>", methods=["GET", "POST"])

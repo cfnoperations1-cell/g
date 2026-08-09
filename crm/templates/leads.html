@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="filters">
-  <a href="{{ url_for('leads.list_leads') }}" class="{{ 'active' if not current_status else '' }}">All</a>
+  <a href="{{ url_for('leads.list_leads', type=current_type) }}" class="{{ 'active' if not current_status else '' }}">All statuses</a>
   {% for status in status_choices %}
-    <a href="{{ url_for('leads.list_leads', status=status) }}" class="{{ 'active' if current_status == status else '' }}">{{ status }}</a>
+    <a href="{{ url_for('leads.list_leads', status=status, type=current_type) }}" class="{{ 'active' if current_status == status else '' }}">{{ status }}</a>
+  {% endfor %}
+</div>
+<div class="filters">
+  <a href="{{ url_for('leads.list_leads', status=current_status) }}" class="{{ 'active' if not current_type else '' }}">All types</a>
+  {% for company_type in type_choices %}
+    <a href="{{ url_for('leads.list_leads', status=current_status, type=company_type) }}" class="{{ 'active' if current_type == company_type else '' }}">{{ company_type.replace('_', ' ') }}</a>
   {% endfor %}
 </div>
 <table>
@@ -12,6 +18,8 @@
       <th>Company</th>
       <th>Website</th>
       <th>Email</th>
+      <th>Type</th>
+      <th>State</th>
       <th>Status</th>
       <th>Source</th>
       <th>Added</th>
@@ -23,12 +31,14 @@
       <td><a href="{{ url_for('leads.lead_detail', lead_id=lead.id) }}">{{ lead.company_name }}</a></td>
       <td><a href="{{ lead.website }}" target="_blank" rel="noopener">{{ lead.domain }}</a></td>
       <td>{{ lead.email or "—" }}</td>
+      <td>{{ (lead.company_type or "—").replace('_', ' ') }}</td>
+      <td>{{ lead.state or "—" }}</td>
       <td><span class="badge status-{{ lead.status }}">{{ lead.status }}</span></td>
       <td>{{ lead.source }}</td>
       <td>{{ lead.created_at.strftime("%Y-%m-%d") if lead.created_at else "" }}</td>
     </tr>
     {% else %}
-    <tr><td colspan="6">No leads yet. Run the scraper agent to populate this list: <code>python -m scraper.agent</code></td></tr>
+    <tr><td colspan="8">No leads yet. Run the scraper agent to populate this list: <code>python -m scraper.agent</code></td></tr>
     {% endfor %}
   </tbody>
 </table>

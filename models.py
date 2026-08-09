@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, UniqueConstraint
 
 from db import Base
 
@@ -12,6 +12,13 @@ class LeadStatus(str, enum.Enum):
     REPLIED = "replied"
     QUALIFIED = "qualified"
     DISQUALIFIED = "disqualified"
+
+
+class CompanyType(str, enum.Enum):
+    RESEARCH_ONLY = "research_only"
+    CONSUMER_AND_RESEARCH = "consumer_and_research"
+    COMPOUNDING_PHARMACY = "compounding_pharmacy"
+    MANUFACTURING_LAB = "manufacturing_lab"
 
 
 class Lead(Base):
@@ -28,6 +35,9 @@ class Lead(Base):
     source = Column(String(100), nullable=False, default="unknown")
     matched_query = Column(String(255), nullable=True)
     research_only_evidence = Column(Text, nullable=True)
+    company_type = Column(String(50), nullable=True)
+    us_based = Column(Boolean, nullable=False, default=False)
+    state = Column(String(50), nullable=True)
     status = Column(String(50), nullable=False, default=LeadStatus.NEW.value)
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

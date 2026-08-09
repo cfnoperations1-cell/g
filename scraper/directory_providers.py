@@ -46,7 +46,7 @@ class GooglePlacesProvider:
             logger.info("Google Places not configured; skipping query %r", query)
             return
 
-        params = {"query": query, "key": self.api_key}
+        params = {"query": query, "key": self.api_key, "region": "us"}
         fetched = 0
 
         while fetched < num_results:

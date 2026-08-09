@@ -1,9 +1,0 @@
-# Search queries used to discover peptide research-chemical companies.
-# One query per line. Lines starting with # are ignored.
-# Edit freely -- these feed both the search-API and directory-API providers.
-"research peptides" supplier "for research use only"
-"research peptides" wholesale supplier -amazon -ebay
-buy research peptides "not for human consumption"
-research peptides manufacturer contact
-"research chemicals" peptides supplier USA
-peptide research chemicals supplier

@@ -1,13 +1,15 @@
-"""Peptide research-company lead-discovery agent.
+"""Peptide-industry lead-discovery agent.
 
-Pipeline: run configured search/directory queries -> collect candidate
-company URLs -> visit each site's own public pages -> extract contact info
-and check for "research use only" language -> upsert qualifying companies
-into the CRM database as new leads.
+Pipeline: combine peptide keywords with per-company-type query templates ->
+run those queries against search/directory APIs -> collect candidate company
+URLs -> visit each site's own public pages -> classify by company type
+(research-only supplier / consumer+research supplier / compounding pharmacy /
+manufacturing lab) and guess US presence -> save qualifying companies into
+the CRM database as new leads.
 
 Usage (run from the repo root):
-    python -m scraper.agent --dry-run
-    python -m scraper.agent --per-query 15 --limit 50
+    python -m scraper.agent --dry-run -v
+    python -m scraper.agent --max-queries 20 --per-query 10 --limit 50
 """
 from __future__ import annotations
 
@@ -21,18 +23,40 @@ import config
 from db import SessionLocal, init_db
 from models import Lead
 from scraper.directory_providers import GooglePlacesProvider
+from scraper.query_templates import QUERY_TEMPLATES
 from scraper.search_providers import BingSearchProvider, GoogleCustomSearchProvider
 from scraper.site_parser import SiteData, get_domain, parse_site
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_QUERIES_FILE = Path(__file__).parent / "queries.txt"
+DEFAULT_KEYWORDS_FILE = Path(__file__).parent / "peptide_keywords.txt"
 
 
-def load_queries(path: Path) -> List[str]:
+def load_keywords(path: Path) -> List[str]:
     if not path.exists():
         return []
     return [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
+
+
+def build_queries(peptide_keywords: List[str], max_queries: Optional[int]) -> List[str]:
+    """Build search queries from every (company type, template, keyword)
+    combination, interleaved round-robin across company types so a small
+    --max-queries budget still samples every target category."""
+    per_type_queries = {
+        company_type: [template.format(peptide=keyword) for template in templates for keyword in peptide_keywords]
+        for company_type, templates in QUERY_TEMPLATES.items()
+    }
+
+    interleaved: List[str] = []
+    max_len = max((len(queries) for queries in per_type_queries.values()), default=0)
+    for i in range(max_len):
+        for queries in per_type_queries.values():
+            if i < len(queries):
+                interleaved.append(queries[i])
+
+    if max_queries is not None:
+        interleaved = interleaved[:max_queries]
+    return interleaved
 
 
 def candidate_urls_from_search(queries: List[str], per_query: int) -> Iterator[Tuple[str, str, str]]:
@@ -58,11 +82,18 @@ def candidate_urls_from_directory(queries: List[str], per_query: int) -> Iterato
             yield result.website, query, provider.name
 
 
-def upsert_lead(session, site_data: SiteData, source: str, matched_query: str, require_research_only: bool) -> str:
-    """Insert a new lead if it qualifies. Returns a short status string."""
-    if require_research_only and not site_data.research_only_evidence:
-        return "skipped_not_research_only"
+def is_qualifying_lead(site_data: SiteData, allow_non_us: bool) -> Optional[str]:
+    """Return None if the lead qualifies, otherwise a stats key explaining why not."""
+    if site_data.company_type is None:
+        return "skipped_not_relevant"
+    if not allow_non_us and not site_data.us_based:
+        return "skipped_non_us"
+    return None
 
+
+def upsert_lead(session, site_data: SiteData, source: str, matched_query: str) -> str:
+    """Insert a new lead. Returns a short status string. Assumes the caller
+    has already checked is_qualifying_lead()."""
     existing = session.query(Lead).filter_by(domain=site_data.domain).one_or_none()
     if existing:
         return "duplicate"
@@ -77,6 +108,9 @@ def upsert_lead(session, site_data: SiteData, source: str, matched_query: str, r
         source=source,
         matched_query=matched_query,
         research_only_evidence=site_data.research_only_evidence,
+        company_type=site_data.company_type,
+        us_based=site_data.us_based,
+        state=site_data.state,
         status="new",
     )
     session.add(lead)
@@ -85,23 +119,27 @@ def upsert_lead(session, site_data: SiteData, source: str, matched_query: str, r
 
 
 def run(
-    queries_file: Path,
+    keywords_file: Path,
     per_query: int,
     limit: Optional[int],
-    require_research_only: bool,
+    max_queries: Optional[int],
+    allow_non_us: bool,
     dry_run: bool,
 ) -> dict:
     init_db()
-    queries = load_queries(queries_file)
-    if not queries:
-        logger.error("No queries loaded from %s", queries_file)
+    peptide_keywords = load_keywords(keywords_file)
+    if not peptide_keywords:
+        logger.error("No peptide keywords loaded from %s", keywords_file)
         return {}
+
+    queries = build_queries(peptide_keywords, max_queries)
+    logger.info("Built %d queries from %d peptide keywords", len(queries), len(peptide_keywords))
 
     candidates = list(candidate_urls_from_search(queries, per_query))
     candidates += list(candidate_urls_from_directory(queries, per_query))
 
     seen_domains: set = set()
-    stats = {"added": 0, "duplicate": 0, "skipped_not_research_only": 0, "fetch_failed": 0}
+    stats = {"added": 0, "duplicate": 0, "skipped_not_relevant": 0, "skipped_non_us": 0, "fetch_failed": 0}
     processed = 0
     session = SessionLocal()
 
@@ -116,21 +154,28 @@ def run(
             processed += 1
 
             logger.info("Visiting %s (via %s / %r)", url, source, query)
-            site_data = parse_site(url)
+            site_data = parse_site(url, peptide_keywords)
             if not site_data.pages_checked:
                 stats["fetch_failed"] += 1
                 continue
 
             if dry_run:
                 logger.info(
-                    "[dry-run] %s | email=%s | research_only=%s",
+                    "[dry-run] %s | type=%s | us_based=%s (%s) | email=%s",
                     site_data.domain,
+                    site_data.company_type,
+                    site_data.us_based,
+                    site_data.state,
                     site_data.email,
-                    bool(site_data.research_only_evidence),
                 )
                 continue
 
-            result = upsert_lead(session, site_data, source, query, require_research_only)
+            skip_reason = is_qualifying_lead(site_data, allow_non_us)
+            if skip_reason:
+                stats[skip_reason] = stats.get(skip_reason, 0) + 1
+                continue
+
+            result = upsert_lead(session, site_data, source, query)
             stats[result] = stats.get(result, 0) + 1
             time.sleep(0.5)  # be polite to target servers
     finally:
@@ -142,13 +187,19 @@ def run(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--queries-file", type=Path, default=DEFAULT_QUERIES_FILE)
+    parser.add_argument("--keywords-file", type=Path, default=DEFAULT_KEYWORDS_FILE)
     parser.add_argument("--per-query", type=int, default=10, help="Results to fetch per query per provider")
     parser.add_argument("--limit", type=int, default=None, help="Max number of new sites to visit")
     parser.add_argument(
-        "--allow-non-research",
+        "--max-queries",
+        type=int,
+        default=20,
+        help="Cap total queries sent to search/directory APIs (mind daily free-tier quotas)",
+    )
+    parser.add_argument(
+        "--allow-non-us",
         action="store_true",
-        help="Also keep leads whose site has no 'research use only' language",
+        help="Also keep leads that don't appear to be US-based (by default only US companies are kept)",
     )
     parser.add_argument("--dry-run", action="store_true", help="Print results without writing to the CRM database")
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -160,10 +211,11 @@ def main() -> None:
     )
 
     run(
-        queries_file=args.queries_file,
+        keywords_file=args.keywords_file,
         per_query=args.per_query,
         limit=args.limit,
-        require_research_only=not args.allow_non_research,
+        max_queries=args.max_queries,
+        allow_non_us=args.allow_non_us,
         dry_run=args.dry_run,
     )
 

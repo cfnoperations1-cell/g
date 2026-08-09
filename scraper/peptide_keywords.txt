@@ -1,0 +1,21 @@
+# Peptide / compound keywords used to build search queries and to check
+# whether a candidate company's site is actually peptide-relevant.
+# One per line, # for comments. Edit freely to match what your business sells.
+BPC-157
+TB-500
+Retatrutide
+Semaglutide
+Tirzepatide
+NAD+
+Ipamorelin
+CJC-1295
+PT-141
+Melanotan II
+GHK-Cu
+Thymosin Alpha-1
+Epithalon
+Sermorelin
+Hexarelin
+AOD-9604
+Selank
+Semax

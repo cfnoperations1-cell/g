@@ -4,6 +4,8 @@
 <h2>{{ lead.company_name }}</h2>
 <p><a href="{{ lead.website }}" target="_blank" rel="noopener">{{ lead.website }}</a></p>
 <dl>
+  <dt>Company type</dt><dd>{{ (lead.company_type or "—").replace('_', ' ') }}</dd>
+  <dt>US-based</dt><dd>{{ "Yes" if lead.us_based else "Unclear/No" }}{{ " (" + lead.state + ")" if lead.state else "" }}</dd>
   <dt>Email</dt><dd>{{ lead.email or "—" }}</dd>
   <dt>Phone</dt><dd>{{ lead.phone or "—" }}</dd>
   <dt>Description</dt><dd>{{ lead.description or "—" }}</dd>
