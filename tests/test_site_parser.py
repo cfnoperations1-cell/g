@@ -76,3 +76,21 @@ def test_pick_best_email_strips_whitespace():
 
 def test_pick_best_email_none_when_all_placeholders():
     assert pick_best_email(["contact@mysite.com", "noreply@acme.com"], "acme.com") is None
+
+
+def test_is_usable_email_rejects_unfilled_form_placeholder():
+    # A mailto of "your@email" -- not a real address, and not regex-valid.
+    assert not is_usable_email("your@email")
+    assert not is_usable_email("your@email.com")
+
+
+def test_is_usable_email_rejects_malformed():
+    assert not is_usable_email("not-an-email")
+    assert not is_usable_email("a@b")
+
+
+def test_pick_best_email_ranks_mailto_and_text_together():
+    # The mangled address arrives first (as a mailto would); the correct one
+    # must still win rather than the first entry short-circuiting.
+    got = pick_best_email(["hello@acmepeptides.come", "hello@acmepeptides.com"], "acmepeptides.com")
+    assert got == "hello@acmepeptides.com"

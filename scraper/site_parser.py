@@ -110,14 +110,21 @@ def _fetch(url: str) -> Optional[str]:
         return None
 
 
+PLACEHOLDER_EMAIL_LOCALS = {"your", "youremail", "your-email", "email", "name", "username", "user"}
+
+
 def is_usable_email(email: str) -> bool:
-    """Reject addresses that aren't a real, company-owned contact: generic
-    role accounts, site-builder placeholders, and unfilled template tokens
-    (e.g. a mailto of "[email]", which arrives percent-encoded)."""
+    """Reject addresses that aren't a real, company-owned contact: malformed
+    strings, generic role accounts, site-builder placeholders, and unfilled
+    template tokens (e.g. "your@email" or a percent-encoded "[email]")."""
     if "%" in email:
         return False
+    # mailto: hrefs are not validated by the address regex on the way in, so
+    # check the shape here rather than trusting the link.
+    if not EMAIL_RE.fullmatch(email):
+        return False
     local, _, domain = email.partition("@")
-    if local.lower() in GENERIC_EMAIL_PREFIXES:
+    if local.lower() in GENERIC_EMAIL_PREFIXES or local.lower() in PLACEHOLDER_EMAIL_LOCALS:
         return False
     if domain.lower() in PLACEHOLDER_EMAIL_DOMAINS:
         return False
@@ -202,7 +209,10 @@ def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> S
                 for a in soup.find_all("a", href=True)
                 if a["href"].lower().startswith("mailto:")
             ]
-            data.email = pick_best_email(mailto_candidates, domain) or _extract_email(html, domain)
+            # Rank mailto links and page-text addresses in one pool: a page can
+            # carry a mangled mailto ("...@acme.come") alongside the correct
+            # address in its text, and taking the first mailto would keep the typo.
+            data.email = pick_best_email(mailto_candidates + EMAIL_RE.findall(html), domain)
 
         if data.phone is None:
             phone_match = PHONE_RE.search(text)
