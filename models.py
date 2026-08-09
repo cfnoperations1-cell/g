@@ -1,7 +1,8 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy.orm import relationship
 
 from db import Base
 
@@ -44,3 +45,28 @@ class Lead(Base):
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    outreach = relationship("Outreach", back_populates="lead", cascade="all, delete-orphan")
+
+
+class Outreach(Base):
+    """One row per message prepared or sent to a lead.
+
+    The emailer checks this table before contacting anyone, so re-running it
+    never emails the same company twice -- important when the scraper adds
+    vendors continuously and the emailer runs on a schedule behind it.
+    """
+
+    __tablename__ = "outreach"
+
+    id = Column(Integer, primary_key=True)
+    lead_id = Column(Integer, ForeignKey("leads.id"), nullable=False, index=True)
+    to_email = Column(String(255), nullable=False)
+    subject = Column(String(500), nullable=False)
+    body = Column(Text, nullable=False)
+    # "drafted" = written to disk for review; "sent" = handed to an SMTP server.
+    delivery = Column(String(20), nullable=False, default="drafted")
+    error = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    lead = relationship("Lead", back_populates="outreach")

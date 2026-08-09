@@ -1,7 +1,7 @@
-# Peptide Industry Lead-Gen: Scraper Agent + CRM
+# Peptide Industry Lead-Gen: Scraper + CRM + Outreach
 
-A two-part system for finding US-based companies in the peptide industry
-and tracking outreach to them:
+A three-part system for finding US-based companies in the peptide industry
+and running outreach to them:
 
 1. **Scraper agent** (`scraper/`) — discovers candidate companies via search
    and business-directory APIs, visits each company's own public website,
@@ -9,11 +9,13 @@ and tracking outreach to them:
    and saves qualifying companies as leads.
 2. **CRM** (`crm/`) — a small local Flask + SQLite web app to view leads,
    filter by status and company type, and track outreach notes.
+3. **Emailer agent** (`emailer/`) — writes outreach to leads that have an
+   email address, records every message so nobody is contacted twice, and
+   defaults to writing drafts for review rather than sending.
 
-Both share one SQLite database (`data/leads.db`) via `db.py` / `models.py`.
-
-An **email follow-up agent** is planned as phase 2 (see Roadmap below) — it
-is intentionally not built yet.
+All three share one SQLite database (`data/leads.db`) via `db.py` /
+`models.py`. `pipeline.py` runs the scraper and emailer back to back, which
+is what you schedule to keep adding vendors continuously.
 
 ## Target company types
 
@@ -200,12 +202,75 @@ run_crm.py                      # CRM entrypoint
 tests/                          # unit tests (no network)
 ```
 
-## Roadmap: email follow-up agent (phase 2)
+## Outreach agent
 
-Not built yet, by design — get the scraper and CRM working first. When
-ready, the plan is:
-- Use the Gmail connector to **draft** (not auto-send) a personalized
-  follow-up email per `new` lead, then flip its status to `contacted`.
-- Only ever create drafts for review first, until you're comfortable
-  trusting the message quality enough to consider auto-send.
-- Pull reply detection from Gmail threads to flip `contacted` -> `replied`.
+Contacts leads the scraper found. Reads the message from
+`emailer/message.txt` (edit it freely — first line is the `Subject:`).
+
+```bash
+python -m emailer.agent --dry-run            # who would be contacted
+python -m emailer.agent                      # write .eml drafts to outreach_drafts/
+python -m emailer.agent --only-manufacturers # only labs that synthesize their own
+python -m emailer.agent --limit 10           # cap this batch
+```
+
+**Drafts are the default and nothing is sent.** Review the `.eml` files, then
+either send them from your mail client or re-run with:
+
+```bash
+python -m emailer.agent --send --i-understand-this-sends-real-email
+```
+
+Sending requires `SMTP_*` credentials in `.env`, and refuses to run until
+`SENDER_EMAIL` and `SENDER_POSTAL_ADDRESS` are filled in — US commercial
+email must carry a real physical address and a working opt-out under
+CAN-SPAM, and both are rendered into the message footer. Messages are spaced
+`EMAIL_DELAY_SECONDS` apart so a batch doesn't leave as a burst.
+
+Every message is written to the `outreach` table, and the agent skips any
+lead that already has a row there. Re-running is safe: it only ever contacts
+companies added since last time, and the lead's status flips to `contacted`.
+The CRM's lead page shows the outreach history.
+
+## Running it continuously
+
+`pipeline.py` does discovery then outreach in one go. Both halves skip work
+they've already done, so it's safe on a repeating schedule.
+
+```bash
+python pipeline.py                  # discover new vendors + write drafts
+python pipeline.py --seeds-only     # re-check the seed list, no search spend
+python pipeline.py --skip-scrape    # outreach only
+```
+
+Daily at 9am via cron:
+
+```
+0 9 * * * cd /path/to/repo && .venv/bin/python pipeline.py >> pipeline.log 2>&1
+```
+
+Leave off `--send` and each run just stacks reviewable drafts in
+`outreach_drafts/`.
+
+## Importing a vendor list by hand
+
+Some directories block automated access. When you can view one in your
+browser but a script can't fetch it, copy the page (or save it) and run:
+
+```bash
+python -m scraper.import_list saved-page.txt --source-host thedirectory.com
+```
+
+That pulls out company domains and appends them to `scraper/seed_urls.txt`.
+
+If a listing gives company *names* but only links to profile pages on the
+directory's own domain, put the names in a TSV (`name<TAB>country`, see
+`scraper/vendor_names.tsv`) and resolve them to real websites:
+
+```bash
+python -m scraper.resolve_vendors --country "United States" --dry-run
+python -m scraper.resolve_vendors --country "United States"
+```
+
+One search per name, scored by how well each candidate domain matches the
+company name, so directories and blogs don't get through.

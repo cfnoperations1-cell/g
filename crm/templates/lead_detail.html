@@ -10,6 +10,14 @@
   <dt>Description</dt><dd>{{ lead.description or "—" }}</dd>
   <dt>Source</dt><dd>{{ lead.source }} (query: {{ lead.matched_query or "—" }})</dd>
   <dt>"Research use only" evidence</dt><dd>{{ lead.research_only_evidence or "—" }}</dd>
+  <dt>Outreach</dt><dd>
+    {% if lead.outreach %}
+      {% for o in lead.outreach %}
+        {{ o.delivery }} to {{ o.to_email }} on {{ o.created_at.strftime("%Y-%m-%d") if o.created_at else "" }}
+        {% if o.error %}<br><span style="color:#b45309">{{ o.error }}</span>{% endif %}<br>
+      {% endfor %}
+    {% else %}not contacted yet{% endif %}
+  </dd>
 </dl>
 <form method="post">
   <label>Status

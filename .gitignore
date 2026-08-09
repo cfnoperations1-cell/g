@@ -7,3 +7,5 @@ instance/
 venv/
 *.db
 .pytest_cache/
+outreach_drafts/
+pipeline.log
