@@ -9,6 +9,8 @@ QUERY_TEMPLATES = {
     "research_only": [
         '"{peptide}" research peptides supplier "for research use only" USA',
         '"{peptide}" research chemicals supplier "not for human consumption"',
+        '"{peptide}" "research use only" "add to cart" -reddit -forum',
+        'buy "{peptide}" research peptide "COA" third party tested USA',
     ],
     "consumer_and_research": [
         'buy "{peptide}" peptides online USA',

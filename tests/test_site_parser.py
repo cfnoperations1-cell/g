@@ -94,3 +94,24 @@ def test_pick_best_email_ranks_mailto_and_text_together():
     # must still win rather than the first entry short-circuiting.
     got = pick_best_email(["hello@acmepeptides.come", "hello@acmepeptides.com"], "acmepeptides.com")
     assert got == "hello@acmepeptides.com"
+
+
+def test_is_public_host_blocks_internal_targets():
+    from scraper.site_parser import is_public_host
+
+    for host in ("localhost", "127.0.0.1", "10.0.0.1", "192.168.1.1", "169.254.169.254", "0.0.0.0"):
+        assert not is_public_host(host), host
+
+
+def test_is_public_host_rejects_unresolvable():
+    from scraper.site_parser import is_public_host
+
+    assert not is_public_host("definitely-not-a-real-host.invalid")
+
+
+def test_parse_site_refuses_non_public_host():
+    from scraper.site_parser import parse_site
+
+    data = parse_site("http://169.254.169.254/latest/meta-data/")
+    assert data.pages_checked == []
+    assert data.email is None

@@ -7,8 +7,10 @@ high-throughput scraper.
 """
 from __future__ import annotations
 
+import ipaddress
 import logging
 import re
+import socket
 from dataclasses import dataclass, field
 from typing import List, Optional
 from urllib.parse import urljoin, urlparse
@@ -83,6 +85,31 @@ def get_domain(url: str) -> str:
     return netloc[4:] if netloc.startswith("www.") else netloc
 
 
+def is_public_host(domain: str) -> bool:
+    """True only if the hostname resolves exclusively to public addresses.
+
+    Candidate URLs come from search results and user-supplied lists, so
+    without this check the scraper could be steered into fetching internal
+    services or a cloud provider's metadata endpoint (SSRF). Any hostname
+    that resolves to a loopback, private, link-local, or otherwise reserved
+    address is refused outright.
+    """
+    try:
+        infos = socket.getaddrinfo(domain, None)
+    except (socket.gaierror, UnicodeError):
+        return False
+    if not infos:
+        return False
+    for info in infos:
+        try:
+            addr = ipaddress.ip_address(info[4][0])
+        except ValueError:
+            return False
+        if not addr.is_global:
+            return False
+    return True
+
+
 def _allowed_by_robots(domain: str, path: str) -> bool:
     rp = _robots_cache.get(domain)
     if rp is None:
@@ -99,12 +126,30 @@ def _allowed_by_robots(domain: str, path: str) -> bool:
         return True
 
 
+_MAX_REDIRECTS = 5
+
+
 def _fetch(url: str) -> Optional[str]:
+    """GET a page, following redirects by hand so every hop is re-checked
+    against is_public_host -- a public site 301ing to an internal address
+    must not carry the request along with it."""
     headers = {"User-Agent": config.SCRAPER_USER_AGENT}
     try:
-        resp = requests.get(url, headers=headers, timeout=config.REQUEST_TIMEOUT_SECONDS)
-        resp.raise_for_status()
-        return resp.text
+        for _ in range(_MAX_REDIRECTS):
+            resp = requests.get(
+                url, headers=headers, timeout=config.REQUEST_TIMEOUT_SECONDS, allow_redirects=False
+            )
+            if resp.is_redirect or resp.is_permanent_redirect:
+                url = urljoin(url, resp.headers.get("Location", ""))
+                next_host = get_domain(url)
+                if not next_host or not is_public_host(next_host):
+                    logger.warning("refusing redirect to non-public host: %r", next_host)
+                    return None
+                continue
+            resp.raise_for_status()
+            return resp.text
+        logger.debug("too many redirects for %s", url)
+        return None
     except requests.RequestException as exc:
         logger.debug("Failed to fetch %s: %s", url, exc)
         return None
@@ -174,6 +219,10 @@ def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> S
     domain = get_domain(base_url)
     data = SiteData(url=base_url, domain=domain)
     combined_text = []
+
+    if not domain or not is_public_host(domain):
+        logger.warning("refusing non-public or unresolvable host: %r", domain)
+        return data
 
     for path in CANDIDATE_PATHS:
         request_path = "/" + path.lstrip("/") if path else "/"
