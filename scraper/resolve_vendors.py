@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_NAMES_FILE = Path(__file__).parent / "vendor_names.tsv"
 DEFAULT_SEED_FILE = Path(__file__).parent / "seed_urls.txt"
+DEFAULT_MAP_FILE = Path(__file__).parent / "vendor_domains.tsv"
 
 # Directories, marketplaces and press -- never the vendor's own site.
 NOT_THE_VENDOR = {
@@ -91,6 +92,31 @@ def first_configured_provider():
     return None
 
 
+def load_domain_map(path: Path) -> dict:
+    """name -> (country, domain) for vendors already resolved."""
+    out = {}
+    if not path.exists():
+        return out
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split("\t")
+        if len(parts) >= 3:
+            out[parts[0]] = (parts[1], parts[2])
+    return out
+
+
+def write_domain_map(rows: List[Tuple[str, str, str]], path: Path) -> None:
+    """Merge new name/country/domain triples into the map file."""
+    existing = load_domain_map(path)
+    for name, country, domain in rows:
+        existing[name] = (country, domain)
+    lines = ["# name\tcountry\tresolved domain -- written by resolve_vendors.py"]
+    lines += [f"{name}\t{country}\t{domain}" for name, (country, domain) in sorted(existing.items())]
+    path.write_text("\n".join(lines) + "\n")
+
+
 def resolve(
     names_file: Path,
     seed_file: Path,
@@ -98,6 +124,7 @@ def resolve(
     limit: Optional[int],
     threshold: float,
     dry_run: bool,
+    map_file: Path = DEFAULT_MAP_FILE,
 ) -> dict:
     provider = first_configured_provider()
     if provider is None:
@@ -113,8 +140,9 @@ def resolve(
 
     resolved: List[str] = []
     unresolved: List[str] = []
+    mapping: List[Tuple[str, str, str]] = []
 
-    for name, _country in vendors:
+    for name, vendor_country in vendors:
         query = f'"{name}" peptides official site'
         try:
             urls = [r.url for r in provider.search(query, 6)]
@@ -127,6 +155,7 @@ def resolve(
         if host:
             logger.info("  %-32s -> %s", name, host)
             resolved.append(host)
+            mapping.append((name, vendor_country, host))
         else:
             logger.info("  %-32s -> (no confident match)", name)
             unresolved.append(name)
@@ -137,6 +166,7 @@ def resolve(
     if dry_run:
         print("\n(dry run -- nothing written)")
     else:
+        write_domain_map(mapping, map_file)
         added, already = merge_into_seed_file(sorted(set(resolved)), seed_file)
         print(f"Added {len(added)} new domains to {seed_file} ({already} already present)")
         if added:
@@ -153,6 +183,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--names-file", type=Path, default=DEFAULT_NAMES_FILE)
     parser.add_argument("--seed-file", type=Path, default=DEFAULT_SEED_FILE)
+    parser.add_argument("--map-file", type=Path, default=DEFAULT_MAP_FILE)
     parser.add_argument("--country", default="United States", help='Filter by country; "" for all')
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
@@ -169,7 +200,8 @@ def main() -> None:
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(message)s",
     )
-    resolve(args.names_file, args.seed_file, args.country or None, args.limit, args.threshold, args.dry_run)
+    resolve(args.names_file, args.seed_file, args.country or None, args.limit, args.threshold,
+            args.dry_run, args.map_file)
 
 
 if __name__ == "__main__":
