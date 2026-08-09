@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<p><a href="{{ url_for('leads.list_leads') }}">&larr; Back to all leads</a></p>
+<h2>{{ lead.company_name }}</h2>
+<p><a href="{{ lead.website }}" target="_blank" rel="noopener">{{ lead.website }}</a></p>
+<dl>
+  <dt>Email</dt><dd>{{ lead.email or "—" }}</dd>
+  <dt>Phone</dt><dd>{{ lead.phone or "—" }}</dd>
+  <dt>Description</dt><dd>{{ lead.description or "—" }}</dd>
+  <dt>Source</dt><dd>{{ lead.source }} (query: {{ lead.matched_query or "—" }})</dd>
+  <dt>"Research use only" evidence</dt><dd>{{ lead.research_only_evidence or "—" }}</dd>
+</dl>
+<form method="post">
+  <label>Status
+    <select name="status">
+      {% for status in status_choices %}
+      <option value="{{ status }}" {{ "selected" if lead.status == status else "" }}>{{ status }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Notes
+    <textarea name="notes" rows="4">{{ lead.notes or "" }}</textarea>
+  </label>
+  <button type="submit">Save</button>
+</form>
+<form method="post" action="{{ url_for('leads.delete_lead', lead_id=lead.id) }}" onsubmit="return confirm('Delete this lead?');">
+  <button type="submit" class="danger">Delete lead</button>
+</form>
+{% endblock %}
