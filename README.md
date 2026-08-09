@@ -94,6 +94,16 @@ cp .env.example .env
 Any provider left blank is simply skipped at runtime (you'll see a log line
 saying so) — the agent still runs with whatever you've configured.
 
+### A note if you're running this inside a sandboxed cloud dev environment
+
+Some hosted dev environments (e.g. Claude Code on the web with a restricted
+network policy) only allow outbound connections to a pre-approved list of
+domains (package registries, well-known APIs, etc.) and will reject
+connections to arbitrary company websites with a proxy-level 403 — which can
+look like every site's robots.txt is disallowing everything. If that
+happens, either switch that environment's network policy to full internet
+access, or run the agent on a machine/environment without that restriction.
+
 ## Running the scraper agent
 
 ```bash
@@ -116,6 +126,10 @@ Flags:
   only US companies are kept)
 - `--company-types` — comma-separated list of company types to actively
   search for (default: `research_only,consumer_and_research`)
+- `--seed-urls-file PATH` — skip search/directory discovery entirely and
+  visit exactly the URLs listed in this file (one per line, `#` for
+  comments). Useful for testing the fetch -> classify -> save pipeline
+  without burning search-API quota, or for feeding in a known company list.
 - `--dry-run` — print results without writing to the database
 - `-v` — verbose logging
 

@@ -44,6 +44,15 @@ def load_keywords(path: Path) -> List[str]:
     return [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
 
 
+def load_seed_urls(path: Path) -> List[str]:
+    """Load explicit candidate URLs, bypassing search/directory discovery
+    entirely. Useful for testing the fetch->classify->save pipeline without
+    a configured search provider, or for feeding in known company lists."""
+    if not path.exists():
+        return []
+    return [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
+
+
 def build_queries(peptide_keywords: List[str], max_queries: Optional[int], company_types: List[str]) -> List[str]:
     """Build search queries from every (company type, template, keyword)
     combination for the requested company types, interleaved round-robin
@@ -139,6 +148,7 @@ def run(
     company_types: List[str],
     allow_non_us: bool,
     dry_run: bool,
+    seed_urls_file: Optional[Path] = None,
 ) -> dict:
     init_db()
     peptide_keywords = load_keywords(keywords_file)
@@ -146,14 +156,18 @@ def run(
         logger.error("No peptide keywords loaded from %s", keywords_file)
         return {}
 
-    queries = build_queries(peptide_keywords, max_queries, company_types)
-    logger.info(
-        "Built %d queries from %d peptide keywords across company types: %s",
-        len(queries), len(peptide_keywords), ", ".join(company_types),
-    )
-
-    candidates = list(candidate_urls_from_search(queries, per_query))
-    candidates += list(candidate_urls_from_directory(queries, per_query))
+    if seed_urls_file is not None:
+        seed_urls = load_seed_urls(seed_urls_file)
+        logger.info("Loaded %d seed URLs from %s (skipping search/directory discovery)", len(seed_urls), seed_urls_file)
+        candidates = [(url, "manual seed list", "seed_list") for url in seed_urls]
+    else:
+        queries = build_queries(peptide_keywords, max_queries, company_types)
+        logger.info(
+            "Built %d queries from %d peptide keywords across company types: %s",
+            len(queries), len(peptide_keywords), ", ".join(company_types),
+        )
+        candidates = list(candidate_urls_from_search(queries, per_query))
+        candidates += list(candidate_urls_from_directory(queries, per_query))
 
     seen_domains: set = set()
     stats = {"added": 0, "duplicate": 0, "skipped_not_relevant": 0, "skipped_non_us": 0, "fetch_failed": 0}
@@ -228,6 +242,12 @@ def main() -> None:
             f"(default: {','.join(DEFAULT_COMPANY_TYPES)})"
         ),
     )
+    parser.add_argument(
+        "--seed-urls-file",
+        type=Path,
+        default=None,
+        help="Skip search/directory discovery and visit exactly these URLs instead (one per line, # for comments)",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print results without writing to the CRM database")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
@@ -245,6 +265,7 @@ def main() -> None:
         company_types=[t.strip() for t in args.company_types.split(",") if t.strip()],
         allow_non_us=args.allow_non_us,
         dry_run=args.dry_run,
+        seed_urls_file=args.seed_urls_file,
     )
 
 
