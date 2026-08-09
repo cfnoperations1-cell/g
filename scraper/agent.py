@@ -122,10 +122,14 @@ def candidate_urls_from_directory(queries: List[str], per_query: int) -> Iterato
             return
 
 
-def is_qualifying_lead(site_data: SiteData, allow_non_us: bool) -> Optional[str]:
+def is_qualifying_lead(site_data: SiteData, allow_non_us: bool, vendors_only: bool = True) -> Optional[str]:
     """Return None if the lead qualifies, otherwise a stats key explaining why not."""
     if site_data.company_type is None:
         return "skipped_not_relevant"
+    if vendors_only and site_data.is_content_site and not site_data.sells_direct:
+        return "skipped_content_site"
+    if vendors_only and not site_data.sells_direct:
+        return "skipped_not_a_vendor"
     if not allow_non_us and not site_data.us_based:
         return "skipped_non_us"
     return None
@@ -149,6 +153,8 @@ def upsert_lead(session, site_data: SiteData, source: str, matched_query: str) -
         matched_query=matched_query,
         research_only_evidence=site_data.research_only_evidence,
         company_type=site_data.company_type,
+        sells_direct=site_data.sells_direct,
+        manufactures=site_data.manufactures,
         us_based=site_data.us_based,
         state=site_data.state,
         status="new",
@@ -167,6 +173,7 @@ def run(
     allow_non_us: bool,
     dry_run: bool,
     seed_urls_file: Optional[Path] = None,
+    vendors_only: bool = True,
 ) -> dict:
     init_db()
     peptide_keywords = load_keywords(keywords_file)
@@ -188,7 +195,11 @@ def run(
         candidates += list(candidate_urls_from_directory(queries, per_query))
 
     seen_domains: set = set()
-    stats = {"added": 0, "duplicate": 0, "skipped_not_relevant": 0, "skipped_non_us": 0, "fetch_failed": 0}
+    stats = {
+        "added": 0, "duplicate": 0, "skipped_not_relevant": 0,
+        "skipped_content_site": 0, "skipped_not_a_vendor": 0,
+        "skipped_non_us": 0, "fetch_failed": 0,
+    }
     processed = 0
     session = SessionLocal()
 
@@ -210,16 +221,19 @@ def run(
 
             if dry_run:
                 logger.info(
-                    "[dry-run] %s | type=%s | us_based=%s (%s) | email=%s",
+                    "[dry-run] %s | type=%s | sells=%s mfg=%s content=%s | us=%s (%s) | %s",
                     site_data.domain,
                     site_data.company_type,
+                    site_data.sells_direct,
+                    site_data.manufactures,
+                    site_data.is_content_site,
                     site_data.us_based,
                     site_data.state,
                     site_data.email,
                 )
                 continue
 
-            skip_reason = is_qualifying_lead(site_data, allow_non_us)
+            skip_reason = is_qualifying_lead(site_data, allow_non_us, vendors_only)
             if skip_reason:
                 stats[skip_reason] = stats.get(skip_reason, 0) + 1
                 continue
@@ -266,6 +280,12 @@ def main() -> None:
         default=None,
         help="Skip search/directory discovery and visit exactly these URLs instead (one per line, # for comments)",
     )
+    parser.add_argument(
+        "--include-non-vendors",
+        action="store_true",
+        help="Also keep sites that don't sell directly (blogs, directories, info pages). "
+             "By default only storefronts selling their own product are kept.",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print results without writing to the CRM database")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
@@ -284,6 +304,7 @@ def main() -> None:
         allow_non_us=args.allow_non_us,
         dry_run=args.dry_run,
         seed_urls_file=args.seed_urls_file,
+        vendors_only=not args.include_non_vendors,
     )
 
 

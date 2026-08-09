@@ -51,17 +51,20 @@ def test_is_qualifying_lead_rejects_irrelevant_site():
 
 
 def test_is_qualifying_lead_rejects_non_us_by_default():
-    site = SiteData(url="https://example.com", domain="example.com", company_type="research_only", us_based=False)
+    site = SiteData(url="https://example.com", domain="example.com", company_type="research_only",
+                    us_based=False, sells_direct=True)
     assert is_qualifying_lead(site, allow_non_us=False) == "skipped_non_us"
 
 
 def test_is_qualifying_lead_allows_non_us_when_flagged():
-    site = SiteData(url="https://example.com", domain="example.com", company_type="research_only", us_based=False)
+    site = SiteData(url="https://example.com", domain="example.com", company_type="research_only",
+                    us_based=False, sells_direct=True)
     assert is_qualifying_lead(site, allow_non_us=True) is None
 
 
 def test_is_qualifying_lead_accepts_relevant_us_site():
-    site = SiteData(url="https://example.com", domain="example.com", company_type="compounding_pharmacy", us_based=True)
+    site = SiteData(url="https://example.com", domain="example.com", company_type="compounding_pharmacy",
+                    us_based=True, sells_direct=True)
     assert is_qualifying_lead(site, allow_non_us=False) is None
 
 
@@ -89,3 +92,27 @@ def test_build_queries_respects_max_queries_and_samples_requested_types():
 def test_build_queries_rejects_unknown_company_type():
     with pytest.raises(ValueError):
         build_queries(["BPC-157"], max_queries=None, company_types=["not_a_real_type"])
+
+
+def test_is_qualifying_lead_rejects_content_site():
+    site = SiteData(url="https://blog.com", domain="blog.com", company_type="research_only",
+                    us_based=True, is_content_site=True, sells_direct=False)
+    assert is_qualifying_lead(site, allow_non_us=False, vendors_only=True) == "skipped_content_site"
+
+
+def test_is_qualifying_lead_rejects_non_vendor():
+    site = SiteData(url="https://info.com", domain="info.com", company_type="research_only",
+                    us_based=True, sells_direct=False)
+    assert is_qualifying_lead(site, allow_non_us=False, vendors_only=True) == "skipped_not_a_vendor"
+
+
+def test_is_qualifying_lead_accepts_storefront():
+    site = SiteData(url="https://shop.com", domain="shop.com", company_type="research_only",
+                    us_based=True, sells_direct=True, manufactures=True)
+    assert is_qualifying_lead(site, allow_non_us=False, vendors_only=True) is None
+
+
+def test_is_qualifying_lead_keeps_non_vendor_when_opted_in():
+    site = SiteData(url="https://info.com", domain="info.com", company_type="research_only",
+                    us_based=True, sells_direct=False)
+    assert is_qualifying_lead(site, allow_non_us=False, vendors_only=False) is None

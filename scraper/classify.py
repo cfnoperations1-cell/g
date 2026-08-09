@@ -41,6 +41,25 @@ COMPOUNDING_SIGNALS = [
 MANUFACTURING_SIGNALS = [
     "cgmp", "gmp facility", "peptide synthesis", "custom peptide synthesis",
     "api manufacturer", "bulk manufacturer", "manufacturing facility",
+    "synthesized in", "manufactured in our", "our lab", "in-house lab",
+    "solid-phase", "solid phase", "lyophilized in",
+]
+
+# Signals that a site sells directly to buyers itself (a storefront) rather
+# than being an information/affiliate page about peptides.
+ECOMMERCE_SIGNALS = [
+    "add to cart", "add to bag", "buy now", "checkout", "shopping cart",
+    "in stock", "out of stock", "free shipping", "shop now", "view product",
+    "select options", "quantity", "sku", "subtotal",
+]
+
+# Signals of an editorial / affiliate / review site -- these rank well for
+# buying queries but are media, not companies that sell peptides.
+CONTENT_SITE_SIGNALS = [
+    "we may earn a commission", "affiliate link", "affiliate disclosure",
+    "editorially independent", "no paid placement", "medically reviewed by",
+    "fact-checked", "our editorial team", "this article", "table of contents",
+    "read our review", "buyer's guide", "buying guide",
 ]
 
 
@@ -85,6 +104,24 @@ def _has_unnegated_signal(lowered_text: str, signals: List[str]) -> bool:
                 return True
             start = idx + 1
     return False
+
+
+def sells_direct(text: str) -> bool:
+    """True if the site looks like a storefront selling to buyers itself."""
+    lowered = text.lower()
+    return sum(1 for signal in ECOMMERCE_SIGNALS if signal in lowered) >= 2
+
+
+def manufactures(text: str) -> bool:
+    """True if the site claims to synthesize/manufacture its own product."""
+    return _has_unnegated_signal(text.lower(), MANUFACTURING_SIGNALS)
+
+
+def is_content_site(text: str) -> bool:
+    """True if the page reads as editorial/affiliate media rather than a
+    company selling its own product."""
+    lowered = text.lower()
+    return sum(1 for signal in CONTENT_SITE_SIGNALS if signal in lowered) >= 2
 
 
 def classify_company_type(text: str, research_only_evidence: Optional[str]) -> str:

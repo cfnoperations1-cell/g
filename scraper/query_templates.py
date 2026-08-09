@@ -13,6 +13,9 @@ QUERY_TEMPLATES = {
     "consumer_and_research": [
         'buy "{peptide}" peptides online USA',
         '"{peptide}" peptides for sale shop',
+        '"{peptide}" peptides "made in USA" shop "add to cart"',
+        '"{peptide}" "our lab" peptides buy third-party tested',
+        '"{peptide}" peptides "synthesized in" USA store',
     ],
     "compounding_pharmacy": [
         '"{peptide}" compounding pharmacy USA',

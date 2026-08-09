@@ -18,7 +18,14 @@ import requests
 from bs4 import BeautifulSoup
 
 import config
-from scraper.classify import classify_company_type, contains_any_keyword, guess_us_presence
+from scraper.classify import (
+    classify_company_type,
+    contains_any_keyword,
+    guess_us_presence,
+    is_content_site,
+    manufactures,
+    sells_direct,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +70,9 @@ class SiteData:
     description: Optional[str] = None
     research_only_evidence: Optional[str] = None
     company_type: Optional[str] = None
+    sells_direct: bool = False
+    manufactures: bool = False
+    is_content_site: bool = False
     us_based: bool = False
     state: Optional[str] = None
     pages_checked: List[str] = field(default_factory=list)
@@ -190,6 +200,10 @@ def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> S
     is_us, state = guess_us_presence(full_text)
     data.us_based = is_us
     data.state = state
+
+    data.sells_direct = sells_direct(full_text)
+    data.manufactures = manufactures(full_text)
+    data.is_content_site = is_content_site(full_text)
 
     if peptide_keywords and contains_any_keyword(full_text, peptide_keywords):
         data.company_type = classify_company_type(full_text, data.research_only_evidence)

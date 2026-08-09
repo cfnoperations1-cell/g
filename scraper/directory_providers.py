@@ -36,7 +36,7 @@ class GooglePlacesProvider:
     DETAILS_ENDPOINT = "https://maps.googleapis.com/maps/api/place/details/json"
 
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or config.GOOGLE_PLACES_API_KEY
+        self.api_key = config.GOOGLE_PLACES_API_KEY if api_key is None else api_key
 
     def is_configured(self) -> bool:
         return bool(self.api_key)

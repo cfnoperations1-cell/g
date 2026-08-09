@@ -36,6 +36,8 @@ class Lead(Base):
     matched_query = Column(String(255), nullable=True)
     research_only_evidence = Column(Text, nullable=True)
     company_type = Column(String(50), nullable=True)
+    sells_direct = Column(Boolean, nullable=False, default=False)
+    manufactures = Column(Boolean, nullable=False, default=False)
     us_based = Column(Boolean, nullable=False, default=False)
     state = Column(String(50), nullable=True)
     status = Column(String(50), nullable=False, default=LeadStatus.NEW.value)

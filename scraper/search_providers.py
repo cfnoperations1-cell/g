@@ -38,8 +38,8 @@ class GoogleCustomSearchProvider:
     ENDPOINT = "https://www.googleapis.com/customsearch/v1"
 
     def __init__(self, api_key: Optional[str] = None, cx: Optional[str] = None):
-        self.api_key = api_key or config.GOOGLE_CSE_API_KEY
-        self.cx = cx or config.GOOGLE_CSE_CX
+        self.api_key = config.GOOGLE_CSE_API_KEY if api_key is None else api_key
+        self.cx = config.GOOGLE_CSE_CX if cx is None else cx
 
     def is_configured(self) -> bool:
         return bool(self.api_key and self.cx)
@@ -85,7 +85,7 @@ class BingSearchProvider:
     ENDPOINT = "https://api.bing.microsoft.com/v7.0/search"
 
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or config.BING_SEARCH_API_KEY
+        self.api_key = config.BING_SEARCH_API_KEY if api_key is None else api_key
 
     def is_configured(self) -> bool:
         return bool(self.api_key)
@@ -118,7 +118,7 @@ class SerperProvider:
     ENDPOINT = "https://google.serper.dev/search"
 
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or config.SERPER_API_KEY
+        self.api_key = config.SERPER_API_KEY if api_key is None else api_key
 
     def is_configured(self) -> bool:
         return bool(self.api_key)
@@ -149,7 +149,7 @@ class BraveSearchProvider:
     ENDPOINT = "https://api.search.brave.com/res/v1/web/search"
 
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or config.BRAVE_SEARCH_API_KEY
+        self.api_key = config.BRAVE_SEARCH_API_KEY if api_key is None else api_key
 
     def is_configured(self) -> bool:
         return bool(self.api_key)

@@ -1,4 +1,11 @@
-from scraper.classify import classify_company_type, contains_any_keyword, guess_us_presence
+from scraper.classify import (
+    classify_company_type,
+    contains_any_keyword,
+    guess_us_presence,
+    is_content_site,
+    manufactures,
+    sells_direct,
+)
 
 KEYWORDS = ["BPC-157", "NAD+"]
 
@@ -65,3 +72,28 @@ def test_classify_ignores_negated_compounding_disclaimer():
 def test_classify_ignores_negated_manufacturing_disclaimer():
     text = "This site is not a gmp facility and does not manufacture peptides."
     assert classify_company_type(text, research_only_evidence=None) == "consumer_and_research"
+
+
+def test_sells_direct_detects_storefront():
+    assert sells_direct("Add to cart. In stock. Free shipping on orders over $100.")
+
+
+def test_sells_direct_false_for_info_page():
+    assert not sells_direct("This article explains what BPC-157 is and how it works.")
+
+
+def test_manufactures_detects_own_synthesis():
+    assert manufactures("All peptides are synthesized in our cGMP facility.")
+
+
+def test_manufactures_false_when_negated():
+    assert not manufactures("We are not a gmp facility and do not manufacture.")
+
+
+def test_is_content_site_detects_affiliate_review():
+    text = "We may earn a commission. Our editorial team fact-checked this buying guide."
+    assert is_content_site(text)
+
+
+def test_is_content_site_false_for_store():
+    assert not is_content_site("Add to cart. Shop our peptides. In stock now.")
