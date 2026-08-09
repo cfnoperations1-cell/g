@@ -42,6 +42,14 @@ CANDIDATE_PATHS = ["", "/about", "/about-us", "/contact", "/contact-us"]
 
 GENERIC_EMAIL_PREFIXES = {"privacy", "abuse", "webmaster", "postmaster", "noreply", "no-reply"}
 
+# Domains belonging to site builders/templates and error trackers rather than
+# the company itself -- these show up as unfilled placeholders in page source.
+PLACEHOLDER_EMAIL_DOMAINS = {
+    "mysite.com", "example.com", "example.org", "domain.com", "yourdomain.com",
+    "yoursite.com", "email.com", "sentry.io", "wixpress.com", "shopify.com",
+    "godaddy.com", "squarespace.com", "test.com",
+}
+
 _robots_cache: dict = {}
 
 
@@ -92,8 +100,22 @@ def _fetch(url: str) -> Optional[str]:
         return None
 
 
+def is_usable_email(email: str) -> bool:
+    """Reject addresses that aren't a real, company-owned contact: generic
+    role accounts, site-builder placeholders, and unfilled template tokens
+    (e.g. a mailto of "[email]", which arrives percent-encoded)."""
+    if "%" in email:
+        return False
+    local, _, domain = email.partition("@")
+    if local.lower() in GENERIC_EMAIL_PREFIXES:
+        return False
+    if domain.lower() in PLACEHOLDER_EMAIL_DOMAINS:
+        return False
+    return True
+
+
 def _extract_email(text: str) -> Optional[str]:
-    candidates = [e for e in EMAIL_RE.findall(text) if e.split("@")[0].lower() not in GENERIC_EMAIL_PREFIXES]
+    candidates = [e for e in EMAIL_RE.findall(text) if is_usable_email(e)]
     if not candidates:
         return None
     candidates.sort(key=lambda e: (0 if any(k in e.lower() for k in ("sales", "info", "contact")) else 1, len(e)))
@@ -151,7 +173,7 @@ def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> S
                 if a["href"].lower().startswith("mailto:")
             ]
             for candidate in mailto_candidates:
-                if candidate.split("@")[0].lower() not in GENERIC_EMAIL_PREFIXES:
+                if is_usable_email(candidate):
                     data.email = candidate
                     break
             if data.email is None:

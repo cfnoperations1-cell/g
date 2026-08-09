@@ -1,0 +1,19 @@
+# Seed URLs: known US peptide companies to run the pipeline against directly,
+# bypassing search-API discovery. Add/remove freely -- one URL per line.
+# Run with: python -m scraper.agent --seed-urls-file scraper/seed_urls.txt
+https://biolongevitylabs.com/
+https://purehealthpeptides.com/
+https://royal-peptides.com/
+https://www.americanpeptides.us/
+https://simplepeptide.com/
+https://www.realpeptides.co/
+https://ionpeptide.com/
+https://www.nationwidepeptides.com/
+https://adaptpeptides.com/
+https://pspeptides.com/
+https://palmettopeptides.com/
+https://onyxbiolabs.com/
+https://alphacarbonlabs.com/
+https://nurevpeptides.com/
+https://limitlesslifenootropics.com/
+https://xenopeptides.com/

@@ -1,4 +1,4 @@
-from scraper.site_parser import _extract_email, find_research_only_evidence, get_domain
+from scraper.site_parser import _extract_email, find_research_only_evidence, get_domain, is_usable_email
 
 
 def test_get_domain_strips_www():
@@ -22,14 +22,32 @@ def test_find_research_only_evidence_missing():
 
 
 def test_extract_email_prefers_sales_or_info():
-    html = "Contact privacy@example.com or sales@example.com for questions."
-    assert _extract_email(html) == "sales@example.com"
+    html = "Contact privacy@acmepeptides.com or sales@acmepeptides.com for questions."
+    assert _extract_email(html) == "sales@acmepeptides.com"
 
 
 def test_extract_email_ignores_generic_only():
-    html = "Reach out to webmaster@example.com"
+    html = "Reach out to webmaster@acmepeptides.com"
     assert _extract_email(html) is None
 
 
 def test_extract_email_no_matches():
     assert _extract_email("No contact info here.") is None
+
+
+def test_is_usable_email_rejects_percent_encoded_template_token():
+    # Seen in the wild: a mailto of "[email]" left unfilled by a template.
+    assert not is_usable_email("%5Bemail%5D@example")
+
+
+def test_is_usable_email_rejects_site_builder_placeholder():
+    assert not is_usable_email("contact@mysite.com")
+
+
+def test_is_usable_email_accepts_real_company_address():
+    assert is_usable_email("support@americanpeptides.us")
+
+
+def test_extract_email_skips_placeholders_for_real_address():
+    html = "Email contact@mysite.com or support@realcompany.com today."
+    assert _extract_email(html) == "support@realcompany.com"
