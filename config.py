@@ -41,6 +41,17 @@ UNSUBSCRIBE_LINE = os.environ.get(
     "Don't want to hear from us again? Reply with \"unsubscribe\" and we'll remove you.",
 )
 
+# Reply detection reads the inbox over IMAP (read-only) so the follow-up
+# cadence can stop once a company answers.
+IMAP_HOST = os.environ.get("IMAP_HOST", "")
+IMAP_PORT = int(os.environ.get("IMAP_PORT", "993"))
+IMAP_USERNAME = os.environ.get("IMAP_USERNAME", "")
+IMAP_PASSWORD = os.environ.get("IMAP_PASSWORD", "")
+IMAP_FOLDER = os.environ.get("IMAP_FOLDER", "INBOX")
+
+FOLLOWUP_INTERVAL_DAYS = int(os.environ.get("FOLLOWUP_INTERVAL_DAYS", "3"))
+MAX_FOLLOWUPS = int(os.environ.get("MAX_FOLLOWUPS", "4"))
+
 SMTP_HOST = os.environ.get("SMTP_HOST", "")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USERNAME = os.environ.get("SMTP_USERNAME", "")

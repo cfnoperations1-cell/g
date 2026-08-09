@@ -16,6 +16,8 @@
         {{ o.delivery }} to {{ o.to_email }} on {{ o.created_at.strftime("%Y-%m-%d") if o.created_at else "" }}
         {% if o.error %}<br><span style="color:#b45309">{{ o.error }}</span>{% endif %}<br>
       {% endfor %}
+      {% if lead.replied_at %}<strong>replied {{ lead.replied_at.strftime("%Y-%m-%d") }} - follow-ups stopped</strong>
+      {% elif lead.opted_out %}<strong>opted out - follow-ups stopped</strong>{% endif %}
     {% else %}not contacted yet{% endif %}
   </dd>
 </dl>
@@ -34,6 +36,10 @@
       <option value="{{ company_type }}" {{ "selected" if lead.company_type == company_type else "" }}>{{ company_type.replace('_', ' ') }}</option>
       {% endfor %}
     </select>
+  </label>
+  <label style="display:flex;align-items:center;gap:.4rem">
+    <input type="checkbox" name="opted_out" {{ "checked" if lead.opted_out else "" }} style="width:auto">
+    Opted out (never contact again)
   </label>
   <label>Notes
     <textarea name="notes" rows="4">{{ lead.notes or "" }}</textarea>

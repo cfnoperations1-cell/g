@@ -1,9 +1,14 @@
 """Outreach agent: emails peptide vendor leads the scraper agent found.
 
-Reads leads from the shared CRM database, writes one message per lead, and
-records it in the outreach table so nobody is ever contacted twice -- which
-matters because the scraper keeps adding vendors and this runs behind it on
-a schedule.
+Reads leads from the shared CRM database and works a follow-up cadence: an
+intro message, then a follow-up every few days until the company replies.
+Every message is recorded, so running this on a schedule behind a scraper
+that keeps adding vendors only ever sends what is actually due.
+
+The sequence stops for a lead as soon as any of these is true:
+  * a reply is detected (emailer.replies) or their status is set to replied
+  * they ask to opt out (Lead.opted_out)
+  * the follow-up cap is reached (--max-followups, default 4)
 
 Two modes:
   drafts (default) -- writes .eml files to outreach_drafts/ for you to review
@@ -15,6 +20,7 @@ Usage:
     python -m emailer.agent --dry-run              # show who would be contacted
     python -m emailer.agent                        # write drafts to review
     python -m emailer.agent --only-manufacturers   # narrow to labs that synthesize
+    python -m emailer.agent --interval-days 3 --max-followups 4
     python -m emailer.agent --send --i-understand-this-sends-real-email
 """
 from __future__ import annotations
@@ -24,6 +30,7 @@ import logging
 import smtplib
 import sys
 import time
+from datetime import datetime, timedelta
 from email.message import EmailMessage
 from email.utils import formataddr
 from pathlib import Path
@@ -36,7 +43,11 @@ from models import Lead, Outreach
 logger = logging.getLogger(__name__)
 
 DEFAULT_MESSAGE_FILE = Path(__file__).parent / "message.txt"
+DEFAULT_FOLLOWUP_FILE = Path(__file__).parent / "followup.txt"
 DEFAULT_DRAFTS_DIR = Path(config.BASE_DIR) / "outreach_drafts"
+
+# A lead in any of these states is finished -- never contact them again.
+TERMINAL_STATUSES = {"replied", "qualified", "disqualified"}
 
 
 def load_message(path: Path) -> Tuple[str, str]:
@@ -76,16 +87,64 @@ def compliance_problems() -> List[str]:
     return problems
 
 
-def pending_leads(session, only_manufacturers: bool, limit: Optional[int]) -> List[Lead]:
-    """Leads with an email address that we have never written to before."""
-    contacted_ids = {row.lead_id for row in session.query(Outreach.lead_id).distinct()}
+def next_step_for(
+    lead: Lead,
+    history: List[Outreach],
+    interval_days: int,
+    max_followups: int,
+    now: Optional[datetime] = None,
+) -> Optional[int]:
+    """Which message this lead is due for, or None if nothing is due.
 
+    Returns 1 for a first contact, 2+ for follow-ups. A lead is due once
+    `interval_days` have passed since the last message. The sequence stops
+    as soon as they reply, opt out, or reach the follow-up cap.
+    """
+    now = now or datetime.utcnow()
+
+    if lead.replied_at is not None or lead.opted_out:
+        return None
+    if (lead.status or "").lower() in TERMINAL_STATUSES:
+        return None
+
+    delivered = sorted(
+        [row for row in history if row.delivery != "failed"],
+        key=lambda row: row.created_at or datetime.min,
+    )
+    if not delivered:
+        return 1
+
+    if len(delivered) >= max_followups + 1:
+        return None
+
+    last = delivered[-1]
+    last_at = last.created_at or datetime.min
+    if now - last_at < timedelta(days=interval_days):
+        return None
+
+    return len(delivered) + 1
+
+
+def plan_outreach(
+    session,
+    only_manufacturers: bool,
+    limit: Optional[int],
+    interval_days: int,
+    max_followups: int,
+    now: Optional[datetime] = None,
+) -> List[Tuple[Lead, int]]:
+    """(lead, step) pairs that are due for a message right now."""
     query = session.query(Lead).filter(Lead.email.isnot(None), Lead.email != "")
     if only_manufacturers:
         query = query.filter(Lead.manufactures.is_(True))
 
-    leads = [lead for lead in query.order_by(Lead.created_at) if lead.id not in contacted_ids]
-    return leads[:limit] if limit is not None else leads
+    due: List[Tuple[Lead, int]] = []
+    for lead in query.order_by(Lead.created_at):
+        step = next_step_for(lead, list(lead.outreach), interval_days, max_followups, now)
+        if step is not None:
+            due.append((lead, step))
+
+    return due[:limit] if limit is not None else due
 
 
 def build_email(lead: Lead, subject: str, body: str) -> EmailMessage:
@@ -99,9 +158,9 @@ def build_email(lead: Lead, subject: str, body: str) -> EmailMessage:
     return msg
 
 
-def write_draft(msg: EmailMessage, lead: Lead, drafts_dir: Path) -> Path:
+def write_draft(msg: EmailMessage, lead: Lead, drafts_dir: Path, step: int = 1) -> Path:
     drafts_dir.mkdir(parents=True, exist_ok=True)
-    path = drafts_dir / f"{lead.id:04d}-{lead.domain.replace('.', '_')}.eml"
+    path = drafts_dir / f"{lead.id:04d}-step{step}-{lead.domain.replace('.', '_')}.eml"
     path.write_bytes(bytes(msg))
     return path
 
@@ -123,10 +182,17 @@ def run(
     limit: Optional[int],
     send: bool,
     dry_run: bool,
+    followup_file: Path = DEFAULT_FOLLOWUP_FILE,
+    interval_days: int = 3,
+    max_followups: int = 4,
 ) -> dict:
     init_db()
-    subject, raw_body = load_message(message_file)
-    body = render(raw_body)
+    first_subject, first_body = load_message(message_file)
+    follow_subject, follow_body = load_message(followup_file)
+    rendered = {
+        1: (first_subject, render(first_body)),
+        2: (follow_subject, render(follow_body)),
+    }
 
     problems = compliance_problems()
     if problems:
@@ -136,21 +202,23 @@ def run(
             sys.exit("Refusing to send with the settings above unfilled. Fix them in .env first.")
 
     session = SessionLocal()
-    stats = {"prepared": 0, "sent": 0, "drafted": 0, "failed": 0, "skipped_already_contacted": 0}
+    stats = {"prepared": 0, "first_contact": 0, "followups": 0, "sent": 0, "drafted": 0, "failed": 0}
 
     try:
-        leads = pending_leads(session, only_manufacturers, limit)
-        total_with_email = session.query(Lead).filter(Lead.email.isnot(None), Lead.email != "").count()
-        stats["skipped_already_contacted"] = total_with_email - len(leads)
-
+        due = plan_outreach(session, only_manufacturers, limit, interval_days, max_followups)
+        contactable = session.query(Lead).filter(Lead.email.isnot(None), Lead.email != "").count()
         logger.info(
-            "%d leads to contact (%d already contacted, skipped)",
-            len(leads), stats["skipped_already_contacted"],
+            "%d of %d contactable leads are due now (every %d days, %d follow-ups max)",
+            len(due), contactable, interval_days, max_followups,
         )
 
-        for lead in leads:
+        for lead, step in due:
+            # Step 1 uses the intro; every later step uses the follow-up copy.
+            subject, body = rendered[1] if step == 1 else rendered[2]
+            label = "first" if step == 1 else f"follow-up #{step - 1}"
+
             if dry_run:
-                logger.info("[dry-run] would email %s <%s>", lead.company_name, lead.email)
+                logger.info("[dry-run] %-12s -> %s <%s>", label, lead.company_name, lead.email)
                 stats["prepared"] += 1
                 continue
 
@@ -161,21 +229,22 @@ def run(
                     send_via_smtp(msg)
                     delivery, error = "sent", None
                     stats["sent"] += 1
-                    logger.info("sent -> %s <%s>", lead.company_name, lead.email)
+                    logger.info("sent   %-12s -> %s <%s>", label, lead.company_name, lead.email)
                 except Exception as exc:  # keep going; record why this one failed
                     delivery, error = "failed", str(exc)
                     stats["failed"] += 1
-                    logger.error("FAILED -> %s <%s>: %s", lead.company_name, lead.email, exc)
+                    logger.error("FAILED %-12s -> %s <%s>: %s", label, lead.company_name, lead.email, exc)
             else:
-                path = write_draft(msg, lead, drafts_dir)
+                path = write_draft(msg, lead, drafts_dir, step)
                 delivery, error = "drafted", None
                 stats["drafted"] += 1
-                logger.info("draft  -> %s <%s>  (%s)", lead.company_name, lead.email, path.name)
+                logger.info("draft  %-12s -> %s <%s>  (%s)", label, lead.company_name, lead.email, path.name)
 
             session.add(
                 Outreach(
                     lead_id=lead.id,
                     to_email=lead.email,
+                    step=step,
                     subject=subject,
                     body=body,
                     delivery=delivery,
@@ -184,6 +253,7 @@ def run(
             )
             if delivery != "failed":
                 lead.status = "contacted"
+                stats["first_contact" if step == 1 else "followups"] += 1
             session.commit()
             stats["prepared"] += 1
 
@@ -204,6 +274,15 @@ def main() -> None:
     parser.add_argument("--message-file", type=Path, default=DEFAULT_MESSAGE_FILE)
     parser.add_argument("--drafts-dir", type=Path, default=DEFAULT_DRAFTS_DIR)
     parser.add_argument("--only-manufacturers", action="store_true", help="Only leads that synthesize their own product")
+    parser.add_argument("--followup-file", type=Path, default=DEFAULT_FOLLOWUP_FILE)
+    parser.add_argument(
+        "--interval-days", type=int, default=3,
+        help="Days to wait before each follow-up (default 3)",
+    )
+    parser.add_argument(
+        "--max-followups", type=int, default=4,
+        help="Follow-ups after the first email before giving up (default 4)",
+    )
     parser.add_argument("--limit", type=int, default=None, help="Cap how many leads to contact this run")
     parser.add_argument("--send", action="store_true", help="Actually deliver over SMTP instead of writing drafts")
     parser.add_argument(
@@ -234,6 +313,9 @@ def main() -> None:
         limit=args.limit,
         send=args.send,
         dry_run=args.dry_run,
+        followup_file=args.followup_file,
+        interval_days=args.interval_days,
+        max_followups=args.max_followups,
     )
 
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 from db import SessionLocal
@@ -50,6 +52,11 @@ def lead_detail(lead_id):
             lead.status = request.form.get("status", lead.status)
             lead.company_type = request.form.get("company_type") or None
             lead.notes = request.form.get("notes", lead.notes)
+            lead.opted_out = request.form.get("opted_out") == "on"
+            # Marking a lead replied here is what stops their follow-ups when
+            # IMAP reply detection isn't configured.
+            if lead.status == "replied" and lead.replied_at is None:
+                lead.replied_at = datetime.utcnow()
             session.commit()
             return redirect(url_for("leads.lead_detail", lead_id=lead_id))
 

@@ -42,6 +42,10 @@ class Lead(Base):
     us_based = Column(Boolean, nullable=False, default=False)
     state = Column(String(50), nullable=True)
     status = Column(String(50), nullable=False, default=LeadStatus.NEW.value)
+    # Set when a reply is detected (or marked by hand). Stops the follow-up
+    # sequence -- the whole point of the cadence is to stop once they answer.
+    replied_at = Column(DateTime, nullable=True)
+    opted_out = Column(Boolean, nullable=False, default=False)
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -62,6 +66,8 @@ class Outreach(Base):
     id = Column(Integer, primary_key=True)
     lead_id = Column(Integer, ForeignKey("leads.id"), nullable=False, index=True)
     to_email = Column(String(255), nullable=False)
+    # 1 = first contact, 2+ = follow-ups in the cadence.
+    step = Column(Integer, nullable=False, default=1)
     subject = Column(String(500), nullable=False)
     body = Column(Text, nullable=False)
     # "drafted" = written to disk for review; "sent" = handed to an SMTP server.
