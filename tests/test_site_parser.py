@@ -1,4 +1,10 @@
-from scraper.site_parser import _extract_email, find_research_only_evidence, get_domain, is_usable_email
+from scraper.site_parser import (
+    _extract_email,
+    find_research_only_evidence,
+    get_domain,
+    is_usable_email,
+    pick_best_email,
+)
 
 
 def test_get_domain_strips_www():
@@ -51,3 +57,22 @@ def test_is_usable_email_accepts_real_company_address():
 def test_extract_email_skips_placeholders_for_real_address():
     html = "Email contact@mysite.com or support@realcompany.com today."
     assert _extract_email(html) == "support@realcompany.com"
+
+
+def test_pick_best_email_prefers_company_domain():
+    got = pick_best_email(["someone@gmail.com", "sales@acmepeptides.com"], "acmepeptides.com")
+    assert got == "sales@acmepeptides.com"
+
+
+def test_pick_best_email_drops_trailing_typo_variant():
+    # A page containing both a valid address and a markup-mangled variant.
+    got = pick_best_email(["hello@acmepeptides.come", "hello@acmepeptides.com"], "acmepeptides.com")
+    assert got == "hello@acmepeptides.com"
+
+
+def test_pick_best_email_strips_whitespace():
+    assert pick_best_email(["  support@acmepeptides.com "], "acmepeptides.com") == "support@acmepeptides.com"
+
+
+def test_pick_best_email_none_when_all_placeholders():
+    assert pick_best_email(["contact@mysite.com", "noreply@acme.com"], "acme.com") is None

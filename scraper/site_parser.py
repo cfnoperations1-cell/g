@@ -124,12 +124,32 @@ def is_usable_email(email: str) -> bool:
     return True
 
 
-def _extract_email(text: str) -> Optional[str]:
-    candidates = [e for e in EMAIL_RE.findall(text) if is_usable_email(e)]
-    if not candidates:
+ROLE_EMAIL_KEYWORDS = ("sales", "info", "contact", "support", "orders", "hello")
+
+
+def pick_best_email(candidates: List[str], site_domain: Optional[str] = None) -> Optional[str]:
+    """Choose the most likely real contact address.
+
+    Prefers an address on the company's own domain, then a role account
+    (sales@/info@/...), then the shortest -- the length tiebreak catches
+    markup typos where a stray character trails a valid address, e.g. both
+    "hello@acme.com" and "hello@acme.come" being present in the page.
+    """
+    usable = [e.strip() for e in candidates if is_usable_email(e.strip())]
+    if not usable:
         return None
-    candidates.sort(key=lambda e: (0 if any(k in e.lower() for k in ("sales", "info", "contact")) else 1, len(e)))
-    return candidates[0]
+
+    def rank(email: str):
+        domain = email.partition("@")[2].lower()
+        on_site_domain = 0 if (site_domain and domain == site_domain.lower()) else 1
+        is_role = 0 if any(k in email.lower() for k in ROLE_EMAIL_KEYWORDS) else 1
+        return (on_site_domain, is_role, len(email))
+
+    return sorted(usable, key=rank)[0]
+
+
+def _extract_email(text: str, site_domain: Optional[str] = None) -> Optional[str]:
+    return pick_best_email(EMAIL_RE.findall(text), site_domain)
 
 
 def find_research_only_evidence(text: str) -> Optional[str]:
@@ -182,12 +202,7 @@ def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> S
                 for a in soup.find_all("a", href=True)
                 if a["href"].lower().startswith("mailto:")
             ]
-            for candidate in mailto_candidates:
-                if is_usable_email(candidate):
-                    data.email = candidate
-                    break
-            if data.email is None:
-                data.email = _extract_email(html)
+            data.email = pick_best_email(mailto_candidates, domain) or _extract_email(html, domain)
 
         if data.phone is None:
             phone_match = PHONE_RE.search(text)
