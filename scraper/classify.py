@@ -65,14 +65,36 @@ def contains_any_keyword(text: str, keywords: List[str]) -> bool:
     return any(keyword.lower() in lowered for keyword in keywords)
 
 
+_NEGATION_WINDOW = 25
+_NEGATION_RE = re.compile(r"\b(not|isn't|aren't|never|no longer|n't)\b")
+
+
+def _has_unnegated_signal(lowered_text: str, signals: List[str]) -> bool:
+    """True if any signal phrase appears without a negation word (not,
+    isn't, never, ...) shortly before it -- companies commonly write
+    "we are NOT a compounding pharmacy" as a legal disclaimer, and a plain
+    substring match would otherwise misread that as a positive signal."""
+    for signal in signals:
+        start = 0
+        while True:
+            idx = lowered_text.find(signal, start)
+            if idx == -1:
+                break
+            window = lowered_text[max(0, idx - _NEGATION_WINDOW):idx]
+            if not _NEGATION_RE.search(window):
+                return True
+            start = idx + 1
+    return False
+
+
 def classify_company_type(text: str, research_only_evidence: Optional[str]) -> str:
     """Classify a peptide-relevant site into one of the four target
     categories. Assumes the caller has already confirmed peptide relevance
     (e.g. via contains_any_keyword) before calling this."""
     lowered = text.lower()
-    if any(signal in lowered for signal in COMPOUNDING_SIGNALS):
+    if _has_unnegated_signal(lowered, COMPOUNDING_SIGNALS):
         return "compounding_pharmacy"
-    if any(signal in lowered for signal in MANUFACTURING_SIGNALS):
+    if _has_unnegated_signal(lowered, MANUFACTURING_SIGNALS):
         return "manufacturing_lab"
     if research_only_evidence:
         return "research_only"

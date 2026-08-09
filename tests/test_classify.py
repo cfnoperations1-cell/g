@@ -53,3 +53,15 @@ def test_classify_research_only():
 def test_classify_defaults_to_consumer_and_research():
     text = "Shop our best-selling peptides, ships same day."
     assert classify_company_type(text, research_only_evidence=None) == "consumer_and_research"
+
+
+def test_classify_ignores_negated_compounding_disclaimer():
+    # Real disclaimer text seen in the wild: a supplier explicitly denying
+    # being a compounding pharmacy shouldn't be classified as one.
+    text = "We are a chemical supplier. We are not a compounding pharmacy or chemical compounding facility."
+    assert classify_company_type(text, research_only_evidence="for research use only") == "research_only"
+
+
+def test_classify_ignores_negated_manufacturing_disclaimer():
+    text = "This site is not a gmp facility and does not manufacture peptides."
+    assert classify_company_type(text, research_only_evidence=None) == "consumer_and_research"

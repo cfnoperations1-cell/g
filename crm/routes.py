@@ -48,11 +48,14 @@ def lead_detail(lead_id):
 
         if request.method == "POST":
             lead.status = request.form.get("status", lead.status)
+            lead.company_type = request.form.get("company_type") or None
             lead.notes = request.form.get("notes", lead.notes)
             session.commit()
             return redirect(url_for("leads.lead_detail", lead_id=lead_id))
 
-        return render_template("lead_detail.html", lead=lead, status_choices=STATUS_CHOICES)
+        return render_template(
+            "lead_detail.html", lead=lead, status_choices=STATUS_CHOICES, type_choices=COMPANY_TYPE_CHOICES
+        )
     finally:
         session.close()
 

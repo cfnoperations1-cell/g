@@ -4,7 +4,6 @@
 <h2>{{ lead.company_name }}</h2>
 <p><a href="{{ lead.website }}" target="_blank" rel="noopener">{{ lead.website }}</a></p>
 <dl>
-  <dt>Company type</dt><dd>{{ (lead.company_type or "—").replace('_', ' ') }}</dd>
   <dt>US-based</dt><dd>{{ "Yes" if lead.us_based else "Unclear/No" }}{{ " (" + lead.state + ")" if lead.state else "" }}</dd>
   <dt>Email</dt><dd>{{ lead.email or "—" }}</dd>
   <dt>Phone</dt><dd>{{ lead.phone or "—" }}</dd>
@@ -17,6 +16,14 @@
     <select name="status">
       {% for status in status_choices %}
       <option value="{{ status }}" {{ "selected" if lead.status == status else "" }}>{{ status }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Company type (auto-classified from the site's own text -- correct it here if it's off)
+    <select name="company_type">
+      <option value="" {{ "selected" if not lead.company_type else "" }}>unclassified</option>
+      {% for company_type in type_choices %}
+      <option value="{{ company_type }}" {{ "selected" if lead.company_type == company_type else "" }}>{{ company_type.replace('_', ' ') }}</option>
       {% endfor %}
     </select>
   </label>
