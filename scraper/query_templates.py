@@ -11,6 +11,11 @@ QUERY_TEMPLATES = {
         '"{peptide}" research chemicals supplier "not for human consumption"',
         '"{peptide}" "research use only" "add to cart" -reddit -forum',
         'buy "{peptide}" research peptide "COA" third party tested USA',
+        # product-page and platform-footprint angles surface storefronts the
+        # generic queries miss (Shopify/WooCommerce shops, direct product URLs)
+        '"{peptide}" inurl:product research peptide',
+        '"{peptide}" research peptide "cart" "checkout" -amazon -ebay',
+        '"{peptide}" peptide vial "certificate of analysis" buy',
     ],
     "consumer_and_research": [
         'buy "{peptide}" peptides online USA',
