@@ -1,15 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <p><a href="{{ url_for('leads.list_leads') }}">&larr; Back to all leads</a></p>
-<h2>{{ lead.company_name }}</h2>
+<h2>{{ lead.company_name }} <small style="font-weight:normal;color:#6b7280">({{ lead.kind or "vendor" }})</small></h2>
 <p><a href="{{ lead.website }}" target="_blank" rel="noopener">{{ lead.website }}</a></p>
 <dl>
   <dt>US-based</dt><dd>{{ "Yes" if lead.us_based else "Unclear/No" }}{{ " (" + lead.state + ")" if lead.state else "" }}</dd>
+  {% if is_clinic %}
+  <dt>City</dt><dd>{{ lead.city or "—" }}</dd>
+  <dt>Clinic type</dt><dd>{{ (lead.clinic_type or "—").replace('_', ' ') }}</dd>
+  <dt>Delivery</dt><dd>{{ "Telehealth" if lead.telehealth else "In-person" }}</dd>
+  <dt>Peptides named on site</dt><dd>{{ lead.peptides_offered or "—" }}</dd>
+  {% endif %}
   <dt>Email</dt><dd>{{ lead.email or "—" }}</dd>
   <dt>Phone</dt><dd>{{ lead.phone or "—" }}</dd>
   <dt>Description</dt><dd>{{ lead.description or "—" }}</dd>
   <dt>Source</dt><dd>{{ lead.source }} (query: {{ lead.matched_query or "—" }})</dd>
-  <dt>"Research use only" evidence</dt><dd>{{ lead.research_only_evidence or "—" }}</dd>
+  <dt>{{ "Peptide-therapy evidence" if is_clinic else '"Research use only" evidence' }}</dt><dd>{{ lead.research_only_evidence or "—" }}</dd>
   <dt>Outreach</dt><dd>
     {% if lead.outreach %}
       {% for o in lead.outreach %}
@@ -29,11 +35,11 @@
       {% endfor %}
     </select>
   </label>
-  <label>Company type (auto-classified from the site's own text -- correct it here if it's off)
-    <select name="company_type">
-      <option value="" {{ "selected" if not lead.company_type else "" }}>unclassified</option>
-      {% for company_type in type_choices %}
-      <option value="{{ company_type }}" {{ "selected" if lead.company_type == company_type else "" }}>{{ company_type.replace('_', ' ') }}</option>
+  <label>{{ "Clinic type" if is_clinic else "Company type" }} (auto-classified from the site's own text -- correct it here if it's off)
+    <select name="lead_type">
+      <option value="" {{ "selected" if not current_type else "" }}>unclassified</option>
+      {% for lead_type in type_choices %}
+      <option value="{{ lead_type }}" {{ "selected" if current_type == lead_type else "" }}>{{ lead_type.replace('_', ' ') }}</option>
       {% endfor %}
     </select>
   </label>

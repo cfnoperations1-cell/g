@@ -115,3 +115,26 @@ def test_parse_site_refuses_non_public_host():
     data = parse_site("http://169.254.169.254/latest/meta-data/")
     assert data.pages_checked == []
     assert data.email is None
+
+
+def test_asset_filenames_are_not_emails():
+    """Retina image filenames match the email regex exactly, and one reached
+    a real lead as its contact address."""
+    from scraper.site_parser import is_usable_email, pick_best_email
+
+    assert not is_usable_email("USA-Map@2x-100.jpg")
+    assert not is_usable_email("logo@2x.png")
+    assert pick_best_email(["USA-Map@2x-100.jpg", "info@clinic.com"]) == "info@clinic.com"
+    assert pick_best_email(["hero@2x.webp"]) is None
+
+
+def test_placeholder_domains_match_subdomains_too():
+    """A Sentry DSN on a subdomain of a known placeholder host reached a real
+    lead as its contact address."""
+    from scraper.site_parser import is_usable_email
+
+    assert not is_usable_email("dd0a55ccb8124b9c9d938e3acf41f8aa@sentry.wixpress.com")
+    assert not is_usable_email("info@uhh.ybs.mybluehost.me")
+    assert not is_usable_email("hello@wixpress.com")
+    # A real clinic domain that merely ends with similar letters is fine.
+    assert is_usable_email("info@notwixpress.com")

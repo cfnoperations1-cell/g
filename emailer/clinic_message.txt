@@ -1,0 +1,28 @@
+Subject: US-made peptide supply for your clinic
+
+Hello, nice to meet you.
+
+My name is Jonathan Cole with Stratos Peptides. We run 4 labs here in the US
+with green-list API, all verified, and we supply clinics and practices that
+offer peptide therapy to their patients.
+
+The reason I'm reaching out: I saw your practice offers peptides, and most
+clinics we talk to are getting their material through channels that trace
+back overseas. We can supply you here in the US, with documentation on every
+lot, at prices comparable to what you're paying now.
+
+Happy to send over our current list, COAs, and pricing -- or if it's easier,
+do you have five minutes to talk this week?
+
+I'm a real person, too -- I'm not a bot, and I'm not on WhatsApp. Just
+Jonathan Cole, here in Las Vegas, lol.
+
+Thanks,
+Jonathan Cole
+Stratos Peptides
+{sender_email}
+
+--
+{sender_company}
+{sender_postal_address}
+{unsubscribe_line}

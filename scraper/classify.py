@@ -28,6 +28,26 @@ US_STATE_NAMES = [
 ]
 
 _STATE_ABBR_RE = re.compile(r"\b(" + "|".join(sorted(US_STATE_ABBREVIATIONS)) + r")\b")
+
+# Abbreviations are resolved to full names before being stored, so the CRM
+# doesn't end up filtering "TX" and "Texas" as two different places.
+_ABBR_TO_NAME = {
+    "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas",
+    "CA": "California", "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware",
+    "FL": "Florida", "GA": "Georgia", "HI": "Hawaii", "ID": "Idaho",
+    "IL": "Illinois", "IN": "Indiana", "IA": "Iowa", "KS": "Kansas",
+    "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+    "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota",
+    "MS": "Mississippi", "MO": "Missouri", "MT": "Montana", "NE": "Nebraska",
+    "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+    "NM": "New Mexico", "NY": "New York", "NC": "North Carolina",
+    "ND": "North Dakota", "OH": "Ohio", "OK": "Oklahoma", "OR": "Oregon",
+    "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+    "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah",
+    "VT": "Vermont", "VA": "Virginia", "WA": "Washington",
+    "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming",
+    "DC": "District of Columbia",
+}
 _STATE_NAME_RE = re.compile("|".join(re.escape(n) for n in US_STATE_NAMES), re.IGNORECASE)
 _US_ZIP_RE = re.compile(r"\b\d{5}(-\d{4})?\b")
 _US_MENTION_RE = re.compile(r"\b(United States|U\.S\.A?\.?|USA)\b", re.IGNORECASE)
@@ -66,14 +86,40 @@ CONTENT_SITE_SIGNALS = [
 def guess_us_presence(text: str) -> Tuple[bool, Optional[str]]:
     """Best-effort guess at whether a site's company is US-based, and which
     state, from mentions of "USA"/state names, or a state abbreviation sitting
-    next to a zip code (to avoid false positives on stray two-letter words)."""
-    state_match = _STATE_NAME_RE.search(text)
-    state = state_match.group(0) if state_match else None
+    next to a zip code (to avoid false positives on stray two-letter words).
+
+    The state is the one mentioned most often, not the first one mentioned:
+    pages routinely name other states in passing (service areas, "we ship to
+    ...", a linked article) before naming their own in the footer address, and
+    taking the first match put an Austin clinic in Colorado.
+    """
+    names = _STATE_NAME_RE.findall(text)
+    state = None
+    if names:
+        counts: dict = {}
+        for name in names:
+            key = name.title()
+            counts[key] = counts.get(key, 0) + 1
+        # dict preserves insertion order, so max() breaks ties toward the
+        # state mentioned earliest -- usually the one in the header address.
+        state = max(counts, key=counts.get)
 
     if not state:
-        abbr_match = _STATE_ABBR_RE.search(text)
-        if abbr_match and _US_ZIP_RE.search(text[abbr_match.end(): abbr_match.end() + 12]):
-            state = abbr_match.group(0)
+        # Every abbreviation on the page, not just the first. search() stopped
+        # at the first \b[A-Z]{2}\b token in the document -- a nav label, "IV",
+        # the "MD" after a doctor's name -- and if that one wasn't followed by
+        # a zip it gave up, never reaching the footer address. That dropped
+        # clinics whose sites write "Austin, TX 78703" rather than "Texas".
+        abbrs = [
+            match.group(0)
+            for match in _STATE_ABBR_RE.finditer(text)
+            if _US_ZIP_RE.search(text[match.end(): match.end() + 12])
+        ]
+        if abbrs:
+            counts = {}
+            for abbr in abbrs:
+                counts[abbr] = counts.get(abbr, 0) + 1
+            state = _ABBR_TO_NAME.get(max(counts, key=counts.get))
 
     is_us = bool(_US_MENTION_RE.search(text)) or state is not None
     return is_us, state

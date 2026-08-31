@@ -1,0 +1,432 @@
+# Candidate US peptide clinics, harvested from live web searches.
+#
+# These are CANDIDATES, not leads. Feed them through the agent and each one
+# is fetched, classified and filtered exactly like a searched result -- a
+# URL here that turns out not to be a peptide-offering US clinic is rejected
+# and never reaches the CRM:
+#
+#     python -m clinics.agent --seed-urls-file clinics/seed_clinics.txt
+#
+# Deep links are kept on purpose: the page a search matched is usually the
+# page that proves the clinic offers peptides, and the agent checks it first.
+# One URL per line, # for comments.
+
+# --- Telehealth / online peptide brands (nationwide) ---
+https://navacenter.com/telehealth-services-at-nava-health/peptide/
+https://multigenwellness.com/peptide-therapy/
+https://tactushealth.com/telehealth/peptides/
+https://purepeptideclinic.com/
+https://precisiontelemed.com/sermorelin/
+https://getheally.com/patients/sermorelin
+https://sermorelin.com/
+https://www.metromedhealth.com/peptides
+
+# --- Austin, TX ---
+https://www.freemanmedicalclinic.com/
+https://www.transformaustinmedspa.com/service/peptides
+https://www.purlifemedical-austin.com/peptide-therapy
+https://www.gracemedspaaustin.com/peptide-therapy
+https://gonstead-atx.com/peptides/
+https://www.savingfaceaustin.com/longevity/peptide-therapy/
+https://ptatx.com/
+https://austinpreferred.com/peptide-therapy-austin-tx/
+
+# --- Miami / South Florida ---
+https://www.perfectb.com/treatment-plans/peptide-treatment-plan/
+https://floridaweightlossmd.com/wellness/peptide-therapy-clinic/orlando/
+https://rewindantiagingmiami.com/services/bpc-157/
+https://miamibariatricplasticsurgery.com/wellness/bpc-157-tb-500-peptide-therapy-miami/
+https://www.southfloridafaceandbody.com/wellness-treatments/peptide-therapy/
+
+# --- Dallas / Fort Worth, TX ---
+https://www.evexias.com/dallas-tx/patients/women/hormone-optimization-therapy/peptide-therapy/
+https://www.jaenixmedspa.com/peptide-therapy-dallas
+https://formulawellness.com/dallas-tx/regenerative-therapy/peptide-therapy/
+https://alphahormones.com/dallas
+https://aspirerejuvenation.com/dallas/peptide-therapy/
+
+# --- Phoenix / Scottsdale, AZ ---
+https://conciergemdla.com/coverage-areas/phoenix/peptide-therapy/
+https://www.onginstitute.com/peptide-therapy/
+https://regenerativeperformance.com/peptide-therapy/
+https://drroznmd.com/scottsdale-naturopathic-services/peptide-therapy-phoenix/
+https://www.azchiroconcierge.com/peptide-therapy
+https://fixmedicalgroup.com/scottsdaleaz/peptide-therapy/
+https://www.besowb.com/services/peptide-therapy/
+
+# --- Denver, CO ---
+https://www.balancedhc.org/peptide-therapy
+https://rockymountainweightlossclinic.com/peptide-therapy/
+https://denverwellnessaesthetic.com/peptide-therapy-denver/
+https://www.vitalogydenver.com/services/peptide-therapy/
+https://gleammedspa.com/services/peptide-therapy-in-denver/
+https://edenhealthclubs.com/functional-medicine/peptide-injections/
+https://www.originalglamdenver.com/wellness/peptide-therapy
+https://ariaintegrativehealth.com/services/peptide-therapy-in-denver/
+
+# --- Los Angeles, CA ---
+https://beverlyhillsconciergedoctor.com/anti-aging-wellness/peptide-therapy/
+https://www.drschwartz.com/non-surgical/wellness/peptides/
+https://regenerativemedicinela.com/treatments/peptide-therapy/
+https://alphamanclinic.com/peptide-therapy-clinic/
+https://thenovuscenter.com/treatments/peptide-therapy
+https://angellongevity.com/treatments-therapies/peptide-therapy/
+https://www.modernwellnessclinic.com/services/peptide-therapy-las-vegas
+https://delphiwellness.clinic/services/peptide-therapy
+
+# --- Telehealth / online brands (batch 2) ---
+https://www.copergrine.com/wellness/peptides
+https://www.houseofpeptidesnyc.com/telehealth
+https://www.wholepathintegrativecare.com/service/peptide-therapy
+https://aspirehealth.care/telehealth/peptide/
+https://beyondmd.com/
+https://tmhealth.us/
+https://nrgclinic.com/
+https://inceptiontelehealth.com/
+https://fyrebody.com/
+https://vikingalternative.com/
+https://gamedaymenshealth.com/
+https://amazing-meds.com/online-trt-clinic/
+https://trtnation.com/
+https://twentymilemedical.com/telehealth/peptide-therapy-longevity/
+https://accschicago.com/peptide-online-wellness-therapies/
+https://amaneciahealth.com/wellness-and-longevity/
+https://prolongmd.com/collections/longevity
+
+# --- Houston, TX ---
+https://houstonregenerativemd.com/peptide-therapy/
+https://houstonrt.com/peptide-therapy/
+https://myevergreenmedspa.com/medspa-houston-tx/wellness/peptides/
+https://www.spineandrehab.com/houston/peptide-therapy/
+https://drshel.com/locations/houston/peptides-therapy-tx/
+https://www.houstonconciergemedicine.com/peptide-therapy
+https://www.behuemn.com/peptide-therapy-houston
+
+# --- Nashville, TN ---
+https://www.toxxology.com/peptides
+https://nashvillehealthpro.com/peptides-treatment-in-nashville-tn/
+https://thedearingclinic.com/services/peptide-therapy
+https://relivehealth.com/west-nashville-tn/peptide-therapy/
+https://www.sommerwhitemd.com/treatments/peptide-therapy-in-nashville/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-nashville-tn/
+
+# --- Atlanta, GA ---
+https://www.progressivemedicalcenter.com/therapies/peptide-therapy/
+https://bellamedspaatl.com/peptide-therapy-in-atlanta-the-science-of-smart-anti-aging-at-bella-medspa-2/
+https://artisanplasticsurgery.com/treatments/peptide-therapy-in-atlanta/
+https://www.drnipandtuck.com/non-surgical/peptide-therapy/
+https://elevateatl.com/peptide-therapy-atlanta/
+https://vitallivinghealthcare.com/wellness/peptide-therapy/
+https://4everyoungantiaging.com/atlanta-midtown/peptide-therapy-in-south-buckhead/
+
+# --- Chicago, IL ---
+https://chicagostemcelldr.com/services/wellness-regenerative-therapies/peptides/
+https://www.thevitaminbariv.com/peptide-therapy
+https://www.bettermedspa.com/
+https://lume-wellness.com/services/peptide-therapy-in-river-north-chicago/
+https://gamedaymenshealth.com/chicago-il/peptide-therapies-vitamin-injections
+https://www.revitalizeivsolutions.com/peptides-injectables
+
+# --- New York, NY ---
+https://manhattanmedicalarts.com/peptide-therapy-nyc
+https://manhattanprimarycare.nyc/peptide-therapy-nyc/
+https://www.drgolberg.nyc/regenerative-medicine/peptide-therapy-in-midtown-manhattan-ny/
+https://www.myadvitam.com/concerns-solutions/peptide-therapy/
+https://www.michaelazizmd.com/services/peptide-therapy
+https://weisswellnessnyc.com/peptide-therapy-midtown-manhattan-10022-2/
+
+# --- Tampa / Orlando, FL ---
+https://biodesignwellness.com/treatments-offered/peptide-therapy/
+https://www.incarenow.com/peptides-in-tampa-why-incare-is-the-top-clinic-for-peptide-therapy/
+https://tampabaytotalwellness.com/peptide-therapy-tampa/
+https://newtampawellness.net/wellness-services/peptides
+https://orthobiologicsassociates.com/peptides/
+https://livingyoungcenter.com/
+
+# --- Seattle, WA ---
+https://flowwellness.com/best-peptide-clinic-seattle/
+https://pinnacleintegrative.com/seattle-peptide-therapy-restore-energy-joint-health/
+https://lifetimewellnesscenternw.com/peptides/
+https://vitalitymedicalpnw.com/peptide-therapy/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-seattle-wa/
+
+# --- San Diego, CA ---
+https://avenanaturalhealth.com/our-services/peptides/
+https://aestheticamedspasd.com/peptide-therapy/
+https://gamedaymenshealth.com/san-diego/sermorelin-peptide
+https://houseofaesthetix.com/san-diegos-best-kept-secret-peptide-therapy-for-anti-aging/
+
+# --- Las Vegas, NV ---
+https://www.livenowlongevity.com/
+https://www.bhrcenter.com/peptide-therapy-las-vegas/
+https://encompasscarelv.com/north-las-vegas-nv/peptide-therapy-program/
+
+# --- Charlotte / Raleigh, NC ---
+https://infinitymedspaandwellness.com/services/peptides-and-amino-acids-treatment-in-charlotte-nc/
+https://heritageregen.com/peptide-therapy/
+https://charlotte-antiaging.com/peptide-therapy/
+https://www.selectfamilypractice.com/services/peptides
+https://klinic.com/peptide-therapy/north-carolina/charlotte
+
+# --- Boston, MA ---
+https://www.menshealthboston.com/services/peptide-therapy/
+https://bostonvitality.com/top-peptide-therapy-massachusetts-clinics-near-you-in-ma/
+https://www.bostonorthopedicandwellness.com/peptides-orthopedics-treatment-dedham-wellesley-ma/
+https://kathrynrussoaesthetics.com/peptides-wellness-therapy-boston-ma/
+https://www.iconmd.com/massachusetts/medical-spa-laser-services-boston/beauty-and-collagen/
+https://gamedaymenshealth.com/boston-ma
+
+# --- Salt Lake City, UT ---
+https://modernslc.com/peptide-therapy-salt-lake-city/
+https://www.utahinjuryclinic.com/
+https://regenerationutah.com/peptide-therapy/
+https://www.altitudemedspa.com/services/peptide-therapy
+https://hausofaesthetics.com/peptide-therapy/
+
+# --- Portland, OR / ME ---
+https://www.apresplasticsurgery.com/portland-med-spa/peptide-therapy/
+https://www.agemanagementcenter.com/services/peptide-therapy/
+https://gamedaymenshealth.com/portland/peptide-therapies-vitamin-injections
+https://www.mettawellnessnw.com/areas-served/peptide-therapy-near-portland-or
+https://www.okojiewellness.com/
+
+# --- Minneapolis, MN ---
+https://www.theclinicmn.com/peptide-therapy
+https://enrichmentskinsolutions.com/best-peptide-therapy-in-minneapolis/
+https://litemedicalclinic.com/peptide-therapy-in-minneapolis-mn/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-minneapolis-mn/
+
+# --- Philadelphia, PA ---
+https://www.drjohnleesurgery.com/peptide-therapy-weight-loss/
+https://phillywellnesscenter.com/peptides/
+https://4everyoungantiaging.com/philadelphia/peptide-clinic-in-philadelphia/
+https://gamedaymenshealth.com/philadelphia/peptide-therapies-vitamin-injections
+
+# --- Detroit, MI ---
+https://advancedbodymedical.com/nutrient-peptide-therapies/
+https://rojasinstitute.com/peptide-therapy/
+https://www.monarchlifestylemed.com/peptide-therapy-for-men/
+https://gamedaymenshealth.com/detroit/sermorelin-peptide
+https://klinic.com/peptide-therapy/michigan/detroit
+
+# --- Kansas City, MO ---
+https://claritydpc.com/treatments/peptide-therapy-in-kansas-city/
+https://www.karmabeautyandwellness.com/treatments/peptide-therapy-in-kansas-city/
+https://kcmedicalwc.com/peptide-therapy/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-kansas-city-mo/
+
+# --- Columbus / Cleveland, OH ---
+https://endocrinology-associates.com/peptide-therapy/
+https://www.columbuslowt.com/peptide-therapy/
+https://wellnesscentercleveland.com/wellness/peptide-therapy/
+https://medelaamor.com/services/health-and-wellness/peptide-therapy-columbus-oh
+https://klinic.com/peptide-therapy/ohio/columbus
+
+# --- Washington DC / Northern Virginia / Maryland ---
+https://evexiamedspa.com/service/peptide-therapy/
+https://cpsdocs.com/metabolic-aesthetics/peptide-therapy/
+https://www.weightlossandvitality.com/services/growth-hormone-peptides
+https://eleverahealth.com/services/peptides/
+https://www.prcindc.com/service/peptide-therapy
+https://www.medicalcosmetic.org/services/peptide-therapy/
+https://proactivwellnesscenters.com/hormone-replacement/advanced-peptides-for-wellness-healing-and-restoration/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-washington-dc/
+
+# --- Orange County / Newport Beach, CA ---
+https://www.smarthealthwellness.com/peptides/
+https://www.drbarx.com/peptides
+https://bluelinewellnessgroup.org/peptide-therapy-orange-county/
+https://beyondwellness.io/peptide-therapy/
+https://www.keymdnewport.com/peptide-therapy-newport-beach-ca/
+https://beyondnewport.com/peptides-therapy-newport-beach/
+https://www.drjohnlaura.com/orange-county/medical-treatment/iv-peptide-therapy/
+https://alphahormones.com/newport-beach
+
+# --- Southwest Florida (Sarasota / Naples / Fort Myers) ---
+https://southwestfloridamedspa.com/services/body/peptide-therapy/
+https://avenclinic.com/peptide-therapy-in-sarasota-fl/
+https://drbnaples.com/peptide-therapy/
+https://thewellnesslabiv.com/peptide-therapy/
+https://floridaregenerative.com/
+https://swflhealthandhydration.com/peptides
+https://tclinicsusa.com/locations/fort-myers/peptides/
+
+# --- Indianapolis / Milwaukee ---
+https://skinrenewdayspa.com/wellness/medical-weight-loss/
+https://illumecosmeticsurgery.com/cosmetic-med-spa/weight-loss-wellness/
+https://milwaukeemedicalweightlossmedispa.com/tirzepatide-in-milwaukee-wi/
+https://www.milwaukeesemaglutide.com/
+https://mytrimmd.com/glp-1-for-weight-loss-indianapolis/
+https://klinic.com/peptide-therapy/indiana/indianapolis
+https://www.remedynowaesthetics.com/medical-weight-loss/
+https://pwlindy.com/
+https://gamedaymenshealth.com/milwaukee-wi/weight-loss-clinic
+
+# --- Oklahoma ---
+https://louloumedspa.com/services/peptide-therapy-in-okc/
+https://eowc.net/peptide-therapy/
+https://glowmedicaltulsa.com/services/wellness/peptide-therapy/
+https://klinic.com/peptide-therapy/oklahoma/tulsa
+https://www.ultimatemensclinic.com/peptide-therapy/
+
+# --- New Orleans / Memphis ---
+https://elitememphis.com/service/peptide-therapy/
+https://prohealthmemphis.com/services/peptide-therapy/
+https://driphydration.com/coverage-areas/new-orleans/peptide-therapy/
+
+# --- Sacramento / San Jose / Bay Area, CA ---
+https://heal-md.com/peptide-therapy-in-sacramento-ca/
+https://www.aestheticenvy.com/wellness/peptide-therapy/
+https://www.mynexgenhealth.com/peptide-therapy/
+
+# --- Boise / Spokane ---
+https://renumedispa.com/wellness/peptide-therapy/
+https://www.imidaho.net/peptide-therapy
+
+# --- Charleston / Greenville, SC ---
+https://www.porticolongevity.com/peptides
+https://intervenemd.com/peptide-therapy-in-charleston/
+https://www.westashleywellness.com/peptide-therapy
+https://wellness-loft.com/peptides/
+https://klinic.com/peptide-therapy/south-carolina/greenville
+https://lowcountrymale.com/peptides/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-greenville-sc/
+
+# --- Hormone / TRT clinics offering peptides ---
+https://healthexpressclinics.com/wellness-services/peptide-therapy/
+https://solasclinic.com/services/peptide-therapy-el-paso/
+https://alphamanclinic.com/peptide-therapy-clinic-torrance/
+
+# --- Virginia (Richmond / Virginia Beach / Norfolk) ---
+https://www.kaadomd.com/injectables/peptide-injections/
+https://fountainofyoumd.com/peptide-therapy/
+https://klinic.com/peptide-therapy/virginia/virginia-beach
+
+# --- Regenerative / orthopedic / sports medicine ---
+https://www.sportsmedicinenewyork.com/peptide-therapy-for-recovery-orthopedic-foot-ankle-surgeon-new-york-west-palm-beach.html
+https://tyranceorthopedics.com/peptides-bpc-157-and-tb-500/
+https://www.jeremyburnhammd.com/what-orthopedic-surgeons-should-know-about-therapeutic-peptides/
+https://titanmedicalcenter.com/peptides-bpc-157-tb-500/
+https://www.stonebridgemed.com/peptides-bpc-157-tb-500/
+
+# --- Connecticut / New Jersey / Long Island ---
+https://newjerseyfunctionalmed.com/peptide-therapy/
+https://www.livationct.com/peptide-therapy
+https://www.healfm.com/areas-served/peptide-therapy-near-staten-island-ny/
+https://www.wholeselfwellnessct.com/services/regenerative-therapies/peptide-therapy/
+https://amarihealth.com/peptide-therapy/connecticut/peptide-therapy-in-middletown-ct/
+https://drsobo.com/
+
+# --- Buffalo / Pittsburgh ---
+https://ehcbuffalo.com/peptide-therapy-in-buffalo-ny/
+https://gamedaymenshealth.com/buffalo/peptide-therapies-vitamin-injections
+https://www.716ology.com/peptide-therapy
+https://klinic.com/peptide-therapy/new-york/buffalo
+
+# --- Scottsdale / Palm Beach / Jupiter ---
+https://www.lifestylemensclinic.com/peptide-therapy
+https://pbpeptides.com/
+https://realresultsmedical.com/peptide-therapy-scottsdale-az/
+https://nouveauhealthandwellness.com/health-wellness/functional-medicine/
+https://www.onelifehealthandperformance.com/health-services-palm-beach/peptide-therapy/
+https://www.modernmedicineaz.com/anti-aging
+https://pbantiaging.com/
+https://4everyoungantiaging.com/jupiter/
+https://thefountainwpb.com/
+
+# --- Texas (Austin / San Antonio / El Paso) ---
+https://nirvanixhealth.com/services/peptides/
+https://www.kalypsowellness.com/peptide-therapy/
+https://saivcenter.com/peptide-therapy/
+https://klinic.com/peptide-therapy/texas/austin
+
+# --- GLP-1 / weight-loss telehealth brands ---
+https://precisiontelemed.com/compounded-semaglutide/
+https://www.trycora.io/
+https://joinfridays.com/
+https://injectco.com/
+
+# --- Jacksonville / Orlando / Fort Lauderdale, FL ---
+https://coastalmedicalspa.com/peptides/
+https://www.blueskieshealthwellness.com/peptide-therapy-in-jacksonville-fl/
+https://thebiostation.com/peptide-therapy-in-jacksonville-fl/
+https://andersonlongevityclinic.com/human-growth-hormone-hgh-peptide-therapy-in-jacksonville-fl
+https://coastalintegrativehealthcare.com/peptide-therapy-in-florida/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-jacksonville-fl/
+
+# --- Kentucky / Tennessee ---
+https://www.calospa.com/our-services/calowellness/peptides/
+https://www.aptivawellness.com/
+https://medicaltransformationcenter.com/peptide-therapies-louisville/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-louisville-ky/
+
+# --- Colorado (Springs / Fort Collins / Boulder) ---
+https://www.onusiv.com/locations/fort-collins
+https://mewellnessandmedspa.com/peptide-therapy-fort-collins/
+https://rmrmco.com/therapies/peptide-therapy/
+https://awakeniv.com/peptide-therapy-in-boulder-co/
+https://www.stratawell.com/peptide-therapy-colorado-springs/
+https://collectivbiowellness.com/care-we-provide/peptide-therapy/
+
+# --- Women's hormone / menopause clinics offering peptides ---
+https://www.joinmidi.com/
+https://steelcitymedicalcenter.com/peptides-for-women/
+https://heartandsoulintegrativehealth.com/peptide-therapy-for-women/
+https://youngermemd.com/why-peptide-therapy-works/
+https://www.starsiakaesthetics.com/treatments/female-peptide-therapy/
+https://refinebytulsi.com/peptides-for-menopause/
+
+# --- Omaha / Des Moines ---
+https://www.88med.com/peptide-therapy
+https://www.balancedhealthclinicne.com/blog/peptide-therapy-omaha
+https://dripzoneomaha.com/peptide-therapy-in-omaha
+https://www.iowaiv.com/weight-loss-peptides
+https://gamedaymenshealth.com/omaha/peptide-therapies-vitamin-injections
+https://nulife-health.com/peptides
+
+# --- Hawaii / Alaska / Reno ---
+https://hawaiiwellnessclinic.com/peptide-therapy-2/
+https://www.vitalityhrt.com/location/peptide-therapy-clinic-of-honolulu-hi/
+
+# --- Concierge / longevity ---
+https://www.emtexas.com/
+https://austinregen.com/concierge-medicine-for-longevity/
+https://www.luraguizmd.com/peptides
+https://www.longevitycville.com/wellness/peptide-cellular-wellness/
+https://www.myconciergemd.com/
+https://www.next-health.com/
+
+# --- Alabama / Mississippi / Louisiana ---
+https://www.birminghamdayspa.com/about-4
+https://beautilab.com/peptidetherapy/
+https://spabatonrouge.com/peptide-therapy/
+https://birminghamsha.com/peptide-therapy
+https://www.thecovery.com/services/peptides
+
+# --- Sexual wellness / PT-141 telehealth ---
+https://premierhormonehealth.com/drugs/pt-141-peptide-therapy-online/
+https://peptidesclinic.net/
+https://honehealth.com/mens/pt-141/
+https://hydramed.com/rx/pt141
+
+# --- Tucson / Albuquerque, NM & AZ ---
+https://altheraclinic.com/our-services-alternative-medicine-albuquerque/peptide-therapy/
+https://mmspatucson.com/peptide-therapy-tucson-az/
+https://www.lowttucson.com/rejuvenation-therapy/
+https://tucsonwellnessmd.com/peptide-therapy/
+
+# --- IV / med spa chains offering peptides ---
+https://purehydrationspa.com/
+https://hydrateivbar.com/
+https://primeivhydration.com/
+https://www.dripivspa.com/
+https://ivmenow.com/
+https://livehydrationspa.com/
+
+# --- New England (NH / CT / VT / ME) ---
+https://www.vikingmedicalgroup.com/peptide-therapy/
+https://doctoranitamd.com/bpc-157-peptide-therapy/
+https://www.cuttingedgetestosteronetherapy.com/service/peptide-therapy
+https://klinic.com/peptide-therapy/new-hampshire/manchester
+https://alchemyclinic.com/service/peptide-therapy-in-manchester-nh/
+https://medmatrixusa.com/blog/maine-peptide-clinic
