@@ -23,7 +23,7 @@ import requests
 
 import config
 from db import SessionLocal, init_db
-from models import Lead
+from models import Lead, LeadKind
 from scraper.directory_providers import GooglePlacesProvider
 from scraper.query_templates import QUERY_TEMPLATES
 from scraper.search_providers import (
@@ -152,6 +152,7 @@ def upsert_lead(session, site_data: SiteData, source: str, matched_query: str) -
         source=source,
         matched_query=matched_query,
         research_only_evidence=site_data.research_only_evidence,
+        kind=LeadKind.VENDOR.value,
         company_type=site_data.company_type,
         sells_direct=site_data.sells_direct,
         manufactures=site_data.manufactures,

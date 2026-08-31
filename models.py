@@ -15,11 +15,34 @@ class LeadStatus(str, enum.Enum):
     DISQUALIFIED = "disqualified"
 
 
+class LeadKind(str, enum.Enum):
+    """Which agent found this lead, and therefore which pitch it gets.
+
+    Vendors (the scraper agent) and clinics (the clinics agent) share one
+    table so dedup, outreach cadence, reply detection, and the CRM all work
+    the same for both -- but they are different businesses with different
+    outreach copy, so every query that leads to an email filters on kind.
+    """
+
+    VENDOR = "vendor"
+    CLINIC = "clinic"
+
+
 class CompanyType(str, enum.Enum):
     RESEARCH_ONLY = "research_only"
     CONSUMER_AND_RESEARCH = "consumer_and_research"
     COMPOUNDING_PHARMACY = "compounding_pharmacy"
     MANUFACTURING_LAB = "manufacturing_lab"
+
+
+class ClinicType(str, enum.Enum):
+    """What a peptide-offering clinic primarily practices."""
+
+    MED_SPA = "med_spa"
+    HORMONE_CLINIC = "hormone_clinic"
+    WEIGHT_LOSS_CLINIC = "weight_loss_clinic"
+    REGENERATIVE_CLINIC = "regenerative_clinic"
+    WELLNESS_CLINIC = "wellness_clinic"
 
 
 class Lead(Base):
@@ -35,8 +58,17 @@ class Lead(Base):
     description = Column(Text, nullable=True)
     source = Column(String(100), nullable=False, default="unknown")
     matched_query = Column(String(255), nullable=True)
+    # For vendors: the "research use only" wording. For clinics: the wording
+    # showing they offer peptide therapy.
     research_only_evidence = Column(Text, nullable=True)
+    kind = Column(String(20), nullable=False, default=LeadKind.VENDOR.value, index=True)
     company_type = Column(String(50), nullable=True)
+    # --- clinic leads only (kind="clinic") ---
+    clinic_type = Column(String(50), nullable=True)
+    city = Column(String(120), nullable=True)
+    # Comma-separated tracked compounds named on the clinic's own site.
+    peptides_offered = Column(Text, nullable=True)
+    telehealth = Column(Boolean, nullable=False, default=False)
     sells_direct = Column(Boolean, nullable=False, default=False)
     manufactures = Column(Boolean, nullable=False, default=False)
     us_based = Column(Boolean, nullable=False, default=False)
@@ -76,3 +108,21 @@ class Outreach(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     lead = relationship("Lead", back_populates="outreach")
+
+
+class DiscoveryState(Base):
+    """Where an agent left off in its query space.
+
+    The clinics agent walks a query space of hundreds of thousands of
+    (city, service, template) combinations. Without a saved cursor every run
+    would start at the top and re-search the same first few hundred queries,
+    finding only clinics already in the CRM. The cursor is what makes "400
+    new leads a day, every day" possible on the same keyword list.
+    """
+
+    __tablename__ = "discovery_state"
+
+    agent = Column(String(50), primary_key=True)
+    query_cursor = Column(Integer, nullable=False, default=0)
+    queries_run = Column(Integer, nullable=False, default=0)
+    last_run_at = Column(DateTime, nullable=True)

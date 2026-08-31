@@ -84,7 +84,10 @@ def main() -> None:
 
     logger.info("=== step 3: preparing outreach ===")
     email_stats = emailer_agent.run(
-        message_file=emailer_agent.DEFAULT_MESSAGE_FILE,
+        # Vendors only: clinic leads are worked by clinic_pipeline.py, which
+        # sends them the clinic copy instead of this pitch.
+        kind="vendor",
+        message_file=None,
         drafts_dir=emailer_agent.DEFAULT_DRAFTS_DIR,
         only_manufacturers=args.only_manufacturers,
         limit=args.email_limit,

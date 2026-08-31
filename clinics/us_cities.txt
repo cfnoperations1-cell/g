@@ -1,0 +1,463 @@
+# US cities used to build geo-targeted clinic search queries.
+# Format: City<TAB>StateAbbrev. One per line, # for comments.
+#
+# Clinics are local businesses, so the city term is what makes the query
+# space large enough to keep finding new ones day after day: every city here
+# is crossed with every service keyword and every query template, and the
+# agent walks that space with a saved cursor so consecutive days don't
+# re-run the same searches. Add or remove rows freely -- more cities means
+# more headroom before the rotation wraps around.
+New York	NY
+Los Angeles	CA
+Chicago	IL
+Houston	TX
+Phoenix	AZ
+Philadelphia	PA
+San Antonio	TX
+San Diego	CA
+Dallas	TX
+Austin	TX
+Jacksonville	FL
+Fort Worth	TX
+San Jose	CA
+Columbus	OH
+Charlotte	NC
+Indianapolis	IN
+San Francisco	CA
+Seattle	WA
+Denver	CO
+Oklahoma City	OK
+Nashville	TN
+Washington	DC
+El Paso	TX
+Las Vegas	NV
+Boston	MA
+Detroit	MI
+Portland	OR
+Louisville	KY
+Memphis	TN
+Baltimore	MD
+Milwaukee	WI
+Albuquerque	NM
+Tucson	AZ
+Fresno	CA
+Sacramento	CA
+Mesa	AZ
+Atlanta	GA
+Kansas City	MO
+Colorado Springs	CO
+Omaha	NE
+Raleigh	NC
+Miami	FL
+Virginia Beach	VA
+Long Beach	CA
+Oakland	CA
+Minneapolis	MN
+Bakersfield	CA
+Tulsa	OK
+Tampa	FL
+Arlington	TX
+Wichita	KS
+Aurora	CO
+New Orleans	LA
+Cleveland	OH
+Anaheim	CA
+Honolulu	HI
+Henderson	NV
+Riverside	CA
+Santa Ana	CA
+Corpus Christi	TX
+Lexington	KY
+Stockton	CA
+St. Paul	MN
+Cincinnati	OH
+Greensboro	NC
+Pittsburgh	PA
+Irvine	CA
+St. Louis	MO
+Lincoln	NE
+Orlando	FL
+Durham	NC
+Plano	TX
+Anchorage	AK
+Newark	NJ
+Chula Vista	CA
+Fort Wayne	IN
+Chandler	AZ
+Toledo	OH
+St. Petersburg	FL
+Reno	NV
+Laredo	TX
+Scottsdale	AZ
+North Las Vegas	NV
+Lubbock	TX
+Madison	WI
+Gilbert	AZ
+Jersey City	NJ
+Glendale	AZ
+Buffalo	NY
+Winston-Salem	NC
+Chesapeake	VA
+Fremont	CA
+Norfolk	VA
+Irving	TX
+Garland	TX
+Paradise	NV
+Arlington	VA
+Richmond	VA
+Hialeah	FL
+Boise	ID
+Spokane	WA
+Frisco	TX
+Moreno Valley	CA
+Tacoma	WA
+Fontana	CA
+Modesto	CA
+Baton Rouge	LA
+Port St. Lucie	FL
+San Bernardino	CA
+McKinney	TX
+Fayetteville	NC
+Santa Clarita	CA
+Des Moines	IA
+Oxnard	CA
+Birmingham	AL
+Spring Valley	NV
+Huntsville	AL
+Rochester	NY
+Cape Coral	FL
+Salem	OR
+Grand Rapids	MI
+Yonkers	NY
+Overland Park	KS
+Santa Rosa	CA
+Amarillo	TX
+Glendale	CA
+Aurora	IL
+Tallahassee	FL
+Montgomery	AL
+Huntington Beach	CA
+Akron	OH
+Little Rock	AR
+Grand Prairie	TX
+Knoxville	TN
+Worcester	MA
+Chattanooga	TN
+Brownsville	TX
+New Haven	CT
+Vancouver	WA
+Fort Lauderdale	FL
+Sioux Falls	SD
+Ontario	CA
+Providence	RI
+Newport News	VA
+Rancho Cucamonga	CA
+Santa Clara	CA
+Oceanside	CA
+Salt Lake City	UT
+Elk Grove	CA
+Garden Grove	CA
+Pembroke Pines	FL
+Peoria	AZ
+Eugene	OR
+Corona	CA
+Cary	NC
+Springfield	MO
+Fort Collins	CO
+Jackson	MS
+Alexandria	VA
+Hayward	CA
+Lancaster	CA
+Lakewood	CO
+Sunnyvale	CA
+Palmdale	CA
+Hollywood	FL
+Springfield	MA
+Macon	GA
+Kansas City	KS
+Sunrise Manor	NV
+Pasadena	TX
+Pomona	CA
+Escondido	CA
+Killeen	TX
+Naperville	IL
+Joliet	IL
+Bellevue	WA
+Rockford	IL
+Savannah	GA
+Paterson	NJ
+Torrance	CA
+Bridgeport	CT
+McAllen	TX
+Mesquite	TX
+Syracuse	NY
+Midland	TX
+Pasadena	CA
+Murfreesboro	TN
+Miramar	FL
+Dayton	OH
+Fullerton	CA
+Orange	CA
+Denton	TX
+Roseville	CA
+Carrollton	TX
+West Valley City	UT
+Charleston	SC
+Warren	MI
+Hampton	VA
+Gainesville	FL
+Visalia	CA
+Coral Springs	FL
+Columbia	SC
+Cedar Rapids	IA
+Sterling Heights	MI
+New Bedford	MA
+Norman	OK
+Waco	TX
+Clarksville	TN
+Surprise	AZ
+Concord	CA
+Olathe	KS
+Thornton	CO
+Athens	GA
+Topeka	KS
+Simi Valley	CA
+Fargo	ND
+Wilmington	NC
+Hartford	CT
+Victorville	CA
+Vallejo	CA
+Berkeley	CA
+Allentown	PA
+Ann Arbor	MI
+Columbia	MO
+Evansville	IN
+Round Rock	TX
+Cambridge	MA
+Independence	MO
+South Bend	IN
+Provo	UT
+Clearwater	FL
+El Monte	CA
+Beaumont	TX
+Lansing	MI
+Peoria	IL
+Downey	CA
+Costa Mesa	CA
+Elgin	IL
+Broken Arrow	OK
+Miami Gardens	FL
+Carlsbad	CA
+West Jordan	UT
+Lowell	MA
+Antioch	CA
+Temecula	CA
+Manchester	NH
+High Point	NC
+Pueblo	CO
+Green Bay	WI
+West Palm Beach	FL
+Murrieta	CA
+Palm Bay	FL
+Everett	WA
+Centennial	CO
+Richardson	TX
+Boulder	CO
+Sandy Springs	GA
+Pearland	TX
+League City	TX
+Sugar Land	TX
+The Woodlands	TX
+Katy	TX
+Southlake	TX
+Franklin	TN
+Brentwood	TN
+Naples	FL
+Sarasota	FL
+Boca Raton	FL
+Delray Beach	FL
+Jupiter	FL
+Palm Beach Gardens	FL
+Fort Myers	FL
+Bradenton	FL
+Palm Harbor	FL
+Winter Park	FL
+Kissimmee	FL
+Melbourne	FL
+Daytona Beach	FL
+Ocala	FL
+Pensacola	FL
+Destin	FL
+Panama City	FL
+Mobile	AL
+Tuscaloosa	AL
+Auburn	AL
+Columbus	GA
+Augusta	GA
+Marietta	GA
+Alpharetta	GA
+Roswell	GA
+Johns Creek	GA
+Greenville	SC
+Mount Pleasant	SC
+Myrtle Beach	SC
+Asheville	NC
+Chapel Hill	NC
+Huntersville	NC
+Concord	NC
+Wilmington	DE
+Bethesda	MD
+Rockville	MD
+Annapolis	MD
+Frederick	MD
+Columbia	MD
+Reston	VA
+Fairfax	VA
+Leesburg	VA
+Charlottesville	VA
+Roanoke	VA
+Morgantown	WV
+Lexington	VA
+Princeton	NJ
+Hoboken	NJ
+Edison	NJ
+Cherry Hill	NJ
+Morristown	NJ
+Stamford	CT
+Greenwich	CT
+Norwalk	CT
+White Plains	NY
+Scarsdale	NY
+Huntington	NY
+Albany	NY
+Saratoga Springs	NY
+Ithaca	NY
+Erie	PA
+Bethlehem	PA
+Lancaster	PA
+Scranton	PA
+King of Prussia	PA
+Wayne	PA
+Portland	ME
+Burlington	VT
+Nashua	NH
+Portsmouth	NH
+Newton	MA
+Quincy	MA
+Framingham	MA
+Danvers	MA
+Warwick	RI
+Schaumburg	IL
+Evanston	IL
+Oak Brook	IL
+Bloomington	IN
+Carmel	IN
+Fishers	IN
+Noblesville	IN
+Bowling Green	KY
+Johnson City	TN
+Germantown	TN
+Southaven	MS
+Gulfport	MS
+Shreveport	LA
+Lafayette	LA
+Metairie	LA
+Fayetteville	AR
+Bentonville	AR
+Springdale	AR
+Springfield	IL
+Columbia	TN
+Troy	MI
+Novi	MI
+Royal Oak	MI
+Birmingham	MI
+Grand Blanc	MI
+Kalamazoo	MI
+Appleton	WI
+Waukesha	WI
+Brookfield	WI
+Eau Claire	WI
+Duluth	MN
+Rochester	MN
+Edina	MN
+Bloomington	MN
+Woodbury	MN
+Sioux City	IA
+Davenport	IA
+Iowa City	IA
+Ames	IA
+Lawrence	KS
+Wichita Falls	TX
+Tyler	TX
+Abilene	TX
+College Station	TX
+New Braunfels	TX
+Georgetown	TX
+Cedar Park	TX
+Conroe	TX
+Odessa	TX
+Edmond	OK
+Owasso	OK
+Bella Vista	AR
+Rapid City	SD
+Bismarck	ND
+Billings	MT
+Bozeman	MT
+Missoula	MT
+Idaho Falls	ID
+Coeur d'Alene	ID
+Meridian	ID
+Cheyenne	WY
+Casper	WY
+Ogden	UT
+Lehi	UT
+Draper	UT
+Park City	UT
+St. George	UT
+Grand Junction	CO
+Durango	CO
+Greeley	CO
+Castle Rock	CO
+Parker	CO
+Littleton	CO
+Santa Fe	NM
+Las Cruces	NM
+Flagstaff	AZ
+Tempe	AZ
+Goodyear	AZ
+Prescott	AZ
+Sedona	AZ
+Sparks	NV
+Carson City	NV
+Bend	OR
+Medford	OR
+Beaverton	OR
+Hillsboro	OR
+Olympia	WA
+Kirkland	WA
+Redmond	WA
+Bothell	WA
+Yakima	WA
+Kennewick	WA
+Walnut Creek	CA
+San Mateo	CA
+Palo Alto	CA
+Mountain View	CA
+Redwood City	CA
+San Rafael	CA
+Napa	CA
+Encinitas	CA
+La Jolla	CA
+Newport Beach	CA
+Laguna Niguel	CA
+Manhattan Beach	CA
+Santa Monica	CA
+Beverly Hills	CA
+Calabasas	CA
+Thousand Oaks	CA
+Ventura	CA
+Santa Barbara	CA
+San Luis Obispo	CA
+Monterey	CA
+Chico	CA
+Redding	CA

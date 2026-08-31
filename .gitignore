@@ -9,3 +9,4 @@ venv/
 .pytest_cache/
 outreach_drafts/
 pipeline.log
+clinic_pipeline.log

@@ -1,0 +1,32 @@
+# Services a US medical clinic advertises when it offers peptides. These are
+# crossed with the city list to build geo-targeted search queries, so keep
+# them phrased the way a clinic's own website would phrase them.
+# One per line, # for comments.
+peptide therapy
+peptide injections
+peptide treatment
+BPC-157
+semaglutide
+tirzepatide
+sermorelin
+ipamorelin
+CJC-1295
+tesamorelin
+NAD+ therapy
+PT-141
+AOD-9604
+thymosin alpha-1
+GHK-Cu
+growth hormone peptide therapy
+hormone replacement therapy
+testosterone replacement therapy
+medical weight loss
+GLP-1 weight loss
+anti-aging medicine
+longevity medicine
+regenerative medicine
+functional medicine
+integrative medicine
+IV therapy and peptides
+sexual wellness peptides
+gut health peptides

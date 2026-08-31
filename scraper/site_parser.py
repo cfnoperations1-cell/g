@@ -78,6 +78,9 @@ class SiteData:
     us_based: bool = False
     state: Optional[str] = None
     pages_checked: List[str] = field(default_factory=list)
+    # Visible text of every page checked, joined. Kept so a caller can run
+    # its own classification (the clinics agent does) without refetching.
+    full_text: str = ""
 
 
 def get_domain(url: str) -> str:
@@ -215,7 +218,17 @@ def find_research_only_evidence(text: str) -> Optional[str]:
     return None
 
 
-def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> SiteData:
+def parse_site(
+    base_url: str,
+    peptide_keywords: Optional[List[str]] = None,
+    candidate_paths: Optional[List[str]] = None,
+) -> SiteData:
+    """Fetch a site's public pages and extract contact info.
+
+    `candidate_paths` overrides which pages are checked -- clinics advertise
+    their treatments on /services and /peptide-therapy, which a vendor's
+    home/about/contact sweep would miss entirely.
+    """
     domain = get_domain(base_url)
     data = SiteData(url=base_url, domain=domain)
     combined_text = []
@@ -224,7 +237,7 @@ def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> S
         logger.warning("refusing non-public or unresolvable host: %r", domain)
         return data
 
-    for path in CANDIDATE_PATHS:
+    for path in (CANDIDATE_PATHS if candidate_paths is None else candidate_paths):
         request_path = "/" + path.lstrip("/") if path else "/"
         if not _allowed_by_robots(domain, request_path):
             logger.debug("robots.txt disallows %s%s", domain, request_path)
@@ -269,6 +282,7 @@ def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> S
                 data.phone = phone_match.group(0)
 
     full_text = " ".join(combined_text)
+    data.full_text = full_text
     data.research_only_evidence = find_research_only_evidence(full_text)
 
     is_us, state = guess_us_presence(full_text)

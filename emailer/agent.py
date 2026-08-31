@@ -1,4 +1,9 @@
-"""Outreach agent: emails peptide vendor leads the scraper agent found.
+"""Outreach agent: emails the leads the discovery agents found.
+
+Handles both kinds of lead in one pass, each with its own copy: peptide
+vendors from the scraper agent get emailer/message.txt, and the US clinics
+from the clinics agent get emailer/clinic_message.txt. Narrow a run to one
+kind with --kind.
 
 Reads leads from the shared CRM database and works a follow-up cadence: an
 intro message, then a follow-up every few days until the company replies.
@@ -38,13 +43,23 @@ from typing import List, Optional, Tuple
 
 import config
 from db import SessionLocal, init_db
-from models import Lead, Outreach
+from models import Lead, LeadKind, Outreach
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_MESSAGE_FILE = Path(__file__).parent / "message.txt"
 DEFAULT_FOLLOWUP_FILE = Path(__file__).parent / "followup.txt"
+DEFAULT_CLINIC_MESSAGE_FILE = Path(__file__).parent / "clinic_message.txt"
+DEFAULT_CLINIC_FOLLOWUP_FILE = Path(__file__).parent / "clinic_followup.txt"
 DEFAULT_DRAFTS_DIR = Path(config.BASE_DIR) / "outreach_drafts"
+
+# A vendor buys API to resell; a clinic buys it to treat patients. Same
+# cadence, same dedup, different pitch -- so the template is chosen per lead
+# from its kind, and a clinic can never be sent the vendor copy by accident.
+TEMPLATES_BY_KIND = {
+    LeadKind.VENDOR.value: (DEFAULT_MESSAGE_FILE, DEFAULT_FOLLOWUP_FILE),
+    LeadKind.CLINIC.value: (DEFAULT_CLINIC_MESSAGE_FILE, DEFAULT_CLINIC_FOLLOWUP_FILE),
+}
 
 # A lead in any of these states is finished -- never contact them again.
 TERMINAL_STATUSES = {"replied", "qualified", "disqualified"}
@@ -125,6 +140,23 @@ def next_step_for(
     return len(delivered) + 1
 
 
+def templates_for(
+    kind: Optional[str],
+    message_file: Optional[Path] = None,
+    followup_file: Optional[Path] = None,
+) -> Tuple[Path, Path]:
+    """Which (intro, follow-up) template files a lead of this kind gets.
+
+    An explicitly passed file wins for every kind -- that's how
+    --message-file stays a global override. Otherwise the kind decides, with
+    the vendor copy as the fallback for leads saved before kinds existed.
+    """
+    default_message, default_followup = TEMPLATES_BY_KIND.get(
+        kind or LeadKind.VENDOR.value, TEMPLATES_BY_KIND[LeadKind.VENDOR.value]
+    )
+    return (message_file or default_message, followup_file or default_followup)
+
+
 def plan_outreach(
     session,
     only_manufacturers: bool,
@@ -132,11 +164,14 @@ def plan_outreach(
     interval_days: int,
     max_followups: int,
     now: Optional[datetime] = None,
+    kind: Optional[str] = None,
 ) -> List[Tuple[Lead, int]]:
     """(lead, step) pairs that are due for a message right now."""
     query = session.query(Lead).filter(Lead.email.isnot(None), Lead.email != "")
     if only_manufacturers:
         query = query.filter(Lead.manufactures.is_(True))
+    if kind:
+        query = query.filter(Lead.kind == kind)
 
     due: List[Tuple[Lead, int]] = []
     for lead in query.order_by(Lead.created_at):
@@ -176,23 +211,34 @@ def send_via_smtp(msg: EmailMessage) -> None:
 
 
 def run(
-    message_file: Path,
+    message_file: Optional[Path],
     drafts_dir: Path,
     only_manufacturers: bool,
     limit: Optional[int],
     send: bool,
     dry_run: bool,
-    followup_file: Path = DEFAULT_FOLLOWUP_FILE,
+    followup_file: Optional[Path] = None,
     interval_days: int = 3,
     max_followups: int = 4,
+    kind: Optional[str] = None,
 ) -> dict:
     init_db()
-    first_subject, first_body = load_message(message_file)
-    follow_subject, follow_body = load_message(followup_file)
-    rendered = {
-        1: (first_subject, render(first_body)),
-        2: (follow_subject, render(follow_body)),
-    }
+
+    # Load each kind's copy once, not once per lead.
+    rendered_by_kind: dict = {}
+
+    def copy_for(lead_kind: Optional[str], step: int) -> Tuple[str, str]:
+        key = lead_kind or LeadKind.VENDOR.value
+        if key not in rendered_by_kind:
+            intro_path, followup_path = templates_for(key, message_file, followup_file)
+            intro_subject, intro_body = load_message(intro_path)
+            follow_subject, follow_body = load_message(followup_path)
+            rendered_by_kind[key] = {
+                1: (intro_subject, render(intro_body)),
+                2: (follow_subject, render(follow_body)),
+            }
+        # Step 1 uses the intro; every later step uses the follow-up copy.
+        return rendered_by_kind[key][1 if step == 1 else 2]
 
     problems = compliance_problems()
     if problems:
@@ -205,16 +251,18 @@ def run(
     stats = {"prepared": 0, "first_contact": 0, "followups": 0, "sent": 0, "drafted": 0, "failed": 0}
 
     try:
-        due = plan_outreach(session, only_manufacturers, limit, interval_days, max_followups)
-        contactable = session.query(Lead).filter(Lead.email.isnot(None), Lead.email != "").count()
+        due = plan_outreach(session, only_manufacturers, limit, interval_days, max_followups, kind=kind)
+        contactable_query = session.query(Lead).filter(Lead.email.isnot(None), Lead.email != "")
+        if kind:
+            contactable_query = contactable_query.filter(Lead.kind == kind)
+        contactable = contactable_query.count()
         logger.info(
             "%d of %d contactable leads are due now (every %d days, %d follow-ups max)",
             len(due), contactable, interval_days, max_followups,
         )
 
         for lead, step in due:
-            # Step 1 uses the intro; every later step uses the follow-up copy.
-            subject, body = rendered[1] if step == 1 else rendered[2]
+            subject, body = copy_for(lead.kind, step)
             label = "first" if step == 1 else f"follow-up #{step - 1}"
 
             if dry_run:
@@ -271,10 +319,18 @@ def run(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--message-file", type=Path, default=DEFAULT_MESSAGE_FILE)
+    parser.add_argument(
+        "--message-file", type=Path, default=None,
+        help="Override the intro copy for every lead. By default each lead gets the "
+             "copy for its kind (message.txt for vendors, clinic_message.txt for clinics).",
+    )
     parser.add_argument("--drafts-dir", type=Path, default=DEFAULT_DRAFTS_DIR)
     parser.add_argument("--only-manufacturers", action="store_true", help="Only leads that synthesize their own product")
-    parser.add_argument("--followup-file", type=Path, default=DEFAULT_FOLLOWUP_FILE)
+    parser.add_argument("--followup-file", type=Path, default=None, help="Override the follow-up copy for every lead")
+    parser.add_argument(
+        "--kind", type=str, default=None, choices=[k.value for k in LeadKind],
+        help="Only contact leads of this kind (vendor or clinic). Default: both, each with its own copy.",
+    )
     parser.add_argument(
         "--interval-days", type=int, default=3,
         help="Days to wait before each follow-up (default 3)",
@@ -316,6 +372,7 @@ def main() -> None:
         followup_file=args.followup_file,
         interval_days=args.interval_days,
         max_followups=args.max_followups,
+        kind=args.kind,
     )
 
 
