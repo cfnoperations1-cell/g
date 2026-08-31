@@ -49,14 +49,50 @@ def test_bare_compound_counts_only_in_clinic_context():
     assert find_peptide_evidence(clinic, KEYWORDS) is not None
 
 
+RESEARCH_STOREFRONT = (
+    "Buy BPC-157 online at the best prices anywhere. All products are for research "
+    "use only and not for human consumption. Add to cart for fast free shipping on "
+    "orders over $200. In stock now, ships same day. Our research-grade purity is "
+    "third-party tested with a certificate of analysis on every vial. Checkout is "
+    "secure. Select options below, choose your quantity, and view your subtotal at "
+    "checkout. Bulk peptides and wholesale peptides available for laboratories."
+)
+
+
 def test_research_vendor_is_not_a_clinic_lead():
-    text = (
-        "Buy BPC-157 online. All products are for research use only and not for "
-        "human consumption. Add to cart. Our clinic-grade purity is third-party tested."
-    )
-    assert is_research_vendor(text)
-    skip_reason, _ = evaluate(text, KEYWORDS)
+    assert is_research_vendor(RESEARCH_STOREFRONT)
+    skip_reason, _ = evaluate(RESEARCH_STOREFRONT, KEYWORDS)
     assert skip_reason == "skipped_research_vendor"
+
+
+def test_a_clinic_disparaging_research_chemicals_is_still_a_clinic():
+    """The commonest false positive on real sites: good clinics talk about
+    research chemicals constantly, to distance themselves from them. Naming
+    the phrase can't be what disqualifies a site, or the best-quality
+    clinics get thrown away."""
+    text = (
+        "Vitality Wellness Clinic of Austin, Texas. Safe, regulated access: avoid the "
+        "risks of research chemicals sold online, which are labeled not for human "
+        "consumption and carry no purity guarantee, no sterility guarantee and no "
+        "medical oversight. We provide a legal pathway to prescription-grade peptide "
+        "therapy through a licensed compounding pharmacy. Our providers build every "
+        "protocol around your labs. Book an appointment with our medical director "
+        "today. New patients welcome at our clinic."
+    )
+    assert not is_research_vendor(text)
+    skip_reason, details = evaluate(text, KEYWORDS)
+    assert skip_reason is None
+    assert details["clinic_type"]
+
+
+def test_a_page_with_no_readable_text_is_reported_separately():
+    """Client-side-rendered sites serve an empty shell. That is "couldn't
+    read it", not "judged it and rejected it" -- conflating the two hid a
+    chunk of real clinics in the not-a-clinic bucket."""
+    skip_reason, _ = evaluate("   ", KEYWORDS)
+    assert skip_reason == "skipped_no_page_text"
+    skip_reason, _ = evaluate("Loading...", KEYWORDS)
+    assert skip_reason == "skipped_no_page_text"
 
 
 def test_detect_peptides_lists_what_the_site_names():
@@ -117,13 +153,27 @@ def test_evaluate_accepts_a_real_clinic():
 
 
 def test_evaluate_rejects_a_clinic_with_no_peptides():
-    text = "Family dentistry. Book an appointment with our providers. New patients welcome."
+    text = (
+        "Riverbend Family Dentistry has served the neighbourhood for thirty years. "
+        "Book an appointment with our providers for cleanings, crowns, whitening and "
+        "orthodontics. New patients welcome. Our medical director is board certified "
+        "and our office hours are Monday through Friday. We accept most insurance "
+        "plans and offer financing for larger treatment plans. Call today to schedule "
+        "a consultation with our team."
+    )
     skip_reason, _ = evaluate(text, KEYWORDS)
     assert skip_reason == "skipped_no_peptides"
 
 
 def test_evaluate_rejects_a_non_clinic():
-    text = "A blog about peptide therapy trends in 2026."
+    text = (
+        "A blog about peptide therapy trends in 2026. This article covers what the "
+        "research says about growth hormone secretagogues, what the FDA has said "
+        "about compounding, and where the market appears to be heading next year. "
+        "Table of contents below. Read our review of the most talked-about compounds, "
+        "and see our buyer's guide for what to ask before starting anything. We may "
+        "earn a commission from links in this article."
+    )
     skip_reason, _ = evaluate(text, KEYWORDS)
     assert skip_reason == "skipped_not_a_clinic"
 

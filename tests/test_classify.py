@@ -30,10 +30,12 @@ def test_guess_us_presence_from_state_name():
 
 
 def test_guess_us_presence_abbreviation_needs_nearby_zip():
-    # "IN" near a zip code should count as Indiana, not the word "in".
+    # "IN" near a zip code should count as Indiana, not the word "in", and is
+    # stored as the full name so the CRM doesn't treat IN and Indiana as two
+    # different places.
     is_us, state = guess_us_presence("Visit us at 123 Main St, Springfield, IN 46201.")
     assert is_us is True
-    assert state == "IN"
+    assert state == "Indiana"
 
 
 def test_guess_us_presence_false_for_unrelated_text():
@@ -97,3 +99,43 @@ def test_is_content_site_detects_affiliate_review():
 
 def test_is_content_site_false_for_store():
     assert not is_content_site("Add to cart. Shop our peptides. In stock now.")
+
+
+def test_state_is_the_one_mentioned_most_not_the_first():
+    """Pages name other states in passing -- service areas, shipping notes, a
+    linked article -- before naming their own. Taking the first match put an
+    Austin clinic in Colorado."""
+    text = (
+        "We ship to Colorado and Nevada. Our clinic is located in Austin, Texas. "
+        "Texas patients can book in person; Texas law requires an initial visit."
+    )
+    is_us, state = guess_us_presence(text)
+    assert is_us is True
+    assert state == "Texas"
+
+
+def test_state_tie_breaks_toward_the_earliest_mention():
+    is_us, state = guess_us_presence("Offices in Oregon and in Nevada.")
+    assert state == "Oregon"
+
+
+def test_state_abbreviation_is_found_past_earlier_two_letter_words():
+    """The abbreviation scan used to stop at the first two-letter token in the
+    document. On a real page that is a nav label or the "MD" after a doctor's
+    name, so the footer address was never reached and US clinics were dropped
+    as non-US."""
+    text = (
+        "IV therapy and hormone care. Meet Dr. Jane Roe, MD, and our team. "
+        "OK, let's get started. Visit our clinic at 8058 Corporate Center, "
+        "Charlotte, NC 28226. Book an appointment today."
+    )
+    is_us, state = guess_us_presence(text)
+    assert is_us is True
+    assert state == "North Carolina"
+
+
+def test_abbreviation_still_needs_an_adjacent_zip():
+    """The zip requirement is what stops stray two-letter words counting."""
+    is_us, state = guess_us_presence("OK, so IN summary, we are AT your service.")
+    assert state is None
+    assert is_us is False

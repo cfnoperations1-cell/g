@@ -103,6 +103,10 @@ AGGREGATOR_DOMAINS = {
 
 _EVIDENCE_WINDOW = 60
 
+# Below this many characters across every page fetched, there is nothing to
+# classify -- the site renders client-side and served us an empty shell.
+_MIN_READABLE_TEXT = 200
+
 # Signal phrases are matched on word boundaries, not as bare substrings:
 # "your clinic" contains "our clinic", "shirt" contains "hrt", and "clinical
 # trial" contains "clinic". Substring matching turned all three into false
@@ -149,8 +153,20 @@ def is_research_vendor(text: str) -> bool:
 
     These are the vendor scraper's target, not this one's, and they use the
     same compound names -- so they have to be filtered out explicitly.
+
+    Naming the phrase is not enough to convict. Good clinics talk about
+    research chemicals constantly, to distance themselves from them:
+    "avoid the risks of research chemicals sold online", "not grey-market
+    research chemicals", "vials labeled not for human consumption ... is not
+    how a licensed clinic should operate". The negation is semantic and far
+    from the phrase, so no negation window catches it. What actually
+    separates the two is behaviour: a research vendor *sells* -- it has a
+    cart and checkout and no patients. So the phrase only counts against a
+    site that reads as a storefront and does not read as a practice.
     """
-    return _has_unnegated_signal(text.lower(), RESEARCH_VENDOR_SIGNALS)
+    if not _has_unnegated_signal(text.lower(), RESEARCH_VENDOR_SIGNALS):
+        return False
+    return sells_direct(text) and not is_clinic(text)
 
 
 def find_peptide_evidence(text: str, peptide_keywords: Optional[List[str]] = None) -> Optional[str]:
@@ -247,6 +263,13 @@ def evaluate(
         "telehealth": False,
         "city": None,
     }
+
+    # A site whose pages carry almost no text is one we can't judge, not one
+    # we've judged and rejected: it renders its content with JavaScript, which
+    # this crawler doesn't run. Reported separately so a run's stats say
+    # "couldn't read these" instead of quietly filing them as not-a-clinic.
+    if len(text.strip()) < _MIN_READABLE_TEXT:
+        return "skipped_no_page_text", details
 
     if is_research_vendor(text):
         return "skipped_research_vendor", details

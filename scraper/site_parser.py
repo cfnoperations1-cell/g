@@ -11,6 +11,7 @@ import ipaddress
 import logging
 import re
 import socket
+import time
 from dataclasses import dataclass, field
 from typing import List, Optional
 from urllib.parse import urljoin, urlparse
@@ -57,9 +58,17 @@ PLACEHOLDER_EMAIL_DOMAINS = {
     "mysite.com", "example.com", "example.org", "domain.com", "yourdomain.com",
     "yoursite.com", "email.com", "sentry.io", "wixpress.com", "shopify.com",
     "godaddy.com", "squarespace.com", "test.com",
+    # Temporary hosting hostnames that sites are still serving after go-live.
+    "mybluehost.me", "wpengine.com", "temporary.site", "websitebuilder.com",
 }
 
 _robots_cache: dict = {}
+
+# Cap on how long we'll honour a site's Crawl-delay between its own pages.
+# Some sites ask for 10s+, which for a handful of pages is fine sequentially
+# but would sink a daily quota; workers are on different domains anyway, so
+# a few seconds per site keeps us polite without stalling the run.
+_MAX_CRAWL_DELAY_SECONDS = 3.0
 
 
 @dataclass
@@ -113,20 +122,66 @@ def is_public_host(domain: str) -> bool:
     return True
 
 
+def _load_robots(domain: str) -> RobotFileParser:
+    """Fetch and parse a site's robots.txt.
+
+    RobotFileParser.read() is deliberately not used: it fetches through
+    urllib, which identifies as "Python-urllib/3.x" and gets a 403 from
+    common WAFs -- and urllib then reads that 403 as "this site forbids all
+    crawling". That silently skipped sites whose robots.txt in fact allows
+    everything. Fetching with the same client and User-Agent we use for
+    pages gets the real file, and status codes follow RFC 9309: an
+    unavailable robots.txt (4xx) means the crawler may proceed, a server
+    error (5xx) means back off entirely.
+    """
+    rp = RobotFileParser()
+    rp.set_url(f"https://{domain}/robots.txt")
+    try:
+        resp = requests.get(
+            f"https://{domain}/robots.txt",
+            headers={"User-Agent": config.SCRAPER_USER_AGENT},
+            timeout=config.REQUEST_TIMEOUT_SECONDS,
+        )
+    except requests.RequestException:
+        # Can't reach it at all; the page fetches are about to fail the same
+        # way, so let them be the thing that reports it.
+        rp.parse([])
+        return rp
+
+    if resp.status_code >= 500:
+        rp.disallow_all = True
+    elif resp.status_code >= 400:
+        rp.parse([])
+    else:
+        rp.parse(resp.text.splitlines())
+    return rp
+
+
 def _allowed_by_robots(domain: str, path: str) -> bool:
     rp = _robots_cache.get(domain)
     if rp is None:
-        rp = RobotFileParser()
-        rp.set_url(f"https://{domain}/robots.txt")
         try:
-            rp.read()
+            rp = _load_robots(domain)
         except Exception:
-            pass
+            rp = RobotFileParser()
+            rp.parse([])
         _robots_cache[domain] = rp
     try:
         return rp.can_fetch(config.SCRAPER_USER_AGENT, f"https://{domain}{path}")
     except Exception:
         return True
+
+
+def _crawl_delay(domain: str) -> float:
+    """The site's requested Crawl-delay, capped."""
+    rp = _robots_cache.get(domain)
+    if rp is None:
+        return 0.0
+    try:
+        delay = rp.crawl_delay(config.SCRAPER_USER_AGENT)
+    except Exception:
+        return 0.0
+    return min(float(delay), _MAX_CRAWL_DELAY_SECONDS) if delay else 0.0
 
 
 _MAX_REDIRECTS = 5
@@ -160,6 +215,14 @@ def _fetch(url: str) -> Optional[str]:
 
 PLACEHOLDER_EMAIL_LOCALS = {"your", "youremail", "your-email", "email", "name", "username", "user"}
 
+# Asset filenames match the email regex exactly -- "USA-Map@2x-100.jpg" is a
+# retina image, not a contact address, and one slipped into a real lead.
+ASSET_FILE_EXTENSIONS = {
+    "jpg", "jpeg", "png", "gif", "webp", "svg", "avif", "bmp", "ico", "tiff",
+    "css", "js", "json", "xml", "pdf", "mp4", "webm", "mp3", "woff", "woff2",
+    "ttf", "otf", "eot", "zip", "gz",
+}
+
 
 def is_usable_email(email: str) -> bool:
     """Reject addresses that aren't a real, company-owned contact: malformed
@@ -174,7 +237,13 @@ def is_usable_email(email: str) -> bool:
     local, _, domain = email.partition("@")
     if local.lower() in GENERIC_EMAIL_PREFIXES or local.lower() in PLACEHOLDER_EMAIL_LOCALS:
         return False
-    if domain.lower() in PLACEHOLDER_EMAIL_DOMAINS:
+    # Suffix match, not equality: an error tracker's address lives on a
+    # subdomain ("...@sentry.wixpress.com"), and an exact-match check let a
+    # Sentry DSN through as a clinic's contact address.
+    lowered_domain = domain.lower()
+    if any(lowered_domain == bad or lowered_domain.endswith("." + bad) for bad in PLACEHOLDER_EMAIL_DOMAINS):
+        return False
+    if domain.rpartition(".")[2].lower() in ASSET_FILE_EXTENSIONS:
         return False
     return True
 
@@ -244,6 +313,8 @@ def parse_site(
             continue
 
         page_url = urljoin(f"https://{domain}/", path.lstrip("/"))
+        if data.pages_checked:
+            time.sleep(_crawl_delay(domain))
         html = _fetch(page_url)
         if not html:
             continue

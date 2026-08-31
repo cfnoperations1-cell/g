@@ -115,7 +115,13 @@ def test_the_cursor_advances_so_tomorrow_searches_somewhere_new(monkeypatch, tmp
 def test_sites_that_are_not_clinics_are_not_saved(monkeypatch, tmp_path):
     Session, _ = install_fakes(
         monkeypatch, tmp_path,
-        page_text="A blog post about peptide therapy trends. Read our buyer's guide.",
+        page_text=(
+            "A blog post about peptide therapy trends this year. Read our buyer's "
+            "guide to the compounds everyone is discussing, with a table of contents "
+            "and links to the studies. This article is editorially independent and "
+            "medically reviewed. We may earn a commission from some links below. "
+            "Read our review of each option before deciding anything for yourself."
+        ),
     )
 
     stats = clinics_agent.run(daily_target=5, per_query=5, max_queries=10, query_batch=5,

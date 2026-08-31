@@ -34,6 +34,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Iterator, List, Optional, Sequence, Tuple
+from urllib.parse import urlparse
 
 import requests
 
@@ -79,6 +80,19 @@ class City(tuple):
     @property
     def state(self) -> str:
         return self[1]
+
+
+def load_seed_urls(path: Path) -> List[str]:
+    """Explicit clinic URLs to visit, bypassing search discovery entirely.
+
+    Every URL still goes through the same fetch -> classify -> save path as a
+    searched one, so a seed that turns out not to be a peptide clinic (or not
+    to be US-based) is rejected exactly like any other candidate. A seed list
+    is a list of *candidates*, never a list of leads.
+    """
+    if not path.exists():
+        return []
+    return [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
 
 
 def load_cities(path: Path) -> List[City]:
@@ -217,9 +231,24 @@ def directory_candidates(queries: Sequence[Tuple[str, str]], per_query: int) -> 
             return
 
 
+def paths_for(url: str) -> List[str]:
+    """The pages to check for this candidate.
+
+    A search result (or a seed) usually points straight at the page that
+    proves the clinic offers peptides -- "/wellness/peptide-therapy/", say.
+    The standard sweep would normalise that away and check only the generic
+    paths, so the one page carrying the evidence goes first, followed by the
+    usual pages for contact details.
+    """
+    path = urlparse(url).path.rstrip("/")
+    if path and path not in CLINIC_PATHS:
+        return [path] + CLINIC_PATHS
+    return CLINIC_PATHS
+
+
 def visit(url: str, peptide_keywords: List[str], city: Optional[str]) -> Tuple[SiteData, Optional[str], dict]:
     """Fetch one clinic site and assess it. Runs on a worker thread."""
-    site_data = parse_site(url, peptide_keywords=None, candidate_paths=CLINIC_PATHS)
+    site_data = parse_site(url, peptide_keywords=None, candidate_paths=paths_for(url))
     if not site_data.pages_checked:
         return site_data, "fetch_failed", {}
     skip_reason, details = evaluate(site_data.full_text, peptide_keywords, queried_city=city)
@@ -280,8 +309,35 @@ def run(
     state_filter: Optional[str] = None,
     use_directory: bool = True,
     resume: bool = True,
+    seed_urls_file: Optional[Path] = None,
 ) -> dict:
     init_db()
+
+    stats = {
+        "added": 0, "duplicate": 0, "fetch_failed": 0, "skipped_not_a_clinic": 0,
+        "skipped_no_peptides": 0, "skipped_research_vendor": 0, "skipped_non_us": 0,
+        "skipped_no_page_text": 0, "skipped_aggregator": 0, "queries_run": 0,
+        "sites_visited": 0,
+    }
+
+    # Seed mode: visit exactly these URLs and stop. No search providers needed,
+    # no cursor to advance, and no daily target -- the list is the work.
+    if seed_urls_file is not None:
+        peptide_keywords = load_keywords(peptides_file)
+        seeds = load_seed_urls(seed_urls_file)
+        logger.info("Loaded %d seed URLs from %s (skipping search discovery)", len(seeds), seed_urls_file)
+        session = SessionLocal()
+        try:
+            seen_domains = {domain for (domain,) in session.query(Lead.domain).all()}
+            _process(
+                iter([(url, "manual seed list", "seed_list", None) for url in seeds]),
+                session, peptide_keywords, seen_domains, stats,
+                remaining=None, workers=workers, allow_non_us=allow_non_us, dry_run=dry_run,
+            )
+        finally:
+            session.close()
+        logger.info("Done. Stats: %s", stats)
+        return stats
 
     cities = load_cities(cities_file)
     services = load_keywords(services_file)
@@ -312,11 +368,6 @@ def run(
         return {}
 
     session = SessionLocal()
-    stats = {
-        "added": 0, "duplicate": 0, "fetch_failed": 0, "skipped_not_a_clinic": 0,
-        "skipped_no_peptides": 0, "skipped_research_vendor": 0, "skipped_non_us": 0,
-        "skipped_aggregator": 0, "queries_run": 0, "sites_visited": 0,
-    }
 
     try:
         cursor = read_cursor(session) if resume else 0
@@ -484,6 +535,11 @@ def main() -> None:
         "--restart-cursor", action="store_true",
         help="Start from the top of the query space instead of resuming where the last run stopped",
     )
+    parser.add_argument(
+        "--seed-urls-file", type=Path, default=None,
+        help="Skip search discovery and visit exactly these clinic URLs instead (one per line, # for "
+             "comments). Each is still fetched, classified and filtered like any other candidate.",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print what it finds; write nothing")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
@@ -507,6 +563,7 @@ def main() -> None:
         state_filter=args.state,
         use_directory=not args.no_directory,
         resume=not args.restart_cursor,
+        seed_urls_file=args.seed_urls_file,
     )
 
 

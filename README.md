@@ -399,6 +399,56 @@ keeps moving. In practice:
   most of the addressable market; when `duplicate` starts dominating the run
   stats, add cities or services rather than raising the target.
 
+## The starter seed list
+
+`clinics/seed_clinics.txt` is a hand-harvested list of ~310 candidate URLs
+(~280 domains): telehealth peptide brands, med spas, hormone/TRT clinics,
+weight-loss clinics and regenerative practices across roughly 40 metros.
+Load it before the first scheduled run so the CRM starts with leads in it
+rather than empty:
+
+```bash
+python -m clinics.agent --seed-urls-file clinics/seed_clinics.txt --workers 10
+```
+
+Two things worth knowing about it:
+
+- **They are candidates, not leads.** Every URL goes through the same
+  fetch -> classify -> filter path as a searched result, so anything that
+  turns out not to be a peptide-offering US clinic is rejected and never
+  reaches the CRM. Measured on a real run: 279 domains in, **199 leads
+  saved** -- 197 of them with an email address or phone number, 89 flagged
+  telehealth, spread across 39 states. The rest break down as ~39 that
+  wouldn't serve a page, 27 that render entirely in JavaScript (see below),
+  and ~14 that turned out not to be peptide clinics.
+- **Multi-location chains collapse to one lead.** Ten city URLs for the same
+  franchise dedupe to a single CRM row, which is what you want -- you
+  contact a company once, not once per branch.
+- **Templated SEO doorway sites were stripped out.** A network of them
+  (one identical page per city subdomain) ranks well for exactly these
+  searches and is never a real practice. Their domains are listed in the
+  strip list in this file's history; the live agent's aggregator filter
+  catches the directory equivalents.
+
+Re-running the seed load later is safe -- domains already in the CRM are
+skipped without being fetched.
+
+### Sites this crawler cannot read
+
+`skipped_no_page_text` counts sites that served a page but no readable text:
+they build their content in the browser with JavaScript, which this crawler
+doesn't run. That was about 10% of the seed list. They are reported under
+their own stat rather than being filed as "not a clinic", because the
+difference matters -- these are sites we couldn't judge, not sites we judged
+and rejected, and several are real clinics worth adding by hand. To pull the
+list out of a run, note the domains logged at `-v`, or re-run that subset
+through a browser-based fetcher.
+
+Sites that return 403 to the crawler's User-Agent are counted in
+`fetch_failed` and left alone deliberately: the User-Agent identifies this
+bot honestly, and dressing it up as a browser to get around a block is not
+something the agent will do.
+
 ## Running the clinic pipeline daily
 
 `clinic_pipeline.py` does discovery, reply detection, then outreach — the
