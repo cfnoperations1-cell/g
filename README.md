@@ -236,6 +236,8 @@ scraper/
   search_providers.py           # Google CSE / Serper / Brave / Bing APIs + DuckDuckGo fallback
   directory_providers.py        # Google Places (New) text search
   finnrick.py                   # Finnrick public vendor API (contact channels)
+  finnrick_roster.py            # adds Finnrick's vendors to a spreadsheet
+  peptiprices_roster.py         # adds suppliers linked from peptiprices.com
   enrich_csv.py                 # completes a vendor spreadsheet from the sources above
   cities.txt                    # {city} values for the med_spa / clinic templates
   site_parser.py                # fetches a company's site, extracts contact info
@@ -329,7 +331,28 @@ Company Type, Detected US State, Instagram, Enrichment, Enriched At`.
 
 `--import-crm` also loads every row that has a website into the CRM as a
 lead (source `vendor_csv`), filling blanks on leads that already exist, so
-the outreach agent can pick them up.
+the outreach agent can pick them up. `--workers 6` processes six vendors
+at a time (each site is still crawled one page at a time), and
+`--skip-visit-when-email` skips the crawl for rows that already have an
+email, which makes a roster of a couple of thousand names finish in well
+under an hour.
+
+### Growing the roster from the directories
+
+Two commands add vendors you don't have yet, ready for `enrich_csv`:
+
+```bash
+python -m scraper.finnrick_roster vendors.csv --out combined.csv              # every live Finnrick vendor
+python -m scraper.finnrick_roster vendors.csv --out combined.csv --only-tested
+python -m scraper.peptiprices_roster combined.csv --out combined.csv         # suppliers linked from peptiprices.com
+python -m scraper.enrich_csv combined.csv --out exports/combined_enriched.csv --workers 6 --import-crm
+```
+
+Finnrick's index carries roughly 1,800 vendors (name, location, website,
+trading status, number of tests); vendors marked not found, deactivated or
+archived are skipped and tested vendors are added first. PeptiPrices links
+each supplier's own site from its `/suppliers` page. PeptideBase sits
+behind a bot challenge and is not read.
 
 ## Importing a vendor list by hand
 

@@ -175,3 +175,33 @@ def test_import_to_crm_adds_and_fills(monkeypatch):
     assert leads["old.com"].email == "hello@old.com"
     assert leads["old.com"].source == "search+vendor_csv"
     assert leads["old.com"].us_based is True
+
+
+def test_skip_visit_when_email_known(monkeypatch):
+    monkeypatch.setattr("scraper.enrich_csv.parse_site",
+                        lambda url, kw: (_ for _ in ()).throw(AssertionError("should not visit")))
+    out = enrich_row(_row(Website="https://acmepeptides.com/", Email="x@acmepeptides.com"), "Vendor", None, {}, None,
+                     visit=True, keywords=[], skip_visit_when_email=True)
+    assert out["Site Status"] == "not visited (email known)"
+
+
+def test_run_with_workers_keeps_row_order(tmp_path, monkeypatch):
+    src = tmp_path / "vendors.csv"
+    src.write_text("Vendor,Website,Email\n" + "".join(f"Vendor {i},https://v{i}.com/,\n" for i in range(12)))
+    out = tmp_path / "out.csv"
+    monkeypatch.setattr("scraper.enrich_csv.FinnrickClient", lambda: FakeFinnrick({}))
+    monkeypatch.setattr("scraper.enrich_csv.first_configured_provider", lambda: None)
+    monkeypatch.setattr("scraper.enrich_csv.load_domain_map", lambda p: {})
+
+    import time as _time
+
+    def fake_parse(url, keywords):
+        _time.sleep(0.01 * (12 - int(url.split("//v")[1].split(".")[0])))  # later rows finish first
+        return SiteData(url=url, domain=url.split("/")[2], email=f"hi@{url.split('/')[2]}", pages_checked=[url])
+
+    monkeypatch.setattr("scraper.enrich_csv.parse_site", fake_parse)
+    stats = run(src, out, pause_seconds=0, workers=4)
+    assert stats["email_filled"] == 12
+    rows = list(csv.DictReader(out.open(encoding="utf-8-sig")))
+    assert [r["Vendor"] for r in rows] == [f"Vendor {i}" for i in range(12)]
+    assert rows[5]["Email"] == "hi@v5.com"

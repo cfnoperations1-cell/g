@@ -33,6 +33,7 @@ import csv
 import logging
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -115,8 +116,14 @@ def enrich_row(
     visit: bool,
     keywords: List[str],
     threshold: float = 0.55,
+    skip_visit_when_email: bool = False,
 ) -> dict:
-    """Return a completed copy of `row`. Pure apart from the sources passed in."""
+    """Return a completed copy of `row`. Pure apart from the sources passed in.
+
+    With skip_visit_when_email, a row that already has an email (from the
+    sheet or Finnrick) is not crawled -- the site visit mostly exists to
+    find one, and skipping it makes a large roster finish in a fraction of
+    the time."""
     row = dict(row)
     for column in FILL_COLUMNS + ADDED_COLUMNS:
         row.setdefault(column, "")
@@ -159,6 +166,8 @@ def enrich_row(
         row["Site Status"] = "no website"
     elif not visit:
         row["Site Status"] = "not visited"
+    elif skip_visit_when_email and not _blank(row, "Email"):
+        row["Site Status"] = "not visited (email known)"
     else:
         data = parse_site(normalize_website(row["Website"]), keywords)
         if not data.pages_checked:
@@ -256,6 +265,8 @@ def run(
     keywords_file: Path = DEFAULT_KEYWORDS_FILE,
     map_file: Path = DEFAULT_MAP_FILE,
     pause_seconds: float = 0.5,
+    workers: int = 1,
+    skip_visit_when_email: bool = False,
 ) -> dict:
     with input_path.open(encoding="utf-8-sig", newline="") as fh:
         reader = csv.DictReader(fh)
@@ -282,23 +293,40 @@ def run(
     # "does this site deal in peptides at all" the generic word counts too.
     keywords = (load_keywords(keywords_file) + ["peptide"]) if visit else []
 
+    workers = max(1, workers)
+    if workers > 1 and config.BROWSER_FALLBACK:
+        # Playwright's sync API is single-threaded; parallel rows use plain fetches only.
+        logger.info("workers=%d: headless-browser fallback disabled for this run", workers)
+        config.BROWSER_FALLBACK = False
+
     stats = {"rows": len(rows), "reused": 0, "website_filled": 0, "email_filled": 0,
              "phone_filled": 0, "reached": 0, "unreachable": 0, "no_website": 0}
     output_path.parent.mkdir(parents=True, exist_ok=True)
     enriched: List[dict] = []
 
+    def work(row: dict):
+        """(reused?, before, result) -- runs in a worker thread."""
+        name = row.get(name_col, "")
+        if name in done:
+            return True, row, done[name]
+        before = dict(row)
+        result = enrich_row(row, name_col, finnrick, domain_map, resolver, visit, keywords, threshold,
+                            skip_visit_when_email)
+        if visit and result.get("Website") and pause_seconds:
+            time.sleep(pause_seconds)
+        return False, before, result
+
+    executor = ThreadPoolExecutor(max_workers=workers)
     try:
         with output_path.open("w", encoding="utf-8-sig", newline="") as fh:
             writer = csv.DictWriter(fh, fieldnames=out_fields, extrasaction="ignore")
             writer.writeheader()
-            for i, row in enumerate(rows, 1):
-                name = row.get(name_col, "")
-                if name in done:
-                    result = done[name]
+            results = executor.map(work, rows) if workers > 1 else map(work, rows)
+            for i, (reused, before, result) in enumerate(results, 1):
+                name = result.get(name_col, "")
+                if reused:
                     stats["reused"] += 1
                 else:
-                    before = dict(row)
-                    result = enrich_row(row, name_col, finnrick, domain_map, resolver, visit, keywords, threshold)
                     for column, key in (("Website", "website_filled"), ("Email", "email_filled"), ("Phone", "phone_filled")):
                         if not before.get(column) and result.get(column):
                             stats[key] += 1
@@ -311,12 +339,11 @@ def run(
                         stats["no_website"] += 1
                     logger.info("%3d/%d %-36s site=%-42s email=%-32s %s", i, len(rows), name[:36],
                                 (result.get("Website") or "-")[:42], (result.get("Email") or "-")[:32], status)
-                    if visit and result.get("Website"):
-                        time.sleep(pause_seconds)
                 writer.writerow({c: result.get(c, "") for c in out_fields})
                 fh.flush()
                 enriched.append(result)
     finally:
+        executor.shutdown(wait=False, cancel_futures=True)
         shutdown_browser()
 
     if do_import:
@@ -338,6 +365,10 @@ def main() -> None:
     parser.add_argument("--resume", action="store_true", help="Keep rows already completed in --out")
     parser.add_argument("--import-crm", action="store_true", help="Also load the enriched rows into the CRM")
     parser.add_argument("--threshold", type=float, default=0.55, help="Name/domain similarity needed to accept a search hit")
+    parser.add_argument("--workers", type=int, default=1,
+                        help="Rows processed in parallel (different sites; each site is still crawled politely)")
+    parser.add_argument("--skip-visit-when-email", action="store_true",
+                        help="Don't crawl a site when the row already has an email; much faster on big rosters")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -355,6 +386,8 @@ def main() -> None:
         resume=args.resume,
         do_import=args.import_crm,
         threshold=args.threshold,
+        workers=args.workers,
+        skip_visit_when_email=args.skip_visit_when_email,
     )
 
 
