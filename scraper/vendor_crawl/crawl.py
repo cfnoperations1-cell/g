@@ -25,7 +25,7 @@ FIXED = ["/contact", "/contact-us", "/pages/contact", "/pages/contact-us", "/pol
          "/pages/about-us", "/pages/about", "/privacy-policy", "/pages/privacy-policy", "/policies/privacy-policy", "/policies/terms-of-service",
          "/terms-of-service", "/terms-and-conditions", "/pages/faq", "/faq", "/support", "/pages/shipping-policy", "/shipping-policy"]
 JUNK = ("example.", "sentry", "wixpress", "domain.com", "email.com", "yourdomain", "yoursite", "mysite.com", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
-        "godaddy", "wordpress", "squarespace", "shopify.com", "noreply", "no-reply", "donotreply", "@2x", "@3x", "schema.org", "w3.org", "test.com", "email@", "name@", "user@", "you@")
+        "godaddy", "wordpress", "squarespace", "shopify.com", "company.com", "yourwebsite.com", "hostingersite.com", "yourcompany", "noreply", "no-reply", "donotreply", "@2x", "@3x", "schema.org", "w3.org", "test.com", "email@", "name@", "user@", "you@")
 SKIP_TAGS = ["script", "style", "noscript", "svg"]
 lock = threading.Lock()
 _robots = {}
@@ -92,11 +92,13 @@ def clean_emails(emails, dom):
     out = set()
     for e in emails:
         e = e.strip().strip(".").lower()
-        e = re.sub(r"^(?:u003e|u003c|x3e|x3c|%3e|%3c|3e|3d)+", "", e)
+        e = re.sub(r"^(?:u003e|u003c|x3e|x3c|%3e|%3c|%20|3e|3d)+", "", e)
         if any(j in e for j in JUNK) or len(e) > 60 or e.count("@") != 1: continue
         local, host = e.split("@")
         if ".." in e or local.startswith((".", "-")) or local.endswith("."): continue
         if not local or local in PLACEHOLDER_LOCAL or "." not in host or len(host.split(".")[-1]) < 2: continue
+        if not re.fullmatch(r"[a-z0-9.-]+\.[a-z]{2,}", host) or re.search(r"\.[a-z]{2,}-", host): continue   # "gmail.com-testi.mp"
+        if re.search(r"\.(com|net|org)\.(?!au$|uk$|br$|mx$|cn$|tw$|hk$)[a-z]{2,3}$", host): continue       # "ngpeptide.com.we"
         if re.search(r"\.(js|css|html|php|webp)$", e): continue
         if re.match(r"^[0-9a-f]{16,}$", local): continue
         out.add(e)
