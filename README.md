@@ -107,7 +107,10 @@ Checked as discovery sources; **neither permits programmatic access to its
 listings**, so the agent does not crawl them:
 
 - `peptidebase.io` sits behind a Cloudflare challenge that returns 403 to
-  every non-browser request, including `/robots.txt`.
+  every non-browser request, including `/robots.txt`. Pages you save from
+  your own browser can be loaded with `scraper/import_peptidebase.py`, which
+  understands its listing cards, vendor table and profile pages (see
+  [Importing a vendor list by hand](#importing-a-vendor-list-by-hand)).
 - `thepeptidelist.com` serves its homepage and article pages but returns
   `403 Your request was blocked` for `/providers` and every provider
   profile. Its vendor data loads from `/api/`, which its own `robots.txt`
@@ -196,6 +199,10 @@ scraper/
   query_templates.py            # per-company-type search query templates
   peptide_keywords.txt          # editable list of tracked peptides/compounds
   agent.py                      # orchestrates: search -> visit -> classify -> save
+  import_list.py                # pulls company domains out of a page you saved/copied
+  import_peptidebase.py         # structured import of saved peptidebase.io pages
+  resolve_vendors.py            # company names -> official websites via search
+  import_vendors.py             # loads the vendor roster into the CRM, enriching each
 crm/
   routes.py, templates/, static/  # Flask views for browsing/updating leads
 run_crm.py                      # CRM entrypoint
@@ -274,3 +281,45 @@ python -m scraper.resolve_vendors --country "United States"
 
 One search per name, scored by how well each candidate domain matches the
 company name, so directories and blogs don't get through.
+
+### PeptideBase pages saved from your browser
+
+`peptidebase.io` gets its own importer because its pages carry more than
+domains: a provider type (Telehealth, Clinic, Pharmacy 503A/503B, Physician,
+testing labs), a location, a Google rating and review count, and regulatory
+flags ("Regulatory warning", "Under Review", "Program Suspended").
+
+1. In your browser, open each directory page you want --
+   `/directory/telehealth`, `/directory/clinics`,
+   `/directory/compounding-pharmacies` (every `?page=N` of them) and
+   `/research-vendors` -- and save it with Ctrl+S ("Webpage, Complete" or
+   "HTML Only") into one folder. If a listing only links to a provider's
+   PeptideBase profile, save that profile page too: the "Visit website" link
+   on it is where the company's own site comes from.
+2. Run the importer against the folder:
+
+```bash
+python -m scraper.import_peptidebase saved-pages/ --dry-run   # see what it parsed
+python -m scraper.import_peptidebase saved-pages/             # import
+```
+
+What it does with the result:
+
+- writes everything to `data/peptidebase_listings.csv` (category, type,
+  name, location, rating, reviews, flag, website, profile URL) -- pass
+  `--csv PATH` to put it elsewhere, or `--csv-only` to stop there
+- providers whose website is known become leads with `source =
+  peptidebase`; the directory's type, location, rating and flags land in the
+  lead's notes, 503A/503B pharmacies are typed `compounding_pharmacy`
+  directly, and contact details are filled in from the company's own site
+  through the same robots.txt-respecting fetch the agent uses (`--no-enrich`
+  skips that step)
+- providers with only a name (no profile page saved, no link in the row) are
+  appended to `scraper/vendor_names.tsv`; run `python -m
+  scraper.import_vendors` afterwards to resolve them to websites by search
+  and import them
+
+Re-running is safe: leads are matched by domain and only gain the
+PeptideBase note and source tag, and roster names are not duplicated. A
+saved copy of Cloudflare's "Just a moment..." interstitial is recognised
+and skipped with a warning -- let the real page load before saving.
