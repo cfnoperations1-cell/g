@@ -25,18 +25,20 @@ import config
 from db import SessionLocal, init_db
 from models import Lead
 from scraper.directory_providers import GooglePlacesProvider
-from scraper.query_templates import QUERY_TEMPLATES
+from scraper.query_templates import LOCAL_COMPANY_TYPES, LOCAL_QUERY_TEMPLATES, QUERY_TEMPLATES
 from scraper.search_providers import (
     BingSearchProvider,
     BraveSearchProvider,
+    DuckDuckGoProvider,
     GoogleCustomSearchProvider,
     SerperProvider,
 )
-from scraper.site_parser import SiteData, get_domain, parse_site
+from scraper.site_parser import SiteData, get_domain, parse_site, shutdown_browser
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_KEYWORDS_FILE = Path(__file__).parent / "peptide_keywords.txt"
+DEFAULT_CITIES_FILE = Path(__file__).parent / "cities.txt"
 
 # Default query focus: B2C peptide brands and general peptide companies.
 # Compounding pharmacies and manufacturing labs are still fully supported
@@ -51,6 +53,13 @@ def load_keywords(path: Path) -> List[str]:
     return [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
 
 
+def load_cities(path: Path) -> List[str]:
+    """Cities for the {city} templates (med spas / clinics), "City, ST" per line."""
+    if not path.exists():
+        return []
+    return [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
+
+
 def load_seed_urls(path: Path) -> List[str]:
     """Load explicit candidate URLs, bypassing search/directory discovery
     entirely. Useful for testing the fetch->classify->save pipeline without
@@ -60,21 +69,40 @@ def load_seed_urls(path: Path) -> List[str]:
     return [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
 
 
-def build_queries(peptide_keywords: List[str], max_queries: Optional[int], company_types: List[str]) -> List[str]:
-    """Build search queries from every (company type, template, keyword)
-    combination for the requested company types, interleaved round-robin
-    across those types so a small --max-queries budget still samples each
-    one evenly."""
-    unknown = set(company_types) - set(QUERY_TEMPLATES)
-    if unknown:
-        raise ValueError(f"Unknown company type(s): {sorted(unknown)}. Valid: {sorted(QUERY_TEMPLATES)}")
+def build_queries(
+    peptide_keywords: List[str],
+    max_queries: Optional[int],
+    company_types: List[str],
+    cities: Optional[List[str]] = None,
+) -> List[str]:
+    """Build search queries for the requested company types, interleaved
+    round-robin across those types so a small --max-queries budget still
+    samples each one evenly.
 
-    per_type_queries = {
-        company_type: [
-            template.format(peptide=keyword) for template in QUERY_TEMPLATES[company_type] for keyword in peptide_keywords
-        ]
-        for company_type in company_types
-    }
+    Vendor types combine every template with every peptide keyword. The
+    location-bound types (med_spa, clinic) combine their templates with
+    every city instead, city-major so a small budget finishes one city
+    before starting the next."""
+    valid = set(QUERY_TEMPLATES) | set(LOCAL_QUERY_TEMPLATES)
+    unknown = set(company_types) - valid
+    if unknown:
+        raise ValueError(f"Unknown company type(s): {sorted(unknown)}. Valid: {sorted(valid)}")
+
+    per_type_queries = {}
+    for company_type in company_types:
+        if company_type in QUERY_TEMPLATES:
+            per_type_queries[company_type] = [
+                template.format(peptide=keyword)
+                for template in QUERY_TEMPLATES[company_type]
+                for keyword in peptide_keywords
+            ]
+        else:
+            city_list = cities if cities is not None else load_cities(DEFAULT_CITIES_FILE)
+            per_type_queries[company_type] = [
+                template.format(city=city)
+                for city in city_list
+                for template in LOCAL_QUERY_TEMPLATES[company_type]
+            ]
 
     interleaved: List[str] = []
     max_len = max((len(queries) for queries in per_type_queries.values()), default=0)
@@ -90,6 +118,9 @@ def build_queries(peptide_keywords: List[str], max_queries: Optional[int], compa
 
 def candidate_urls_from_search(queries: List[str], per_query: int) -> Iterator[Tuple[str, str, str]]:
     providers = [GoogleCustomSearchProvider(), SerperProvider(), BraveSearchProvider(), BingSearchProvider()]
+    if not any(p.is_configured() for p in providers):
+        # Zero-setup path: no API key at all falls back to DuckDuckGo.
+        providers.append(DuckDuckGoProvider())
     for provider in providers:
         if not provider.is_configured():
             logger.info("Skipping %s (not configured)", provider.name)
@@ -107,7 +138,10 @@ def candidate_urls_from_search(queries: List[str], per_query: int) -> Iterator[T
                 break
 
 
-def candidate_urls_from_directory(queries: List[str], per_query: int) -> Iterator[Tuple[str, str, str]]:
+def candidate_urls_from_directory(queries: List[str], per_query: int) -> Iterator[Tuple[str, str, str, dict]]:
+    """Yields (url, query, source, extra): Places already knows the business
+    name, phone and address, so those ride along to fill in whatever the
+    site itself doesn't state."""
     provider = GooglePlacesProvider()
     if not provider.is_configured():
         logger.info("Skipping %s (not configured)", provider.name)
@@ -116,7 +150,7 @@ def candidate_urls_from_directory(queries: List[str], per_query: int) -> Iterato
         logger.info("[%s] searching: %s", provider.name, query)
         try:
             for result in provider.search(query, per_query):
-                yield result.website, query, provider.name
+                yield result.website, query, provider.name, result.as_extra()
         except requests.RequestException as exc:
             logger.warning("[%s] query failed, skipping this provider: %s", provider.name, exc)
             return
@@ -126,28 +160,36 @@ def is_qualifying_lead(site_data: SiteData, allow_non_us: bool, vendors_only: bo
     """Return None if the lead qualifies, otherwise a stats key explaining why not."""
     if site_data.company_type is None:
         return "skipped_not_relevant"
-    if vendors_only and site_data.is_content_site and not site_data.sells_direct:
-        return "skipped_content_site"
-    if vendors_only and not site_data.sells_direct:
-        return "skipped_not_a_vendor"
+    if site_data.company_type in LOCAL_COMPANY_TYPES:
+        # Med spas and clinics buy peptides rather than sell them, so the
+        # storefront requirement doesn't apply; media sites are still out.
+        if site_data.is_content_site:
+            return "skipped_content_site"
+    else:
+        if vendors_only and site_data.is_content_site and not site_data.sells_direct:
+            return "skipped_content_site"
+        if vendors_only and not site_data.sells_direct:
+            return "skipped_not_a_vendor"
     if not allow_non_us and not site_data.us_based:
         return "skipped_non_us"
     return None
 
 
-def upsert_lead(session, site_data: SiteData, source: str, matched_query: str) -> str:
+def upsert_lead(session, site_data: SiteData, source: str, matched_query: str, extra: Optional[dict] = None) -> str:
     """Insert a new lead. Returns a short status string. Assumes the caller
-    has already checked is_qualifying_lead()."""
+    has already checked is_qualifying_lead(). `extra` carries directory
+    fields (name, phone, state) used where the site itself had none."""
     existing = session.query(Lead).filter_by(domain=site_data.domain).one_or_none()
     if existing:
         return "duplicate"
 
+    extra = extra or {}
     lead = Lead(
-        company_name=site_data.company_name or site_data.domain,
+        company_name=site_data.company_name or extra.get("company_name") or site_data.domain,
         website=site_data.url,
         domain=site_data.domain,
         email=site_data.email,
-        phone=site_data.phone,
+        phone=site_data.phone or extra.get("phone"),
         description=site_data.description,
         source=source,
         matched_query=matched_query,
@@ -155,8 +197,8 @@ def upsert_lead(session, site_data: SiteData, source: str, matched_query: str) -
         company_type=site_data.company_type,
         sells_direct=site_data.sells_direct,
         manufactures=site_data.manufactures,
-        us_based=site_data.us_based,
-        state=site_data.state,
+        us_based=site_data.us_based or bool(extra.get("state")),
+        state=site_data.state or extra.get("state"),
         status="new",
     )
     session.add(lead)
@@ -174,6 +216,7 @@ def run(
     dry_run: bool,
     seed_urls_file: Optional[Path] = None,
     vendors_only: bool = True,
+    cities: Optional[List[str]] = None,
 ) -> dict:
     init_db()
     peptide_keywords = load_keywords(keywords_file)
@@ -186,7 +229,7 @@ def run(
         logger.info("Loaded %d seed URLs from %s (skipping search/directory discovery)", len(seed_urls), seed_urls_file)
         candidates = [(url, "manual seed list", "seed_list") for url in seed_urls]
     else:
-        queries = build_queries(peptide_keywords, max_queries, company_types)
+        queries = build_queries(peptide_keywords, max_queries, company_types, cities)
         logger.info(
             "Built %d queries from %d peptide keywords across company types: %s",
             len(queries), len(peptide_keywords), ", ".join(company_types),
@@ -204,7 +247,9 @@ def run(
     session = SessionLocal()
 
     try:
-        for url, query, source in candidates:
+        for item in candidates:
+            url, query, source = item[0], item[1], item[2]
+            extra = item[3] if len(item) > 3 else None
             if limit is not None and processed >= limit:
                 break
             domain = get_domain(url)
@@ -238,11 +283,12 @@ def run(
                 stats[skip_reason] = stats.get(skip_reason, 0) + 1
                 continue
 
-            result = upsert_lead(session, site_data, source, query)
+            result = upsert_lead(session, site_data, source, query, extra)
             stats[result] = stats.get(result, 0) + 1
             time.sleep(0.5)  # be polite to target servers
     finally:
         session.close()
+        shutdown_browser()
 
     logger.info("Done. Stats: %s", stats)
     return stats
@@ -270,9 +316,17 @@ def main() -> None:
         default=",".join(DEFAULT_COMPANY_TYPES),
         help=(
             "Comma-separated company types to actively search for: "
-            "research_only, consumer_and_research, compounding_pharmacy, manufacturing_lab "
+            "research_only, consumer_and_research, compounding_pharmacy, manufacturing_lab, "
+            "med_spa, clinic "
             f"(default: {','.join(DEFAULT_COMPANY_TYPES)})"
         ),
+    )
+    parser.add_argument(
+        "--cities",
+        type=str,
+        default=None,
+        help='Cities for med_spa/clinic queries, semicolon-separated, e.g. "Las Vegas, NV;Phoenix, AZ" '
+             f"(default: every city in {DEFAULT_CITIES_FILE.name})",
     )
     parser.add_argument(
         "--seed-urls-file",
@@ -305,6 +359,7 @@ def main() -> None:
         dry_run=args.dry_run,
         seed_urls_file=args.seed_urls_file,
         vendors_only=not args.include_non_vendors,
+        cities=[c.strip() for c in args.cities.split(";") if c.strip()] if args.cities else None,
     )
 
 

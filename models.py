@@ -20,6 +20,10 @@ class CompanyType(str, enum.Enum):
     CONSUMER_AND_RESEARCH = "consumer_and_research"
     COMPOUNDING_PHARMACY = "compounding_pharmacy"
     MANUFACTURING_LAB = "manufacturing_lab"
+    # Location-bound buyers of peptides rather than sellers: found city by
+    # city via Google Places and the {city} query templates.
+    MED_SPA = "med_spa"
+    CLINIC = "clinic"
 
 
 class Lead(Base):

@@ -115,3 +115,95 @@ def test_parse_site_refuses_non_public_host():
     data = parse_site("http://169.254.169.254/latest/meta-data/")
     assert data.pages_checked == []
     assert data.email is None
+
+
+def test_extract_instagram_skips_non_profile_paths():
+    from scraper.site_parser import extract_instagram
+
+    html = '<a href="https://www.instagram.com/p/abc123/">post</a> <a href="https://instagram.com/glow.medspa">IG</a>'
+    assert extract_instagram(html) == "@glow.medspa"
+    assert extract_instagram("<p>no socials</p>") is None
+
+
+def test_thin_page_and_challenge_detection():
+    from scraper.site_parser import _is_thin_page, _looks_like_challenge
+
+    assert _is_thin_page('<html><body><div id="root"></div><script src="app.js"></script></body></html>')
+    assert not _is_thin_page("<html><body>" + "Real peptide content. " * 30 + "</body></html>")
+    assert _looks_like_challenge("<title>Just a moment...</title>")
+    assert not _looks_like_challenge("<title>Acme Peptides</title>")
+
+
+class _FakeResp:
+    def __init__(self, status, text=""):
+        self.status_code = status
+        self.text = text
+        self.headers = {}
+        self.is_redirect = False
+        self.is_permanent_redirect = False
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            import requests
+
+            raise requests.HTTPError(f"{self.status_code}")
+
+
+def test_fetch_uses_browser_fallback_on_bot_challenge(monkeypatch):
+    from scraper import site_parser
+
+    rendered = "<html><body>" + "Rendered peptide storefront. " * 20 + "</body></html>"
+    monkeypatch.setattr(site_parser.requests, "get", lambda *a, **kw: _FakeResp(403))
+    monkeypatch.setattr(site_parser, "browser_fallback_available", lambda: True)
+    monkeypatch.setattr(site_parser, "_browser_fetch", lambda url: rendered)
+    assert site_parser._fetch("https://acmepeptides.com/") == rendered
+
+
+def test_fetch_without_browser_returns_none_on_challenge(monkeypatch):
+    from scraper import site_parser
+
+    monkeypatch.setattr(site_parser.requests, "get", lambda *a, **kw: _FakeResp(200, "<title>Just a moment...</title>"))
+    monkeypatch.setattr(site_parser, "browser_fallback_available", lambda: False)
+    assert site_parser._fetch("https://acmepeptides.com/") is None
+
+
+def test_fetch_keeps_plain_html_when_browser_not_needed(monkeypatch):
+    from scraper import site_parser
+
+    html = "<html><body>" + "Plain peptide storefront copy. " * 20 + "</body></html>"
+    monkeypatch.setattr(site_parser.requests, "get", lambda *a, **kw: _FakeResp(200, html))
+    monkeypatch.setattr(site_parser, "_browser_fetch", lambda url: (_ for _ in ()).throw(AssertionError("should not render")))
+    assert site_parser._fetch("https://acmepeptides.com/") == html
+
+
+def _robots_resp(status, text=""):
+    r = _FakeResp(status, text)
+    return r
+
+
+def test_robots_fetched_with_bot_user_agent_and_parsed(monkeypatch):
+    from scraper import site_parser
+
+    seen = {}
+
+    def fake_get(url, headers=None, timeout=None):
+        seen["ua"] = headers["User-Agent"]
+        return _robots_resp(200, "User-agent: *\nDisallow: /wp-admin/\n")
+
+    monkeypatch.setattr(site_parser.requests, "get", fake_get)
+    monkeypatch.setattr(site_parser, "_robots_cache", {})
+    assert site_parser._allowed_by_robots("acmepeptides.com", "/")
+    assert not site_parser._allowed_by_robots("acmepeptides.com", "/wp-admin/x")
+    assert seen["ua"] == site_parser.config.SCRAPER_USER_AGENT
+
+
+def test_robots_4xx_means_no_restrictions_and_5xx_means_stay_out(monkeypatch):
+    from scraper import site_parser
+
+    monkeypatch.setattr(site_parser.requests, "get", lambda url, headers=None, timeout=None: _robots_resp(403))
+    monkeypatch.setattr(site_parser, "_robots_cache", {})
+    assert site_parser._allowed_by_robots("blocked-robots.com", "/")
+
+    monkeypatch.setattr(site_parser.requests, "get", lambda url, headers=None, timeout=None: _robots_resp(503))
+    monkeypatch.setattr(site_parser, "_robots_cache", {})
+    assert not site_parser._allowed_by_robots("down.com", "/")

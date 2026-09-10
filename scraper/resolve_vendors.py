@@ -23,7 +23,12 @@ from typing import List, Optional, Tuple
 import requests
 
 from scraper.import_list import _is_company_host, _normalize_host, merge_into_seed_file
-from scraper.search_providers import BraveSearchProvider, GoogleCustomSearchProvider, SerperProvider
+from scraper.search_providers import (
+    BraveSearchProvider,
+    DuckDuckGoProvider,
+    GoogleCustomSearchProvider,
+    SerperProvider,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +91,8 @@ def pick_domain(name: str, urls: List[str], threshold: float) -> Optional[str]:
 
 
 def first_configured_provider():
-    for provider in (SerperProvider(), BraveSearchProvider(), GoogleCustomSearchProvider()):
+    """Best available search provider: a keyed API first, DuckDuckGo last."""
+    for provider in (SerperProvider(), BraveSearchProvider(), GoogleCustomSearchProvider(), DuckDuckGoProvider()):
         if provider.is_configured():
             return provider
     return None
@@ -128,7 +134,8 @@ def resolve(
 ) -> dict:
     provider = first_configured_provider()
     if provider is None:
-        sys.exit("No search provider configured. Set SERPER_API_KEY (or BRAVE/GOOGLE) in .env")
+        sys.exit("No search provider available. Set SERPER_API_KEY (or BRAVE/GOOGLE) in .env, "
+                 "or `pip install ddgs` for the keyless fallback")
 
     vendors = load_vendor_names(names_file)
     if country:

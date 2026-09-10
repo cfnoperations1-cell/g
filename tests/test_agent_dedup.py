@@ -116,3 +116,45 @@ def test_is_qualifying_lead_keeps_non_vendor_when_opted_in():
     site = SiteData(url="https://info.com", domain="info.com", company_type="research_only",
                     us_based=True, sells_direct=False)
     assert is_qualifying_lead(site, allow_non_us=False, vendors_only=False) is None
+
+
+def test_build_queries_local_types_expand_cities_city_major():
+    queries = build_queries(["BPC-157"], max_queries=None, company_types=["med_spa"], cities=["Las Vegas, NV", "Reno, NV"])
+    from scraper.query_templates import LOCAL_QUERY_TEMPLATES
+
+    per_city = len(LOCAL_QUERY_TEMPLATES["med_spa"])
+    assert len(queries) == 2 * per_city
+    assert all("Las Vegas, NV" in q for q in queries[:per_city])
+    assert all("Reno, NV" in q for q in queries[per_city:])
+    assert "{city}" not in " ".join(queries)
+
+
+def test_build_queries_mixes_vendor_and_local_types():
+    queries = build_queries(["BPC-157"], max_queries=4, company_types=["research_only", "clinic"], cities=["Austin, TX"])
+    assert len(queries) == 4
+    assert any("Austin, TX" in q for q in queries)
+    assert any("BPC-157" in q for q in queries)
+
+
+def test_local_lead_qualifies_without_a_storefront():
+    site = SiteData(url="https://glowmedspa.com", domain="glowmedspa.com", company_type="med_spa",
+                    us_based=True, sells_direct=False)
+    assert is_qualifying_lead(site, allow_non_us=False, vendors_only=True) is None
+
+
+def test_local_content_site_is_still_skipped():
+    site = SiteData(url="https://spablog.com", domain="spablog.com", company_type="clinic",
+                    us_based=True, sells_direct=False, is_content_site=True)
+    assert is_qualifying_lead(site, allow_non_us=False, vendors_only=True) == "skipped_content_site"
+
+
+def test_upsert_uses_directory_extras_for_missing_fields():
+    session = make_session()
+    site = SiteData(url="https://glowmedspa.com", domain="glowmedspa.com", company_type="med_spa", us_based=False)
+    extra = {"company_name": "Glow Med Spa", "phone": "(702) 555-0123", "state": "NV", "address": "1 Strip Blvd"}
+    assert upsert_lead(session, site, "google_places", "med spa peptides Las Vegas, NV", extra) == "added"
+    lead = session.query(Lead).one()
+    assert lead.company_name == "Glow Med Spa"
+    assert lead.phone == "(702) 555-0123"
+    assert lead.state == "NV"
+    assert lead.us_based is True

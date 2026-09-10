@@ -90,3 +90,68 @@ def test_failing_provider_does_not_abort_the_run(monkeypatch):
 
     results = list(agent.candidate_urls_from_search(["peptides"], 5))
     assert results == [("https://acmepeptides.com", "peptides", "working")]
+
+
+def test_duckduckgo_disabled_is_not_configured():
+    from scraper.search_providers import DuckDuckGoProvider
+
+    provider = DuckDuckGoProvider(enabled=False)
+    assert provider.is_configured() is False
+    assert list(provider.search("peptides", 5)) == []
+
+
+def test_duckduckgo_parses_rows_from_ddgs(monkeypatch):
+    from scraper.search_providers import DuckDuckGoProvider
+
+    monkeypatch.setattr("scraper.search_providers._ddgs_text", lambda q, n, backend, timeout: [
+        {"href": "https://acmepeptides.com/", "title": "Acme", "body": "research peptides"},
+        {"title": "no link"},
+    ])
+    monkeypatch.setattr("scraper.search_providers.time.sleep", lambda s: None)
+    provider = DuckDuckGoProvider(enabled=True)
+    monkeypatch.setattr(provider, "is_configured", lambda: True)
+    results = list(provider.search("peptides", 5))
+    assert [r.url for r in results] == ["https://acmepeptides.com/"]
+    assert results[0].snippet == "research peptides"
+
+
+def test_duckduckgo_transient_failure_yields_nothing_without_raising(monkeypatch):
+    from scraper.search_providers import DuckDuckGoProvider
+
+    def boom(q, n, backend, timeout):
+        raise RuntimeError("Connection reset by peer")
+
+    monkeypatch.setattr("scraper.search_providers._ddgs_text", boom)
+    monkeypatch.setattr("scraper.search_providers.time.sleep", lambda s: None)
+    provider = DuckDuckGoProvider(enabled=True, attempts=2)
+    monkeypatch.setattr(provider, "is_configured", lambda: True)
+    assert list(provider.search("peptides", 5)) == []
+
+
+def test_agent_falls_back_to_duckduckgo_only_when_nothing_is_keyed(monkeypatch):
+    from scraper import agent
+    from scraper.search_providers import SearchResult
+
+    class Unconfigured:
+        name = "unconfigured"
+
+        def is_configured(self):
+            return False
+
+        def search(self, query, num_results):
+            return iter(())
+
+    class FakeDDG:
+        name = "duckduckgo"
+
+        def is_configured(self):
+            return True
+
+        def search(self, query, num_results):
+            yield SearchResult(url="https://acmepeptides.com", title="Acme", snippet="", query=query)
+
+    for name in ("GoogleCustomSearchProvider", "SerperProvider", "BraveSearchProvider", "BingSearchProvider"):
+        monkeypatch.setattr(agent, name, lambda *a, **kw: Unconfigured())
+    monkeypatch.setattr(agent, "DuckDuckGoProvider", lambda *a, **kw: FakeDDG())
+
+    assert list(agent.candidate_urls_from_search(["peptides"], 5)) == [("https://acmepeptides.com", "peptides", "duckduckgo")]

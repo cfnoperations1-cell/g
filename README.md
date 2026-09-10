@@ -17,20 +17,6 @@ All three share one SQLite database (`data/leads.db`) via `db.py` /
 `models.py`. `pipeline.py` runs the scraper and emailer back to back, which
 is what you schedule to keep adding vendors continuously.
 
-## Local lead bot (`peptide-lead-bot/`)
-
-A separate, self-contained scraper for **med spas, clinics, and vendors**
-that offer peptides, organised city-by-city. It has its own SQLite store,
-config (`peptide-lead-bot/config/queries.yaml`), and CSV export, and does
-not share the CRM database. See `peptide-lead-bot/CLAUDE.md` for setup and
-commands:
-
-```bash
-cd peptide-lead-bot
-pip install -r requirements.txt && playwright install chromium
-python -m bot run --mode medspa --cities "Las Vegas, NV;Phoenix, AZ" --limit 5
-```
-
 ## Target company types
 
 Every lead is classified into one of four categories, based on what its own
@@ -44,11 +30,23 @@ site says:
   phrases like "compounding pharmacy", "PCAB accredited", "USP 795/797")
 - `manufacturing_lab` — a peptide manufacturing/synthesis lab (detected via
   phrases like "cGMP", "custom peptide synthesis", "API manufacturer")
+- `med_spa` — a med spa / aesthetics practice that offers peptides to its
+  clients (a buyer, not a seller; detected via practice copy such as
+  "Botox", "fillers", "microneedling")
+- `clinic` — a wellness / hormone / longevity clinic offering peptide
+  therapy (also a buyer; "hormone therapy", "IV therapy", "book a consultation")
 
 A site only gets classified at all if it actually mentions one of your
 tracked peptide keywords (`scraper/peptide_keywords.txt`) — otherwise it's
 skipped as irrelevant. By default, only leads that also look US-based are
 kept (see below); pass `--allow-non-us` to disable that filter.
+
+`med_spa` and `clinic` are found **city by city**: their query templates
+take a `{city}` placeholder filled from `scraper/cities.txt` (or
+`--cities "Las Vegas, NV;Phoenix, AZ"`), and Google Places is by far the
+best source for them because it returns the business's website, phone and
+address in one call. Because they buy peptides rather than sell them, the
+"must be a storefront" filter doesn't apply to these two types.
 
 By default the agent only actively *searches* for `research_only` and
 `consumer_and_research` companies (B2C peptide brands and general peptide
@@ -115,6 +113,20 @@ cp .env.example .env
 Any provider left blank is simply skipped at runtime (you'll see a log line
 saying so) — the agent still runs with whatever you've configured.
 
+**No keys at all?** The agent falls back to DuckDuckGo through the `ddgs`
+package (installed with the requirements). It needs no account, but it is
+slow, rate-limited and noisier than a real API, so treat it as a way to get
+going rather than the way to run at volume. Set `DUCKDUCKGO_FALLBACK=false`
+to turn it off.
+
+### Finnrick (finnrick.com)
+
+Finnrick publishes independent test results for peptide vendors together
+with each vendor's contact channels (website, email, WhatsApp, Telegram),
+and its `robots.txt` explicitly allows reading the public API under
+`/api/v1/`. `scraper/finnrick.py` reads that index (cached for a day in
+`data/finnrick_vendors.json`) and is the first source `enrich_csv` consults.
+
 ### Peptide directory sites (thepeptidelist.com, peptidebase.io)
 
 Checked as discovery sources; **neither permits programmatic access to its
@@ -144,6 +156,22 @@ look like every site's robots.txt is disallowing everything. If that
 happens, either switch that environment's network policy to full internet
 access, or run the agent on a machine/environment without that restriction.
 
+### JavaScript-only sites (headless browser fallback)
+
+Some vendor sites ship an empty HTML shell and render everything in the
+browser, or answer a plain request with a bot-challenge page. When a fetch
+comes back like that and Playwright is installed, the page is re-fetched
+in headless Chromium, with the same User-Agent and the same robots.txt
+decision as the plain request. Install it once:
+
+```bash
+pip install playwright && playwright install chromium
+```
+
+It is on whenever Playwright is importable; `BROWSER_FALLBACK=false`
+disables it, and `PLAYWRIGHT_CHROMIUM_PATH` points it at an existing
+Chromium binary if you have one.
+
 ## Running the scraper agent
 
 ```bash
@@ -166,6 +194,8 @@ Flags:
   only US companies are kept)
 - `--company-types` — comma-separated list of company types to actively
   search for (default: `research_only,consumer_and_research`)
+- `--cities` — semicolon-separated cities for `med_spa` / `clinic` queries
+  (default: every line of `scraper/cities.txt`)
 - `--seed-urls-file PATH` — skip search/directory discovery entirely and
   visit exactly the URLs listed in this file (one per line, `#` for
   comments). Useful for testing the fetch -> classify -> save pipeline
@@ -203,8 +233,11 @@ or external services.
 ```
 config.py, db.py, models.py     # shared config + SQLAlchemy engine + Lead model
 scraper/
-  search_providers.py           # Google CSE / Bing search API wrappers
-  directory_providers.py        # Google Places directory API wrapper
+  search_providers.py           # Google CSE / Serper / Brave / Bing APIs + DuckDuckGo fallback
+  directory_providers.py        # Google Places (New) text search
+  finnrick.py                   # Finnrick public vendor API (contact channels)
+  enrich_csv.py                 # completes a vendor spreadsheet from the sources above
+  cities.txt                    # {city} values for the med_spa / clinic templates
   site_parser.py                # fetches a company's site, extracts contact info
   classify.py                   # company-type classification + US-presence heuristic
   query_templates.py            # per-company-type search query templates
@@ -265,6 +298,38 @@ Daily at 9am via cron:
 
 Leave off `--send` and each run just stacks reviewable drafts in
 `outreach_drafts/`.
+
+## Completing a vendor spreadsheet
+
+If you already have a list of vendors with gaps in it (names, some
+directory links, few websites, fewer emails), `enrich_csv` fills the blanks
+from sources that publish the vendor's own details and writes a completed
+copy. Nothing is ever invented: a cell no source can fill stays empty,
+existing values are never overwritten, and each row says where every fill
+came from.
+
+```bash
+python -m scraper.enrich_csv vendors.csv                       # -> data/out/vendors_enriched.csv
+python -m scraper.enrich_csv vendors.csv --out exports/vendors_enriched.csv --import-crm
+python -m scraper.enrich_csv vendors.csv --no-visit            # directory sources only
+python -m scraper.enrich_csv vendors.csv --limit 20            # quick test
+python -m scraper.enrich_csv vendors.csv --resume              # continue an interrupted run
+```
+
+Sources, in order: Finnrick's public vendor API (website, email, WhatsApp,
+Telegram), `scraper/vendor_domains.tsv` (websites resolved earlier), a web
+search for the name (keyed API or the DuckDuckGo fallback), and finally
+the vendor's own site (email, phone, Instagram, whether it actually
+mentions peptides, and the company type). The input needs only a
+`Vendor` / `Name` / `Company` column; these columns are filled or added:
+
+`Website, Email, Phone, WhatsApp, Telegram/Signal, Social, Email Source,
+Finnrick Profile` plus `Website Source, Site Status, Peptide Confirmed,
+Company Type, Detected US State, Instagram, Enrichment, Enriched At`.
+
+`--import-crm` also loads every row that has a website into the CRM as a
+lead (source `vendor_csv`), filling blanks on leads that already exist, so
+the outreach agent can pick them up.
 
 ## Importing a vendor list by hand
 

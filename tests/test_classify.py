@@ -97,3 +97,30 @@ def test_is_content_site_detects_affiliate_review():
 
 def test_is_content_site_false_for_store():
     assert not is_content_site("Add to cart. Shop our peptides. In stock now.")
+
+
+def test_classify_med_spa_from_practice_copy():
+    from scraper.classify import looks_like_med_spa
+
+    text = "Glow Med Spa offers Botox, dermal fillers, microneedling and peptide therapy. Book your facial today."
+    assert looks_like_med_spa(text)
+    assert classify_company_type(text, research_only_evidence=None) == "med_spa"
+
+
+def test_classify_clinic_from_practice_copy():
+    from scraper.classify import looks_like_clinic
+
+    text = "Our longevity clinic provides hormone therapy, IV therapy and peptide protocols. Book a consultation with our providers."
+    assert looks_like_clinic(text)
+    assert classify_company_type(text, research_only_evidence=None) == "clinic"
+
+
+def test_storefront_with_spa_words_is_still_a_seller():
+    text = "Add to cart. In stock. Free shipping. Our aesthetic peptides are loved by med spa clients and facial specialists."
+    assert classify_company_type(text, research_only_evidence=None) == "consumer_and_research"
+
+
+def test_single_spa_word_is_not_enough():
+    from scraper.classify import looks_like_med_spa
+
+    assert not looks_like_med_spa("We ship research peptides to labs and the occasional med spa.")

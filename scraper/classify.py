@@ -63,6 +63,38 @@ CONTENT_SITE_SIGNALS = [
 ]
 
 
+# Signals of a med spa / aesthetics practice -- a buyer of peptides for its
+# clients rather than a seller. Two distinct signals are required so a
+# vendor's passing "wellness" mention doesn't flip it.
+MED_SPA_SIGNALS = [
+    "med spa", "medspa", "medical spa", "botox", "dermal filler", "fillers",
+    "microneedling", "laser hair removal", "aesthetic", "aesthetics",
+    "facial", "coolsculpting", "prp", "morpheus8", "injectables",
+]
+
+# Signals of a wellness / hormone / longevity clinic.
+CLINIC_SIGNALS = [
+    "clinic", "wellness center", "hormone replacement", "hormone therapy",
+    "trt", "hrt", "anti-aging", "longevity", "iv therapy", "weight loss program",
+    "functional medicine", "telehealth", "book an appointment", "book a consultation",
+    "our providers", "nurse practitioner", "medical director", "patients",
+]
+
+
+def _count_signals(lowered_text: str, signals: List[str]) -> int:
+    return sum(1 for signal in signals if signal in lowered_text)
+
+
+def looks_like_med_spa(text: str) -> bool:
+    lowered = text.lower()
+    return _count_signals(lowered, MED_SPA_SIGNALS) >= 2
+
+
+def looks_like_clinic(text: str) -> bool:
+    lowered = text.lower()
+    return _count_signals(lowered, CLINIC_SIGNALS) >= 2
+
+
 def guess_us_presence(text: str) -> Tuple[bool, Optional[str]]:
     """Best-effort guess at whether a site's company is US-based, and which
     state, from mentions of "USA"/state names, or a state abbreviation sitting
@@ -135,4 +167,11 @@ def classify_company_type(text: str, research_only_evidence: Optional[str]) -> s
         return "manufacturing_lab"
     if research_only_evidence:
         return "research_only"
+    # A storefront is a seller whatever else its copy says; only a site with
+    # no cart and practice-style copy is a med spa / clinic (a buyer).
+    if not sells_direct(text):
+        if looks_like_med_spa(text):
+            return "med_spa"
+        if looks_like_clinic(text):
+            return "clinic"
     return "consumer_and_research"

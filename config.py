@@ -61,6 +61,22 @@ SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 EMAIL_DELAY_SECONDS = float(os.environ.get("EMAIL_DELAY_SECONDS", "8"))
 
 REQUEST_TIMEOUT_SECONDS = float(os.environ.get("REQUEST_TIMEOUT_SECONDS", "10"))
+
+# --- Keyless search fallback ---
+# When no search API key is configured at all, fall back to DuckDuckGo via
+# the `ddgs` package. Slower and rate-limited, and results are noisier than
+# a paid API, but it lets the pipeline run with zero setup.
+DUCKDUCKGO_FALLBACK = os.environ.get("DUCKDUCKGO_FALLBACK", "true").lower() != "false"
+DUCKDUCKGO_BACKEND = os.environ.get("DUCKDUCKGO_BACKEND", "bing, duckduckgo")
+
+# --- Headless-browser fallback for JS-only pages ---
+# If a page comes back empty or as a bot-challenge stub, re-fetch it with
+# headless Chromium (Playwright) when it is installed. Same User-Agent and
+# robots.txt rules apply; this only helps with sites that render in JS.
+BROWSER_FALLBACK = os.environ.get("BROWSER_FALLBACK", "true").lower() != "false"
+# Path to a Chromium binary if Playwright's own download isn't present
+# (e.g. a preinstalled /opt/pw-browsers/chromium).
+PLAYWRIGHT_CHROMIUM_PATH = os.environ.get("PLAYWRIGHT_CHROMIUM_PATH", "")
 SCRAPER_USER_AGENT = os.environ.get(
     "SCRAPER_USER_AGENT",
     "PeptideLeadBot/0.1 (+contact: your-email@example.com)",
