@@ -17,7 +17,8 @@ def dom_of(u):
 
 # 1. crawl results: base passes, then Chromium shards override by domain
 res = {}
-for f in [f"{S}/results.jsonl", f"{S}/results3.jsonl"] + sorted(glob.glob(f"{S}/results*.pw*.jsonl")) + sorted(glob.glob(f"{S}/results_deep*.jsonl")):
+BASE = [f for f in sorted(glob.glob(f"{S}/results*.jsonl")) if ".pw" not in f and "deep" not in f and "pre_pw" not in f]
+for f in BASE + sorted(glob.glob(f"{S}/results*.pw*.jsonl")) + sorted(glob.glob(f"{S}/results_deep*.jsonl")):
     if not os.path.exists(f): continue
     for l in open(f):
         r = json.loads(l); res[r["domain"]] = r
@@ -39,12 +40,13 @@ for l in open(os.path.join(ROOT, "scraper", "vendor_domains.tsv")):
     p = l.rstrip("\n").split("\t")
     if len(p) >= 3 and p[2] and p[2].strip() not in NON_VENDOR: name2dom.setdefault(norm(p[0]), (p[2].strip(), "roster"))
 known = json.load(open(f"{S}/known_emails.json"))
+FR = json.load(open(f"{S}/finnrick/meta.json")) if os.path.exists(f"{S}/finnrick/meta.json") else {}
 known_by_dom = {}
 for e, d in known.items(): known_by_dom.setdefault(d, []).append(e)
 
 COLS = ["vendor", "country", "website", "domain", "primary_email", "all_emails", "email_source", "email_page", "phone", "whatsapp", "telegram_signal", "social",
         "us_signal_on_site", "state_mentioned", "company_type", "sells_direct", "research_only", "peptide_terms_found", "peptide_hits",
-        "peptidebase_tier", "listed_on", "peptidebase_profile", "finnrick_profile", "crawl_status", "pages_checked", "notes"]
+        "peptidebase_tier", "listed_on", "peptidebase_profile", "finnrick_profile", "finnrick_location", "finnrick_products_tested", "finnrick_tests", "finnrick_status", "crawl_status", "pages_checked", "notes"]
 
 def enrich(base, dom):
     r = res.get(dom, {})
@@ -73,6 +75,14 @@ def enrich(base, dom):
         "peptidebase_tier": base.get("tier", ""), "listed_on": base.get("listed_on", ""), "peptidebase_profile": base.get("pb", ""), "finnrick_profile": base.get("fr", ""),
         "crawl_status": st, "pages_checked": len(r.get("pages_checked") or []), "notes": "; ".join(n for n in notes if n),
     })
+    fm = FR.get(dom)
+    if fm:
+        row["finnrick_profile"] = row["finnrick_profile"] or f"https://www.finnrick.com/vendors/{fm['slug']}"
+        row["finnrick_location"], row["finnrick_products_tested"], row["finnrick_tests"], row["finnrick_status"] = fm["location"], fm["product_count"], fm["test_count"], fm["status"]
+        if not row["listed_on"] or "Finnrick" not in row["listed_on"]: row["listed_on"] = (row["listed_on"] + ", " if row["listed_on"] else "") + "Finnrick"
+        if row["country"].startswith("unknown") or not row["country"] or "(roster)" in row["country"]:
+            if re.search(r"\bus\b", fm["location"], re.I): row["country"] = "United States (Finnrick)"
+            elif fm["location"]: row["country"] = f"{fm['location']} (Finnrick)"
     return row
 
 out, seen = [], set()
@@ -93,12 +103,15 @@ for dom, r in res.items():
     if dom in seen or not dom or dom in NON_VENDOR: continue
     cname = r.get("company_name") or ""
     if BAD_NAME.search(cname): cname = ""
-    base = {"vendor": r.get("roster_name") or cname or dom, "country": "United States (roster)" if r.get("source") in ("seed_urls", "vendor_domains") else "", "listed_on": f"repo roster ({r.get('source','')})"}
+    fm = FR.get(dom, {})
+    base = {"vendor": fm.get("name") or r.get("roster_name") or cname or dom,
+            "country": "United States (roster)" if r.get("source") in ("seed_urls", "vendor_domains") else ("unknown (not stated on list)" if fm else ""),
+            "listed_on": "Finnrick" if fm else f"repo roster ({r.get('source','')})"}
     out.append(enrich(base, dom)); seen.add(dom)
 
 def us_ok(r): return r["country"].startswith("United States") or r["us_signal_on_site"] == "yes"
 out = [r for r in out if us_ok(r) or r["country"].startswith("unknown")]
-out.sort(key=lambda x: (x["primary_email"] == "", 0 if x["country"].startswith("United States") else 1, -int(x["peptide_hits"]), x["vendor"].lower()))
+out.sort(key=lambda x: (x["primary_email"] == "", 0 if x["country"].startswith("United States") else 1, -int(x["finnrick_products_tested"] or 0), -int(x["peptide_hits"]), x["vendor"].lower()))
 os.makedirs(f"{ROOT}/data/out", exist_ok=True)
 def write(path, rows_):
     with open(path, "w", newline="", encoding="utf-8-sig") as f:
