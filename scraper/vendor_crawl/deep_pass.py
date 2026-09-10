@@ -6,19 +6,19 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import crawl
 S = crawl.S
 res = {}
-for f in sorted(glob.glob(f"{S}/results*.jsonl")):
-    if "deep" in os.path.basename(f): continue
+BASE = [f for f in sorted(glob.glob(f"{S}/results*.jsonl")) if ".pw" not in f and "deep" not in f and "pre_pw" not in f]
+for f in BASE + sorted(glob.glob(f"{S}/results*.pw*.jsonl")) + sorted(glob.glob(f"{S}/results_deep*.jsonl")):
     if os.path.exists(f):
         for l in open(f): r = json.loads(l); res[r["domain"]] = r
-SHARD, NSHARD = int(sys.argv[1]), int(sys.argv[2])
-targets = [r for r in res.values() if r["status"] in ("ok", "ok_chromium") and not r.get("emails")]
+SHARD, NSHARD = int(sys.argv[1]), int(sys.argv[2]); RUN = sys.argv[3] if len(sys.argv) > 3 else "a"
+targets = [r for r in res.values() if r["status"] in ("ok", "ok_chromium") and not r.get("emails") and not r["status"].endswith("+deep")]
 targets = [r for i, r in enumerate(sorted(targets, key=lambda r: r["domain"])) if i % NSHARD == SHARD]
 print(f"{len(targets)} sites to deep-crawl", flush=True)
 PATHS = ["/policies/contact-information", "/policies/privacy-policy", "/policies/terms-of-service", "/policies/refund-policy", "/policies/shipping-policy",
          "/pages/contact", "/pages/contact-us", "/pages/about-us", "/pages/about", "/pages/faq", "/pages/faqs", "/pages/shipping", "/pages/refund-policy",
          "/contact", "/contact-us", "/contactus", "/about", "/about-us", "/privacy-policy", "/privacy", "/terms", "/terms-of-service", "/terms-and-conditions",
          "/refund-policy", "/return-policy", "/shipping-policy", "/faq", "/faqs", "/support", "/help", "/wholesale", "/customer-service", "/legal", "/disclaimer"]
-out = open(f"{S}/results_deep{SHARD}.jsonl", "w")
+out = open(f"{S}/results_deep_{RUN}{SHARD}.jsonl", "w")
 from playwright.sync_api import sync_playwright
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True, executable_path=os.environ.get("CHROMIUM_PATH") or None, proxy=({"server": os.environ["HTTPS_PROXY"]} if os.environ.get("HTTPS_PROXY") else None),
