@@ -1,7 +1,9 @@
 """Polite concurrent crawler: visit each vendor domain's own public pages, pull emails/phones,
 classify US presence + vendor type. Resumable: appends one JSON line per domain to results.jsonl."""
-import json, os, re, sys, time, threading, html as htmlmod
-from concurrent.futures import ThreadPoolExecutor
+import json, os, re, sys, time, threading, socket, html as htmlmod
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutTimeout
+socket.setdefaulttimeout(25)
+PER_SITE_TIMEOUT = int(os.environ.get("PER_SITE_TIMEOUT", "240"))
 from urllib.parse import urljoin, urlparse
 from urllib.robotparser import RobotFileParser
 import requests
@@ -172,8 +174,11 @@ def main():
     print(f"{len(todo)} domains to crawl ({len(done)} already done)", flush=True)
     def work(item):
         dom, src, name = item
-        try: rec = crawl(dom, src, name)
+        inner = ThreadPoolExecutor(1)
+        try: rec = inner.submit(crawl, dom, src, name).result(timeout=PER_SITE_TIMEOUT)
+        except FutTimeout: rec = {"domain": dom, "source": src, "roster_name": name, "status": "error:timeout", "emails": [], "pages_checked": []}
         except Exception as ex: rec = {"domain": dom, "source": src, "roster_name": name, "status": f"exception:{type(ex).__name__}:{ex}"[:200], "emails": [], "pages_checked": []}
+        finally: inner.shutdown(wait=False)
         with lock:
             with open(OUT, "a") as f: f.write(json.dumps(rec) + "\n")
             print(f"{dom:35s} {rec['status']:14s} pages={len(rec['pages_checked'])} emails={rec.get('emails')}", flush=True)
