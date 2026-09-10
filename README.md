@@ -17,6 +17,20 @@ All three share one SQLite database (`data/leads.db`) via `db.py` /
 `models.py`. `pipeline.py` runs the scraper and emailer back to back, which
 is what you schedule to keep adding vendors continuously.
 
+## Local lead bot (`peptide-lead-bot/`)
+
+A separate, self-contained scraper for **med spas, clinics, and vendors**
+that offer peptides, organised city-by-city. It has its own SQLite store,
+config (`peptide-lead-bot/config/queries.yaml`), and CSV export, and does
+not share the CRM database. See `peptide-lead-bot/CLAUDE.md` for setup and
+commands:
+
+```bash
+cd peptide-lead-bot
+pip install -r requirements.txt && playwright install chromium
+python -m bot run --mode medspa --cities "Las Vegas, NV;Phoenix, AZ" --limit 5
+```
+
 ## Target company types
 
 Every lead is classified into one of four categories, based on what its own

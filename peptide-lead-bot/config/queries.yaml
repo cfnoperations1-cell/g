@@ -1,0 +1,99 @@
+# Search queries per mode. {city} is substituted for each city in the cities list.
+# Add/remove freely. More queries = more coverage = more API calls.
+
+cities:
+  - "Las Vegas, NV"
+  - "Henderson, NV"
+  - "Reno, NV"
+  - "Phoenix, AZ"
+  - "Scottsdale, AZ"
+  - "Tucson, AZ"
+  - "Los Angeles, CA"
+  - "Beverly Hills, CA"
+  - "Newport Beach, CA"
+  - "San Diego, CA"
+  - "San Francisco, CA"
+  - "San Jose, CA"
+  - "Sacramento, CA"
+  - "Salt Lake City, UT"
+  - "Denver, CO"
+  - "Boulder, CO"
+  - "Dallas, TX"
+  - "Fort Worth, TX"
+  - "Houston, TX"
+  - "Austin, TX"
+  - "San Antonio, TX"
+  - "Miami, FL"
+  - "Fort Lauderdale, FL"
+  - "Boca Raton, FL"
+  - "Orlando, FL"
+  - "Tampa, FL"
+  - "Naples, FL"
+  - "Jacksonville, FL"
+  - "Atlanta, GA"
+  - "Nashville, TN"
+  - "Charlotte, NC"
+  - "Raleigh, NC"
+  - "Chicago, IL"
+  - "New York, NY"
+  - "Long Island, NY"
+  - "Newark, NJ"
+  - "Boston, MA"
+  - "Philadelphia, PA"
+  - "Washington, DC"
+  - "Baltimore, MD"
+  - "Seattle, WA"
+  - "Portland, OR"
+  - "Minneapolis, MN"
+  - "Detroit, MI"
+  - "Columbus, OH"
+  - "Indianapolis, IN"
+  - "Kansas City, MO"
+  - "St. Louis, MO"
+  - "Oklahoma City, OK"
+  - "New Orleans, LA"
+
+medspa:
+  - "med spa peptides {city}"
+  - "medical spa peptide therapy {city}"
+  - "med spa BPC-157 {city}"
+  - "med spa semaglutide tirzepatide {city}"
+  - "med spa NAD+ injections {city}"
+  - "aesthetics clinic peptide injections {city}"
+
+clinic:
+  - "peptide therapy clinic {city}"
+  - "anti-aging clinic peptides {city}"
+  - "hormone clinic peptide therapy {city}"
+  - "wellness clinic BPC-157 {city}"
+  - "longevity clinic peptides {city}"
+  - "IV therapy clinic NAD+ peptides {city}"
+  - "men's health clinic sermorelin {city}"
+
+# Vendor mode ignores cities (national)
+vendor:
+  - "peptide supplier wholesale"
+  - "wholesale peptides for clinics"
+  - "peptide vendor list"
+  - "research peptides supplier USA"
+  - "503B outsourcing facility peptides"
+  - "503A compounding pharmacy peptides sermorelin BPC-157"
+  - "peptide manufacturer GMP USA"
+  - "buy peptides bulk API supplier"
+  - "peptide company reviews vendor directory"
+  - "best peptide vendors 2026"
+  - "compounding pharmacy tirzepatide wholesale"
+  - "NAD+ injection supplier clinics"
+
+# Directory / listing pages worth crawling for outbound business links.
+# The bot visits these, collects every external business link on the page, and enriches them.
+# Pages that need a login: run `python -m bot login <domain>` first.
+directories:
+  medspa:
+    - "https://www.americanmedspa.org/find-a-med-spa"
+    - "https://www.realself.com/find/med-spa"
+  clinic:
+    - "https://thepeptidelist.com/providers"
+  vendor:
+    - "https://thepeptidelist.com/vendors"
+    - "https://www.fda.gov/drugs/human-drug-compounding/registered-outsourcing-facilities"
