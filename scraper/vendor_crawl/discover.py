@@ -21,6 +21,8 @@ QUERIES = ["peptide discount code", "peptide coupon code 2026", "research peptid
            "chemyo coupon code", "sports technology labs coupon", "pure rawz coupon code", "particle peptides discount", "peptide sciences coupon code",
            "research peptides promo code list", "peptide vendors coupon aggregator", "peptide brand discount codes influencer", "peptide vendor affiliate program",
            "peptide vendor tier list", "peptide vendor rankings tested", "peptide vendor scorecard", "janoshik tested peptide vendors list"]
+if len(sys.argv) > 1: QUERIES = [l.strip() for l in open(sys.argv[1]) if l.strip()]
+DISC_OUT = os.environ.get("DISC_OUT", f"{S}/domains_disc.tsv")
 SKIP = set(SKIP_DOMAINS) | {"finnrick.com", "peptidebase.io", "thepeptidelist.com", "tobaccovillenc.org", "stonevillenc.org"}
 hits = {}   # domain -> {"via": query or list page, "kind": "result"|"outlink", "anchor": ...}
 pages = {}  # result url -> query
@@ -48,7 +50,7 @@ with DDGS(timeout=25) as d:
 print(f"{len(pages)} result pages, {len(hits)} domains; now harvesting outbound links from list-like pages", flush=True)
 VENDORISH = re.compile(r"peptide|pep|amino|research|lab|bio|chem|sarm|compound|synth|tide", re.I)
 listpages = []
-for i, (u, q) in enumerate(list(pages.items())[:250]):
+for i, (u, q) in enumerate(list(pages.items())[:int(os.environ.get('HARVEST_MAX', '250'))]):
     dom = domain_of(u)
     try:
         h, st = crawl.fetch(u)
@@ -62,7 +64,7 @@ for i, (u, q) in enumerate(list(pages.items())[:250]):
         if od and od != dom and not _skip(od) and od not in SKIP and (VENDORISH.search(od) or VENDORISH.search(a.get_text(" ", strip=True)[:60])):
             out.setdefault(od, a.get_text(" ", strip=True)[:60])
     text = soup.get_text(" ", strip=True).lower()
-    is_list = len(out) >= 5 and ("coupon" in text or "discount" in text or "vendor" in text or "best" in text or "review" in text)
+    is_list = len(out) >= 3 and ("coupon" in text or "discount" in text or "vendor" in text or "best" in text or "review" in text)
     if is_list:
         listpages.append((u, q, len(out)))
         for od, anchor in out.items():
@@ -70,7 +72,7 @@ for i, (u, q) in enumerate(list(pages.items())[:250]):
     print(f"  ({i+1}) {dom[:40]:40s} outlinks={len(out):3d} list={is_list}", flush=True)
     time.sleep(1.0)
 have = {l.split("\t")[0] for l in open(f"{S}/domains.tsv") if l.strip()}
-with open(f"{S}/domains_disc.tsv", "w") as f, open(f"{S}/domains.tsv", "a") as g:
+with open(DISC_OUT, "w") as f, open(f"{S}/domains.tsv", "a") as g:
     n = 0
     for dom, m in hits.items():
         if dom in have: continue

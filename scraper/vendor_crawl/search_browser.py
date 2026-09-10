@@ -7,6 +7,7 @@ import crawl
 S = crawl.S
 src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "discover.py")).read()
 QUERIES = eval(src[src.index("QUERIES = ["):src.index("]", src.index('"janoshik tested peptide vendors list"'))+1].split("=",1)[1])
+if len(sys.argv) > 1: QUERIES = [l.strip() for l in open(sys.argv[1]) if l.strip()]
 CACHE = f"{S}/search_cache.json"; cache = json.load(open(CACHE)) if os.path.exists(CACHE) else {}
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 def unwrap(u):
@@ -24,7 +25,7 @@ with sync_playwright() as p:
     for q in QUERIES:
         if q in cache and cache[q]: continue
         res = []
-        for first in (1, 11, 21):
+        for first in (1, 11):
             try:
                 page.goto(f"https://www.bing.com/search?q={quote_plus(q)}&count=10&first={first}&setlang=en&cc=US", wait_until="domcontentloaded", timeout=30000)
                 time.sleep(2.0)
@@ -34,7 +35,7 @@ with sync_playwright() as p:
                     if href.startswith("http"): res.append({"href": href, "title": (title or "").strip()})
             except Exception as e:
                 print(f"[{q}] page {first}: {str(e)[:80]}", flush=True)
-            time.sleep(3.0)
+            time.sleep(1.5)
         cache[q] = res; json.dump(cache, open(CACHE, "w"))
         print(f"[{q}] {len(res)} results", flush=True)
     b.close()
