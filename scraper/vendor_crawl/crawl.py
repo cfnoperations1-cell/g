@@ -65,7 +65,10 @@ def fetch(url):
     if "text/html" not in r.headers.get("content-type", "text/html"): return "", "nonhtml"
     return t, "ok"
 
+LONG_RUN = re.compile(r"[A-Za-z0-9+/=_%-]{200,}")   # base64 / minified blobs make the email regexes quadratic
+
 def extract(html, base):
+    html = LONG_RUN.sub(" ", html[:3_000_000])
     soup = BeautifulSoup(html, "lxml")
     title = soup.title.get_text(strip=True) if soup.title else ""
     og = soup.find("meta", property="og:site_name"); site_name = og.get("content", "") if og else ""
