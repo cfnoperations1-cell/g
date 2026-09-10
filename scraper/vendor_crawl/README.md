@@ -12,6 +12,8 @@ python scraper/vendor_crawl/crawl.py data/vendor_crawl/domains.tsv          # re
 python scraper/vendor_crawl/guess.py names.txt data/vendor_crawl/guessed.tsv
 # 3. Cloudflare / JS-only sites: headless Chromium, N shards
 python scraper/vendor_crawl/pw_pass.py data/vendor_crawl/results.jsonl 0 4   # shard 0 of 4
+# 3b. reachable sites with no email yet: every policy/contact path, then Chromium (3 shards)
+python scraper/vendor_crawl/deep_pass.py 0 3
 # 4. merge everything into the CSVs
 python scraper/vendor_crawl/compile_csv.py 2026-09-10
 ```

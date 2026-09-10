@@ -5,6 +5,9 @@ from urllib.parse import urlparse
 S = os.environ.get("VENDOR_CRAWL_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "vendor_crawl")); os.makedirs(S, exist_ok=True); sys.path.insert(0, S)
 import crawl
 
+def norm(n): return re.sub(r"[^a-z0-9]+", " ", re.sub(r"\b(inc|llc|ltd|co|company|the|us|usa)\b\.?", " ", (n or "").lower())).strip()
+NON_VENDOR = {"researchgate.net", "atom.com", "facebook.com", "instagram.com", "linkedin.com", "google.com", "youtube.com", "amazon.com"}
+
 def dom_of(u):
     u = (u or "").strip()
     if not u: return ""
@@ -14,7 +17,7 @@ def dom_of(u):
 
 # 1. crawl results: base passes, then Chromium shards override by domain
 res = {}
-for f in [f"{S}/results.jsonl", f"{S}/results3.jsonl"] + sorted(glob.glob(f"{S}/results*.pw*.jsonl")):
+for f in [f"{S}/results.jsonl", f"{S}/results3.jsonl"] + sorted(glob.glob(f"{S}/results*.pw*.jsonl")) + sorted(glob.glob(f"{S}/results_deep*.jsonl")):
     if not os.path.exists(f): continue
     for l in open(f):
         r = json.loads(l); res[r["domain"]] = r
@@ -26,11 +29,15 @@ for f in (f"{S}/guessed.tsv", f"{S}/guessed3.tsv"):
             p = l.rstrip("\n").split("\t")
             if len(p) >= 4 and p[1] and p[2] in ("verified", "blocked_unverified"):
                 d = dom_of(p[3]) or p[1]
-                if d != "atom.com": name2dom[p[0].lower()] = (d, p[2])
+                if d != "atom.com": name2dom[norm(p[0])] = (d, p[2])
+BAD_NAME = re.compile(r"challenge|just a moment|access denied|attention required|404|not found|robot", re.I)
+for d, r in res.items():
+    for n in (r.get("roster_name"), r.get("company_name")):
+        if n and norm(n) and not BAD_NAME.search(n) and d not in NON_VENDOR: name2dom.setdefault(norm(n), (d, "crawled"))
 for l in open(os.path.join(ROOT, "scraper", "vendor_domains.tsv")):
     if l.startswith("#") or not l.strip(): continue
     p = l.rstrip("\n").split("\t")
-    if len(p) >= 3 and p[2]: name2dom.setdefault(p[0].lower(), (p[2].strip(), "roster"))
+    if len(p) >= 3 and p[2] and p[2].strip() not in NON_VENDOR: name2dom.setdefault(norm(p[0]), (p[2].strip(), "roster"))
 known = json.load(open(f"{S}/known_emails.json"))
 known_by_dom = {}
 for e, d in known.items(): known_by_dom.setdefault(d, []).append(e)
@@ -54,7 +61,7 @@ def enrich(base, dom):
     if base.get("resolution") == "blocked_unverified": notes.append("domain guessed from name, not verified")
     row = dict.fromkeys(COLS, "")
     row.update({
-        "vendor": base.get("vendor") or r.get("company_name") or dom, "country": base.get("country", ""),
+        "vendor": base.get("vendor") or (r.get("company_name") if not re.search(r"challenge|just a moment|access denied|attention required|404|not found", r.get("company_name") or "", re.I) else "") or r.get("roster_name") or dom, "country": base.get("country", ""),
         "website": (f"https://{dom}/" if dom else ""), "domain": dom,
         "primary_email": emails[0] if emails else "", "all_emails": "; ".join(emails), "email_source": src, "email_page": r.get("email_page", ""),
         "phone": "; ".join(r.get("phones") or []) or base.get("master_phone", ""), "whatsapp": base.get("whatsapp", ""),
@@ -75,15 +82,18 @@ for m in master:
     if c and not c.startswith("United States"): continue
     dom = dom_of(m["Website"]); resolution = "master_website"
     if not dom:
-        dom, resolution = name2dom.get(m["Vendor"].lower(), ("", ""))
+        dom, resolution = name2dom.get(norm(m["Vendor"]), ("", ""))
+    if dom in NON_VENDOR: dom, resolution = "", ""
     base = {"vendor": m["Vendor"], "country": c or "unknown (not stated on list)", "master_email": m["Email"], "master_phone": m["Phone"], "whatsapp": m["WhatsApp"],
             "telegram": m["Telegram/Signal"], "social": m["Social"], "tier": m["PeptideBase Tier"], "listed_on": m["Listed On"], "pb": m["PeptideBase Profile"],
             "fr": m["Finnrick Profile"], "master_notes": m["Notes"], "resolution": resolution}
     out.append(enrich(base, dom)); seen.add(dom)
 # roster / seed vendors not in the master list
 for dom, r in res.items():
-    if dom in seen or not dom: continue
-    base = {"vendor": r.get("roster_name") or r.get("company_name") or dom, "country": "United States (roster)" if r.get("source") in ("seed_urls", "vendor_domains") else "", "listed_on": f"repo roster ({r.get('source','')})"}
+    if dom in seen or not dom or dom in NON_VENDOR: continue
+    cname = r.get("company_name") or ""
+    if BAD_NAME.search(cname): cname = ""
+    base = {"vendor": r.get("roster_name") or cname or dom, "country": "United States (roster)" if r.get("source") in ("seed_urls", "vendor_domains") else "", "listed_on": f"repo roster ({r.get('source','')})"}
     out.append(enrich(base, dom)); seen.add(dom)
 
 def us_ok(r): return r["country"].startswith("United States") or r["us_signal_on_site"] == "yes"
@@ -96,7 +106,7 @@ def write(path, rows_):
     return len(rows_)
 stamp = sys.argv[1] if len(sys.argv) > 1 else "latest"
 n_all = write(f"{ROOT}/data/out/us_peptide_vendors_all_{stamp}.csv", out)
-n_em = write(f"{ROOT}/data/out/us_peptide_vendors_with_email_{stamp}.csv", [r for r in out if r["primary_email"]])
+n_em = write(f"{ROOT}/data/out/us_peptide_vendors_with_email_{stamp}.csv", [r for r in out if r["primary_email"] and (r["country"].startswith("United States") or r["us_signal_on_site"] == "yes")])
 us_rows = [r for r in out if r["country"].startswith("United States")]
 print(f"rows={n_all} with_email={n_em} | master-US={len(us_rows)} master-US-with-email={sum(1 for r in us_rows if r['primary_email'])} | no_website={sum(1 for r in out if not r['domain'])}")
 from collections import Counter; print(Counter(r["crawl_status"].split(":")[0] for r in out))
