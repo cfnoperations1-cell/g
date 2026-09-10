@@ -24,19 +24,27 @@ QUERIES = ["peptide discount code", "peptide coupon code 2026", "research peptid
 SKIP = set(SKIP_DOMAINS) | {"finnrick.com", "peptidebase.io", "thepeptidelist.com", "tobaccovillenc.org", "stonevillenc.org"}
 hits = {}   # domain -> {"via": query or list page, "kind": "result"|"outlink", "anchor": ...}
 pages = {}  # result url -> query
-with DDGS(timeout=20) as d:
+CACHE = f"{S}/search_cache.json"
+cache = json.load(open(CACHE)) if os.path.exists(CACHE) else {}
+with DDGS(timeout=25) as d:
     for q in QUERIES:
-        try:
-            res = list(d.text(q, max_results=30, backend="bing"))
-        except Exception as e:
-            print(f"[{q}] search failed: {e}", flush=True); time.sleep(5); continue
+        if q in cache:
+            res = cache[q]
+        else:
+            res = None
+            for attempt in range(3):
+                try:
+                    res = list(d.text(q, max_results=30, backend="bing")); break
+                except Exception as e:
+                    print(f"[{q}] attempt {attempt+1} failed: {str(e)[:80]}", flush=True); time.sleep(30 * (attempt + 1))
+            if res is None: continue
+            cache[q] = res; json.dump(cache, open(CACHE, "w")); time.sleep(8)
         n = 0
         for x in res:
             u = x.get("href", ""); dom = domain_of(u)
             if not dom or _skip(dom) or dom in SKIP: continue
             pages.setdefault(u, q); hits.setdefault(dom, {"via": q, "kind": "result", "anchor": x.get("title", "")[:80]}); n += 1
         print(f"[{q}] {n} usable results", flush=True)
-        time.sleep(2.5)
 print(f"{len(pages)} result pages, {len(hits)} domains; now harvesting outbound links from list-like pages", flush=True)
 VENDORISH = re.compile(r"peptide|pep|amino|research|lab|bio|chem|sarm|compound|synth|tide", re.I)
 listpages = []

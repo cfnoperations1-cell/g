@@ -23,3 +23,5 @@ second per site, Chrome-like User-Agent, no search-engine result pages are scrap
 no emails are ever guessed. Behind a TLS-intercepting proxy, Chromium needs
 `--disable-features=PostQuantumKyber,UseMLKEM,EncryptedClientHello --ssl-version-max=tls1.2`
 (already set in `pw_pass.py`) and `CHROMIUM_PATH` if Playwright's own browser isn't installed.
+
+Discovery: `search_browser.py` runs the query list through headless Chromium on Bing into `search_cache.json`; `discover.py` then harvests vendor links from coupon/list pages into `domains_disc.tsv`.
