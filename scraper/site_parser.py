@@ -384,6 +384,8 @@ def find_research_only_evidence(text: str) -> Optional[str]:
 
 
 def parse_site(base_url: str, peptide_keywords: Optional[List[str]] = None) -> SiteData:
+    global _browser_used_this_run
+    _browser_used_this_run = False  # tracked per site, reported on data.used_browser
     domain = get_domain(base_url)
     data = SiteData(url=base_url, domain=domain)
     combined_text = []
