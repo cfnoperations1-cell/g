@@ -22,21 +22,30 @@ with sync_playwright() as p:
     b = p.chromium.launch(headless=True, executable_path=os.environ.get("CHROMIUM_PATH") or None, proxy=({"server": os.environ["HTTPS_PROXY"]} if os.environ.get("HTTPS_PROXY") else None),
                           args=["--disable-features=PostQuantumKyber,UseMLKEM,EncryptedClientHello", "--ssl-version-max=tls1.2"])
     ctx = b.new_context(user_agent=UA, locale="en-US"); page = ctx.new_page()
+    empty_streak = 0
     for q in QUERIES:
         if q in cache and cache[q]: continue
         res = []
-        for first in (1, 11):
-            try:
-                page.goto(f"https://www.bing.com/search?q={quote_plus(q)}&count=10&first={first}&setlang=en&cc=US", wait_until="domcontentloaded", timeout=30000)
+        for attempt in range(3):
+            res = []
+            for first in (1, 11):
+                try:
+                    page.goto(f"https://www.bing.com/search?q={quote_plus(q)}&count=10&first={first}&setlang=en&cc=US", wait_until="domcontentloaded", timeout=30000)
+                    time.sleep(2.5)
+                    items = page.eval_on_selector_all("li.b_algo h2 a", "els => els.map(e => [e.href, e.textContent])")
+                    for href, title in items:
+                        href = unwrap(href)
+                        if href.startswith("http"): res.append({"href": href, "title": (title or "").strip()})
+                except Exception as e:
+                    print(f"[{q}] page {first}: {str(e)[:80]}", flush=True)
                 time.sleep(2.0)
-                items = page.eval_on_selector_all("li.b_algo h2 a", "els => els.map(e => [e.href, e.textContent])")
-                for href, title in items:
-                    href = unwrap(href)
-                    if href.startswith("http"): res.append({"href": href, "title": (title or "").strip()})
-            except Exception as e:
-                print(f"[{q}] page {first}: {str(e)[:80]}", flush=True)
-            time.sleep(1.5)
+            if res: break
+            wait = 120 * (attempt + 1); print(f"[{q}] empty, backing off {wait}s", flush=True); time.sleep(wait)
+            ctx.close(); ctx = b.new_context(user_agent=UA, locale="en-US"); page = ctx.new_page()
         cache[q] = res; json.dump(cache, open(CACHE, "w"))
+        empty_streak = 0 if res else empty_streak + 1
         print(f"[{q}] {len(res)} results", flush=True)
+        if empty_streak >= 6: print("giving up: 6 consecutive empty queries", flush=True); break
+        time.sleep(4.0)
     b.close()
 print("SEARCH_DONE", flush=True)
