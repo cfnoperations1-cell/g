@@ -27,7 +27,7 @@ FIXED = ["/contact", "/contact-us", "/pages/contact", "/pages/contact-us", "/pol
          "/pages/about-us", "/pages/about", "/privacy-policy", "/pages/privacy-policy", "/policies/privacy-policy", "/policies/terms-of-service",
          "/terms-of-service", "/terms-and-conditions", "/pages/faq", "/faq", "/support", "/pages/shipping-policy", "/shipping-policy"]
 JUNK = ("example.", "sentry", "wixpress", "domain.com", "email.com", "yourdomain", "yoursite", "mysite.com", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
-        "godaddy", "wordpress", "squarespace", "shopify.com", "company.com", "yourwebsite.com", "hostingersite.com", "yourcompany", "noreply", "no-reply", "donotreply", "@2x", "@3x", "schema.org", "w3.org", "test.com", "email@", "name@", "user@", "you@")
+        "godaddy", "wordpress", "squarespace", "shopify.com", "company.com", "yourwebsite.com", "hostingersite.com", "yourcompany", "university.edu", "j.doe@", "jdoe@", "john.doe", "jane.doe", "noreply", "no-reply", "donotreply", "@2x", "@3x", "schema.org", "w3.org", "test.com", "email@", "name@", "user@", "you@")
 SKIP_TAGS = ["script", "style", "noscript", "svg"]
 lock = threading.Lock()
 _robots = {}

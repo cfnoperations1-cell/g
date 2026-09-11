@@ -105,12 +105,13 @@ for dom, r in res.items():
     if BAD_NAME.search(cname): cname = ""
     fm = FR.get(dom, {})
     base = {"vendor": fm.get("name") or r.get("roster_name") or cname or dom,
-            "country": "United States (roster)" if r.get("source") in ("seed_urls", "vendor_domains") else ("unknown (not stated on list)" if fm else ""),
+            "country": "United States (roster)" if r.get("source") in ("seed_urls", "vendor_domains") else ("unknown (not stated on list)" if fm else "unknown (discovered via search)"),
             "listed_on": "Finnrick" if fm else f"repo roster ({r.get('source','')})"}
     out.append(enrich(base, dom)); seen.add(dom)
 
 def us_ok(r): return r["country"].startswith("United States") or r["us_signal_on_site"] == "yes"
-out = [r for r in out if us_ok(r) or r["country"].startswith("unknown")]
+def relevant(r): return int(r["peptide_hits"]) >= 1 or not r["country"].startswith("unknown (discovered")
+out = [r for r in out if (us_ok(r) or r["country"].startswith("unknown")) and relevant(r)]
 out.sort(key=lambda x: (x["primary_email"] == "", 0 if x["country"].startswith("United States") else 1, -int(x["finnrick_products_tested"] or 0), -int(x["peptide_hits"]), x["vendor"].lower()))
 os.makedirs(f"{ROOT}/data/out", exist_ok=True)
 def write(path, rows_):
@@ -119,7 +120,7 @@ def write(path, rows_):
     return len(rows_)
 stamp = sys.argv[1] if len(sys.argv) > 1 else "latest"
 n_all = write(f"{ROOT}/data/out/us_peptide_vendors_all_{stamp}.csv", out)
-n_em = write(f"{ROOT}/data/out/us_peptide_vendors_with_email_{stamp}.csv", [r for r in out if r["primary_email"] and (r["country"].startswith("United States") or r["us_signal_on_site"] == "yes")])
+n_em = write(f"{ROOT}/data/out/us_peptide_vendors_with_email_{stamp}.csv", [r for r in out if r["primary_email"] and (r["country"].startswith("United States") or r["us_signal_on_site"] == "yes" or r["country"].startswith("unknown"))])
 us_rows = [r for r in out if r["country"].startswith("United States")]
 print(f"rows={n_all} with_email={n_em} | master-US={len(us_rows)} master-US-with-email={sum(1 for r in us_rows if r['primary_email'])} | no_website={sum(1 for r in out if not r['domain'])}")
 from collections import Counter; print(Counter(r["crawl_status"].split(":")[0] for r in out))
