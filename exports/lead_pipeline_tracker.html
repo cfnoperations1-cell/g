@@ -1,0 +1,329 @@
+<title>Peptide Lead Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#eef3f2; --surface:#ffffff; --surface-2:#f4f8f7;
+    --ink:#0c1a19; --muted:#4a5b5a; --faint:#7d8f8e;
+    --border:#d3e0de; --border-strong:#b7c9c7;
+    --accent:#0b6e6d; --accent-soft:#d5e9e8; --accent-ink:#084f4e;
+    --done:#1c7a4d; --done-soft:#d6ecdf;
+    --run:#a25c00; --run-soft:#f6e6cf;
+    --block:#a83535; --block-soft:#f3d9d9;
+    --queue:#5a6b6a; --queue-soft:#e2e9e8;
+    --shadow:0 1px 2px rgba(12,26,25,.05), 0 6px 20px -12px rgba(12,26,25,.18);
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --disp:"Archivo","IBM Plex Sans",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#0a1413; --surface:#0f1c1b; --surface-2:#12211f;
+    --ink:#e8f1f0; --muted:#9db1af; --faint:#6f8280;
+    --border:#213230; --border-strong:#2d423f;
+    --accent:#3fb9b4; --accent-soft:#123230; --accent-ink:#7fd6d1;
+    --done:#4fc487; --done-soft:#0f2a1f;
+    --run:#e0a44b; --run-soft:#2c2210;
+    --block:#e07070; --block-soft:#2e1616;
+    --queue:#93a5a3; --queue-soft:#1a2725;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -14px rgba(0,0,0,.6);
+  }}
+  :root[data-theme="dark"]{
+    --ground:#0a1413; --surface:#0f1c1b; --surface-2:#12211f;
+    --ink:#e8f1f0; --muted:#9db1af; --faint:#6f8280;
+    --border:#213230; --border-strong:#2d423f;
+    --accent:#3fb9b4; --accent-soft:#123230; --accent-ink:#7fd6d1;
+    --done:#4fc487; --done-soft:#0f2a1f;
+    --run:#e0a44b; --run-soft:#2c2210;
+    --block:#e07070; --block-soft:#2e1616;
+    --queue:#93a5a3; --queue-soft:#1a2725;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -14px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;font-size:15px}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;padding-block:34px}
+  a{color:var(--accent-ink)}
+  h1,h2,h3{margin:0;font-family:var(--disp);text-wrap:balance;letter-spacing:-.01em}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* header */
+  header{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;
+    border-bottom:2px solid var(--border-strong);padding-bottom:22px}
+  header h1{font-size:clamp(28px,5vw,40px);font-weight:800;line-height:1.02}
+  .sub{color:var(--muted);margin-top:8px;max-width:52ch}
+  .asof{text-align:right;font-family:var(--mono);font-size:12px;color:var(--faint);line-height:1.7}
+  .asof b{color:var(--ink);font-weight:600}
+  .theme-btn{margin-top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:999px;
+    padding:5px 12px;cursor:pointer}
+  .theme-btn:hover{border-color:var(--border-strong);color:var(--ink)}
+  .theme-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* kpi */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 16px 15px;box-shadow:var(--shadow)}
+  .kpi .n{font-family:var(--disp);font-weight:800;font-size:34px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .kpi .k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:9px}
+  .kpi .d{color:var(--muted);font-size:12.5px;margin-top:5px}
+  .kpi.accent{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset, var(--shadow)}
+  .kpi.accent .n{color:var(--accent)}
+
+  section{margin-top:38px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+  .sec-head h2{font-size:19px;font-weight:700}
+  .sec-head .count{font-family:var(--mono);font-size:12px;color:var(--faint)}
+
+  /* pipeline stages */
+  .flow{display:flex;flex-wrap:wrap;gap:8px}
+  .stage{flex:1 1 130px;min-width:120px;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:12px 13px;position:relative}
+  .stage .s-top{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--faint)}
+  .stage .s-name{font-weight:600;margin-top:6px;font-size:14px}
+  .stage .s-meta{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .dot.done{background:var(--done)} .dot.run{background:var(--run);box-shadow:0 0 0 0 var(--run);animation:pulse 1.8s infinite}
+  .dot.queue{background:var(--queue)} .dot.block{background:var(--block)}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--run) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+  @media (prefers-reduced-motion:reduce){.dot.run{animation:none}}
+
+  /* phase groups */
+  .phase{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);
+    overflow:hidden;margin-bottom:16px}
+  .phase-hd{display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid var(--border);
+    background:var(--surface-2)}
+  .phase-hd .pn{font-family:var(--disp);font-weight:700;font-size:16px}
+  .phase-hd .pmeta{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .bar{height:6px;border-radius:999px;background:var(--queue-soft);overflow:hidden;width:120px;margin-left:14px}
+  .bar > i{display:block;height:100%;background:var(--accent);border-radius:999px}
+  .status-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
+    padding:4px 9px;border-radius:999px}
+  .t-done{color:var(--done);background:var(--done-soft)}
+  .t-run{color:var(--run);background:var(--run-soft)}
+  .t-queue{color:var(--queue);background:var(--queue-soft)}
+  .t-block{color:var(--block);background:var(--block-soft)}
+
+  ul.tasks{list-style:none;margin:0;padding:6px 0}
+  ul.tasks li{display:flex;align-items:center;gap:13px;padding:10px 18px}
+  ul.tasks li + li{border-top:1px solid var(--border)}
+  .check{width:19px;height:19px;border-radius:6px;flex:none;display:grid;place-items:center;border:1.5px solid var(--border-strong)}
+  .check.done{background:var(--done);border-color:var(--done)}
+  .check.run{border-color:var(--run)}
+  .check.block{border-color:var(--block);background:var(--block-soft)}
+  .check svg{width:12px;height:12px}
+  .task-name{font-weight:500}
+  .task-name.dn{color:var(--muted)}
+  .task-meta{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+  .stripe{width:3px;align-self:stretch;border-radius:3px;flex:none;margin:-10px 0;margin-right:-4px}
+
+  /* sources + gaps tables */
+  .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tablecard{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .tablecard h3{font-size:14px;padding:14px 16px 12px;border-bottom:1px solid var(--border);font-family:var(--disp)}
+  th,td{text-align:left;padding:9px 16px}
+  th{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:600}
+  tbody tr + tr td{border-top:1px solid var(--border)}
+  td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+  .src-name{font-weight:500}
+  .gap{display:flex;gap:11px;padding:12px 16px;align-items:flex-start}
+  .gap + .gap{border-top:1px solid var(--border)}
+  .gap .g-n{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--block);font-variant-numeric:tabular-nums;min-width:34px}
+  .gap .g-t{font-size:13px;color:var(--muted)}
+  .gap .g-t b{color:var(--ink);font-weight:600;display:block;font-size:13.5px;margin-bottom:1px}
+
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);
+    font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
+
+  @media (max-width:720px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}
+    .asof{text-align:left}
+    header{align-items:flex-start}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Lead-gen operations</div>
+      <h1>Peptide Lead Pipeline</h1>
+      <p class="sub">Discovery, crawl and contact-enrichment across US peptide vendors, med spas and clinics. One row per source; emails taken only from each site's own published pages.</p>
+    </div>
+    <div>
+      <div class="asof">
+        RUN <b>2026-09-12</b><br>
+        vendor phase <b>complete</b><br>
+        med-spa phase <b>running</b>
+      </div>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">◐ Theme</button>
+    </div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi accent">
+      <div class="n mono">1,399</div>
+      <div class="k">Vendors indexed</div>
+      <div class="d">across 4 sources, US &amp; unknown-origin</div>
+    </div>
+    <div class="kpi">
+      <div class="n mono">885</div>
+      <div class="k">With a real email</div>
+      <div class="d">599 on the vendor's own domain</div>
+    </div>
+    <div class="kpi">
+      <div class="n mono">300</div>
+      <div class="k">Med-spa queries</div>
+      <div class="d">50 US cities · scrape in progress</div>
+    </div>
+    <div class="kpi">
+      <div class="n mono">516</div>
+      <div class="k">Discovery searches</div>
+      <div class="d">research-only, coupon &amp; wholesale angles</div>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Flow</span><h2>Enrichment pipeline</h2>
+      <span class="count">discover → crawl → render → deep → compile</span></div>
+    <div class="flow" id="flow"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Task board</h2><span class="count" id="taskCount"></span></div>
+    <div id="phases"></div>
+  </section>
+
+  <section>
+    <div class="grid2">
+      <div class="tablecard">
+        <h3>Vendors by source</h3>
+        <table>
+          <thead><tr><th>Source</th><th style="text-align:right">Vendors</th><th style="text-align:right">With email</th></tr></thead>
+          <tbody id="srcBody"></tbody>
+        </table>
+      </div>
+      <div class="tablecard">
+        <h3>Known gaps &amp; manual follow-up</h3>
+        <div id="gaps"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Peptide Lead Pipeline · scraper/vendor_crawl</span>
+    <span>Emails harvested from published pages only · robots.txt honoured · no accounts created</span>
+  </footer>
+</div>
+
+<script>
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+
+  const stages = [
+    {name:"Discover",   st:"done", meta:"516 queries · Bing"},
+    {name:"Crawl",      st:"done", meta:"~2,400 sites"},
+    {name:"Render",     st:"done", meta:"Chromium · CF sites"},
+    {name:"Deep pass",  st:"done", meta:"contact + policy pages"},
+    {name:"Compile",    st:"done", meta:"CSV · 2 files"},
+    {name:"Med-spa run",st:"run",  meta:"50 cities · live"},
+  ];
+
+  const phases = [
+    {name:"Phase 1 — Vendor discovery & enrichment", status:"done", pct:100,
+     tasks:[
+      {t:"Ingest master roster (PeptideBase + Finnrick)", s:"done", m:"367 rows"},
+      {t:"Pull Finnrick public vendor index", s:"done", m:"1,796 → 1,113 US/unknown"},
+      {t:"Crawl repo seed & roster lists", s:"done", m:"183 domains"},
+      {t:"Add Gmail & Drive contacts", s:"done", m:"22 emails"},
+      {t:"Resolve vendor name → website", s:"done", m:"70 verified"},
+      {t:"Search discovery (research-only, coupon, wholesale)", s:"done", m:"516 queries"},
+      {t:"Crawl + email/phone/IG extraction", s:"done", m:"resumable, robots-aware"},
+      {t:"Chromium render pass (Cloudflare / JS sites)", s:"done", m:"356 retried"},
+      {t:"Deep contact & policy-page pass", s:"done", m:"+69 emails"},
+      {t:"Compile & commit CSV exports", s:"done", m:"1,399 / 885"},
+     ]},
+    {name:"Phase 2 — Med spas & clinics offering peptides", status:"run", pct:22,
+     tasks:[
+      {t:"Build city × treatment query set", s:"done", m:"300 queries"},
+      {t:"Bing browser search across 50 cities", s:"run", m:"in progress"},
+      {t:"Extract business domains (skip directories)", s:"queue", m:"queued"},
+      {t:"Crawl + confirm peptide mentions", s:"queue", m:"queued"},
+      {t:"Chromium render pass", s:"queue", m:"queued"},
+      {t:"Compile med-spa CSV", s:"queue", m:"queued"},
+     ]},
+    {name:"Phase 3 — Next verticals", status:"queue", pct:0,
+     tasks:[
+      {t:"Telehealth companies needing 503A", s:"queue", m:"planned"},
+      {t:"503A / 503B compounding pharmacies", s:"queue", m:"classifier ready"},
+      {t:"Affiliate & discount-code networks (deep)", s:"queue", m:"planned"},
+     ]},
+  ];
+
+  const sources = [
+    {n:"Finnrick public index", v:"1,039", e:"617"},
+    {n:"Repo seed & roster lists", v:"141", e:"348"},
+    {n:"Master roster (PeptideBase)", v:"149", e:"112"},
+    {n:"Search discovery", v:"70", e:"37"},
+  ];
+
+  const gaps = [
+    {n:"141", t:"Cloudflare-hard sites", d:"Block even a real browser — flagged in the CSV for a manual contact-page check."},
+    {n:"25",  t:"No findable website", d:"Roster vendors with a name but no site; need a manual or directory lookup."},
+    {n:"—",   t:"PeptideBase listings", d:"Sit behind a bot challenge; not scraped. Their data already flows in via the master roster."},
+  ];
+
+  const S = {done:"done", run:"run", queue:"queue", block:"block"};
+  const flow = document.getElementById("flow");
+  stages.forEach(s=>{
+    const el=document.createElement("div"); el.className="stage";
+    el.innerHTML=`<div class="s-top"><span class="dot ${s.st}"></span>${s.st==="run"?"Running":s.st==="done"?"Done":"Queued"}</div>
+      <div class="s-name">${s.name}</div><div class="s-meta">${s.meta}</div>`;
+    flow.appendChild(el);
+  });
+
+  const tagFor = st => st==="done"?'<span class="status-tag t-done">Complete</span>'
+    : st==="run"?'<span class="status-tag t-run">Running</span>'
+    : '<span class="status-tag t-queue">Queued</span>';
+
+  const phasesEl=document.getElementById("phases");
+  let totalDone=0,total=0;
+  phases.forEach(p=>{
+    const card=document.createElement("div"); card.className="phase";
+    let lis="";
+    p.tasks.forEach(tk=>{
+      total++; if(tk.s==="done")totalDone++;
+      const stripe = tk.s==="block"?'<span class="stripe" style="background:var(--block)"></span>':
+                     tk.s==="run"?'<span class="stripe" style="background:var(--run)"></span>':'';
+      const check = tk.s==="done"?`<span class="check done">${ICON_CHECK}</span>`
+        : tk.s==="run"?'<span class="check run"><span class="dot run" style="width:9px;height:9px"></span></span>'
+        : '<span class="check"></span>';
+      lis+=`<li>${stripe}${check}<span class="task-name ${tk.s==='done'?'dn':''}">${tk.t}</span><span class="task-meta">${tk.m}</span></li>`;
+    });
+    card.innerHTML=`<div class="phase-hd"><span class="pn">${p.name}</span>${tagFor(p.status)}
+        <span class="pmeta">${p.pct}%</span><span class="bar"><i style="width:${p.pct}%;background:${p.status==='run'?'var(--run)':p.status==='queue'?'var(--queue)':'var(--done)'}"></i></span></div>
+      <ul class="tasks">${lis}</ul>`;
+    phasesEl.appendChild(card);
+  });
+  document.getElementById("taskCount").textContent = `${totalDone} of ${total} tasks complete`;
+
+  const sb=document.getElementById("srcBody");
+  sources.forEach(s=>{ const tr=document.createElement("tr");
+    tr.innerHTML=`<td class="src-name">${s.n}</td><td class="num">${s.v}</td><td class="num">${s.e}</td>`; sb.appendChild(tr); });
+
+  const g=document.getElementById("gaps");
+  gaps.forEach(x=>{ const d=document.createElement("div"); d.className="gap";
+    d.innerHTML=`<span class="g-n">${x.n}</span><span class="g-t"><b>${x.t}</b>${x.d}</span>`; g.appendChild(d); });
+
+  // theme toggle: cycles system → light → dark
+  const root=document.documentElement, btn=document.getElementById("themeBtn");
+  let mode = null;
+  try{ mode = localStorage.getItem("plt-theme"); }catch(e){}
+  if(mode) root.setAttribute("data-theme",mode);
+  btn.addEventListener("click",()=>{
+    mode = mode==="dark" ? "light" : "dark";
+    root.setAttribute("data-theme",mode);
+    try{ localStorage.setItem("plt-theme",mode); }catch(e){}
+  });
+</script>
