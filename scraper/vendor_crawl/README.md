@@ -25,3 +25,17 @@ no emails are ever guessed. Behind a TLS-intercepting proxy, Chromium needs
 (already set in `pw_pass.py`) and `CHROMIUM_PATH` if Playwright's own browser isn't installed.
 
 Discovery: `search_browser.py` runs the query list through headless Chromium on Bing into `search_cache.json`; `discover.py` then harvests vendor links from coupon/list pages into `domains_disc.tsv`.
+
+## Med spas / clinics (no API key)
+
+Bing web search geolocates to the server's region and returns articles for "med spa peptides <city>"; Startpage (Google results)
+rendered in headless Chromium returns the actual local businesses. Flow:
+
+```bash
+python scraper/vendor_crawl/sp_search.py scraper/vendor_crawl/medspa_queries.txt data/vendor_crawl/medspa_cache_sp.json
+MEDSPA_CACHE=data/vendor_crawl/medspa_cache_sp.json python scraper/vendor_crawl/medspa_domains.py   # result sites -> domains.tsv with state|city
+MEDSPA_MODE=1 MAX_LINKED=10 CRAWL_OUT=data/vendor_crawl/medspa/results_sp.jsonl python scraper/vendor_crawl/crawl.py data/vendor_crawl/medspa/domains.tsv
+python scraper/vendor_crawl/pw_pass.py data/vendor_crawl/medspa/results_sp.jsonl 0 4     # x4 shards
+python scraper/vendor_crawl/medspa_compile.py 2026-09-12   # data/out/medspa_peptide_*.csv + medspa_by_state_<date>/ + state summary
+```
+`MEDSPA_MODE` makes the crawler prioritise service / treatment / weight-loss / peptide pages, where med spas list what they offer.
