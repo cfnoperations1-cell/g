@@ -156,7 +156,7 @@
       <div class="asof">
         RUN <b>2026-09-12</b><br>
         vendor phase <b>complete</b><br>
-        med-spa phase <b>running</b>
+        med-spa phase <b>complete</b>
       </div>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">◐ Theme</button>
     </div>
@@ -174,9 +174,9 @@
       <div class="d">599 on the vendor's own domain</div>
     </div>
     <div class="kpi">
-      <div class="n mono">232</div>
-      <div class="k">Med-spa leads by state</div>
-      <div class="d">40 states · from peptide intake forms</div>
+      <div class="n mono">1,150+</div>
+      <div class="k">Med spas offering peptides</div>
+      <div class="d">site-confirmed + intake forms · by state</div>
     </div>
     <div class="kpi">
       <div class="n mono">516</div>
@@ -227,7 +227,7 @@
     {name:"Render",     st:"done", meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done", meta:"contact + policy pages"},
     {name:"Compile",    st:"done", meta:"CSV · 2 files"},
-    {name:"Med-spa run",st:"run",  meta:"50 cities · live"},
+    {name:"Med-spa run",st:"done", meta:"50 cities · 930 confirmed"},
   ];
 
   const phases = [
@@ -244,13 +244,14 @@
       {t:"Deep contact & policy-page pass", s:"done", m:"+69 emails"},
       {t:"Compile & commit CSV exports", s:"done", m:"1,399 / 885"},
      ]},
-    {name:"Phase 2 — Med spas & clinics offering peptides", status:"run", pct:60,
+    {name:"Phase 2 — Med spas & clinics offering peptides", status:"done", pct:100,
      tasks:[
-      {t:"Build city × treatment query set", s:"done", m:"300 queries"},
-      {t:"Bing browser search across 50 cities", s:"done", m:"low yield — see note"},
-      {t:"Parse Drive peptide-intake forms → by state", s:"done", m:"232 leads / 40 states"},
-      {t:"Split per-state CSVs + state summary", s:"done", m:"exports/medspa_by_state"},
-      {t:"Google Places discovery (per-city geo)", s:"block", m:"needs API key"},
+      {t:"Build city × treatment query set", s:"done", m:"300 queries · 50 cities"},
+      {t:"Startpage search in Chromium (Bing was geo-blind)", s:"done", m:"1,244 business sites"},
+      {t:"Med-spa-mode crawl (service & treatment pages)", s:"done", m:"930 confirm peptides"},
+      {t:"Chromium pass on blocked sites", s:"done", m:"265 retried"},
+      {t:"Parse Drive peptide-intake forms", s:"done", m:"232 leads / 40 states"},
+      {t:"Merge, dedupe, split per state", s:"done", m:"exports/medspa_by_state"},
      ]},
     {name:"Phase 3 — Next verticals", status:"queue", pct:0,
      tasks:[
@@ -271,7 +272,7 @@
     {n:"141", t:"Cloudflare-hard sites", d:"Block even a real browser — flagged in the CSV for a manual contact-page check."},
     {n:"25",  t:"No findable website", d:"Roster vendors with a name but no site; need a manual or directory lookup."},
     {n:"—",   t:"PeptideBase listings", d:"Sit behind a bot challenge; not scraped. Their data already flows in via the master roster."},
-    {n:"!",   t:"Med-spa web search is geo-blind", d:"Bing localises to the server region and returns articles, not local businesses. City-by-city med-spa discovery needs a Google Places or Serper API key."},
+    {n:"—",   t:"Med-spa reach = 50 metros", d:"Discovery ran city-by-city over the 50 cities in config/queries.yaml. Add cities there and re-run to cover more markets."},
   ];
 
   const S = {done:"done", run:"run", queue:"queue", block:"block"};
