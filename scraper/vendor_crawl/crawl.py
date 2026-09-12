@@ -16,13 +16,17 @@ S = os.environ.get("VENDOR_CRAWL_DIR", os.path.join(os.path.dirname(os.path.absp
 IN, OUT = sys.argv[1] if len(sys.argv) > 1 else f"{S}/domains.tsv", os.environ.get("CRAWL_OUT", f"{S}/results.jsonl")
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 H = {"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9", "Accept": "text/html,application/xhtml+xml,*/*;q=0.8"}
-DELAY, TIMEOUT, MAX_LINKED, MAX_FIXED, WORKERS = 1.0, 20, 6, 6, int(os.environ.get("CRAWL_WORKERS", "8"))
+DELAY, TIMEOUT, MAX_LINKED, MAX_FIXED, WORKERS = 1.0, 20, int(os.environ.get("MAX_LINKED", "6")), 6, int(os.environ.get("CRAWL_WORKERS", "8"))
 EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
 OBF_RE = re.compile(r"([a-zA-Z0-9._%+-]+)\s*[\[(]\s*at\s*[\])]\s*([a-zA-Z0-9.-]+)\s*[\[(]\s*dot\s*[\])]\s*([a-zA-Z]{2,})", re.I)
 PHONE_RE = re.compile(r"(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}")
 CF_RE = re.compile(r'data-cfemail="([0-9a-fA-F]+)"')
 RESEARCH_ONLY = ["for research use only", "research use only", "not for human consumption", "not intended for human", "research purposes only", "laboratory research use only"]
 PRIORITY = ["contact", "about", "privacy", "terms", "support", "faq", "wholesale", "shipping", "refund", "return", "policies"]
+if os.environ.get("MEDSPA_MODE"):
+    PRIORITY = ["peptide", "service", "treatment", "weight-loss", "weightloss", "glp", "semaglutide", "tirzepatide", "hormone",
+                "injection", "iv-therapy", "iv-drip", "wellness", "aesthetic", "menu", "pricing", "sermorelin", "nad", "hrt",
+                "trt", "anti-aging", "longevity", "medical", "contact", "about", "location", "book"] + PRIORITY
 FIXED = ["/contact", "/contact-us", "/pages/contact", "/pages/contact-us", "/policies/contact-information", "/about", "/about-us",
          "/pages/about-us", "/pages/about", "/privacy-policy", "/pages/privacy-policy", "/policies/privacy-policy", "/policies/terms-of-service",
          "/terms-of-service", "/terms-and-conditions", "/pages/faq", "/faq", "/support", "/pages/shipping-policy", "/shipping-policy"]
