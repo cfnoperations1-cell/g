@@ -1,3 +1,3 @@
-﻿business_name,contact_name,state,states_served,email,phone,products,source
-The Fox Spa,Jayme Donaldson,WY,Wyoming,jayraed1981@gmail.com,3072515889,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
-Wyoming Radiance Spa,Parry Davison,WY,Wyoming,davisonp94@hotmail.com,NIS (307)723-0125,Office use Semaglutide,Response Sheet
+﻿business_name,state,city,website,email,all_emails,phone,instagram,peptide_terms_found,peptide_hits,category,source,source_query,notes
+The Fox Spa,WY,,,jayraed1981@gmail.com,jayraed1981@gmail.com,3072515889,,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Jayme Donaldson; states served: Wyoming
+Wyoming Radiance Spa,WY,,,davisonp94@hotmail.com,davisonp94@hotmail.com,NIS (307)723-0125,,Office use Semaglutide,,med spa / clinic (intake form),peptide intake form (Drive),,contact: Parry Davison; states served: Wyoming

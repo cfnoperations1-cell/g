@@ -1,4 +1,4 @@
-﻿business_name,contact_name,state,states_served,email,phone,products,source
-406 Psychiatric Solutions,Amber Dayhuff,MT,Montana,addayhuff0801@gmail.com,4064911313,"Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
-The Last Best Clinic,Shannon,MT,Montana,lastbestclinic@gmail.com,4069922570,"Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
-Wellness Options,Jamie Goldberg,MT,Montana,wellnessoptionsmontana@gmail.com,406-498-5449,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
+﻿business_name,state,city,website,email,all_emails,phone,instagram,peptide_terms_found,peptide_hits,category,source,source_query,notes
+406 Psychiatric Solutions,MT,,,addayhuff0801@gmail.com,addayhuff0801@gmail.com,4064911313,,"Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Amber Dayhuff; states served: Montana
+The Last Best Clinic,MT,,,lastbestclinic@gmail.com,lastbestclinic@gmail.com,4069922570,,"Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Shannon; states served: Montana
+Wellness Options,MT,,,wellnessoptionsmontana@gmail.com,wellnessoptionsmontana@gmail.com,406-498-5449,,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Jamie Goldberg; states served: Montana

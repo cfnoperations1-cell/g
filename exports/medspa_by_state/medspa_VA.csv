@@ -1,5 +1,5 @@
-﻿business_name,contact_name,state,states_served,email,phone,products,source
-Cardinal Care Psychiatric Services,Naomi Myrick,VA,Virginia,nmyrick@cardinalcarepsych.com,"7576534131, 7572558045(pharmacy#)","Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
-S$S medical services,Erica Williams,VA,Virginia and New York,edavis0912@gmail.com,8043161204,"Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
-"The Shala, LLc",Amber Satterfield,VA,West Virginia,rnshalawv@gmail.com,6813783370,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
-Well life with Sam,Samantha Cogil,VA,Virginia,smiller1985@gmail.com,540-425-0574,"Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
+﻿business_name,state,city,website,email,all_emails,phone,instagram,peptide_terms_found,peptide_hits,category,source,source_query,notes
+Cardinal Care Psychiatric Services,VA,,,nmyrick@cardinalcarepsych.com,nmyrick@cardinalcarepsych.com,"7576534131, 7572558045(pharmacy#)",,"Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Naomi Myrick; states served: Virginia
+S$S medical services,VA,,,edavis0912@gmail.com,edavis0912@gmail.com,8043161204,,"Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Erica Williams; states served: Virginia and New York
+"The Shala, LLc",VA,,,rnshalawv@gmail.com,rnshalawv@gmail.com,6813783370,,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Amber Satterfield; states served: West Virginia
+Well life with Sam,VA,,,smiller1985@gmail.com,smiller1985@gmail.com,540-425-0574,,"Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Samantha Cogil; states served: Virginia

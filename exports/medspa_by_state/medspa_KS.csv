@@ -1,4 +1,4 @@
-﻿business_name,contact_name,state,states_served,email,phone,products,source
-PS Wellness + Aesthetics,Ashlee Hess,KS,"Kansas, Missouri, Nebraska,colorado",ajhess1518@gmail.com,NIS 9136307345,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
-Push health,Rajeshwary Nair,KS,"Tx, Fl, VT, NM, Kansas and Az",rajinairnp@gmail.com,9728277727,"Patient specific Semaglutide, Patient Specific Tirzepatide",Response Sheet
-RENEW HEALTH AND WELLNESS,Stacy Wessley,KS,Kansas,rhw316@gmail.com,3162594787,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide, Vitamin injections",Response Sheet
+﻿business_name,state,city,website,email,all_emails,phone,instagram,peptide_terms_found,peptide_hits,category,source,source_query,notes
+PS Wellness + Aesthetics,KS,,,ajhess1518@gmail.com,ajhess1518@gmail.com,NIS 9136307345,,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,"contact: Ashlee Hess; states served: Kansas, Missouri, Nebraska,colorado"
+Push health,KS,,,rajinairnp@gmail.com,rajinairnp@gmail.com,9728277727,,"Patient specific Semaglutide, Patient Specific Tirzepatide",,med spa / clinic (intake form),peptide intake form (Drive),,"contact: Rajeshwary Nair; states served: Tx, Fl, VT, NM, Kansas and Az"
+RENEW HEALTH AND WELLNESS,KS,,,rhw316@gmail.com,rhw316@gmail.com,3162594787,,"Office use Semaglutide, Office use Tirzepatide, Patient specific Semaglutide, Patient Specific Tirzepatide, Vitamin injections",,med spa / clinic (intake form),peptide intake form (Drive),,contact: Stacy Wessley; states served: Kansas
