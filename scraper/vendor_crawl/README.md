@@ -39,3 +39,16 @@ python scraper/vendor_crawl/pw_pass.py data/vendor_crawl/medspa/results_sp.jsonl
 python scraper/vendor_crawl/medspa_compile.py 2026-09-12   # data/out/medspa_peptide_*.csv + medspa_by_state_<date>/ + state summary
 ```
 `MEDSPA_MODE` makes the crawler prioritise service / treatment / weight-loss / peptide pages, where med spas list what they offer.
+
+## Finding vendors that are not on the list yet (repeatable round)
+
+```bash
+cp exports/us_peptide_vendors_all_<last>.csv data/vendor_crawl/vendors_before.csv          # baseline for the diff
+python scraper/vendor_crawl/sp_search.py scraper/vendor_crawl/queries_round3.txt data/vendor_crawl/search_cache_sp_round3.json
+DISC_CACHE=data/vendor_crawl/search_cache_sp_round3.json DISC_OUT=data/vendor_crawl/domains_new.tsv python scraper/vendor_crawl/discover.py scraper/vendor_crawl/queries_round3.txt
+python scraper/vendor_crawl/list_deep.py                    # follow coupon / list / directory pages one level deeper
+# crawl + pw_pass + deep_pass on the new domains (see above), then:
+python scraper/vendor_crawl/new_vendors_diff.py <date>      # exports/us_peptide_vendors_NEW_<date>.csv = domains absent from the baseline
+```
+Write fresh angles into a new queries file each round (new peptides, states, storefront phrases, coupon/affiliate phrasing); a query already
+in the cache is skipped, so re-running the same file costs nothing.
