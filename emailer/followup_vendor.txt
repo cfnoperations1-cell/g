@@ -1,0 +1,26 @@
+Subject: Re: {orig_subject}
+
+Hi there,
+
+{stage_line} I reached out a few days ago about {business_name} adding a
+domestic peptide source.
+
+Quick recap: we manufacture in four US labs on green-list API, every batch
+ships with a third-party COA, and we supply both bulk API and finished vials
+with a one-week turnaround. Brands that moved to us from overseas suppliers
+got US-made product at comparable cost, with no customs risk and consistent
+purity batch to batch.
+
+If you'd like to compare numbers, reply here and I'll send the wholesale
+catalog with per-vial and per-mg pricing. If it's not a fit right now, no
+problem at all.
+
+Thanks,
+Jonathan Cole
+Marinexis Biologics
+{sender_email}
+
+--
+{sender_company}
+{sender_postal_address}
+{unsubscribe_line}
