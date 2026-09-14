@@ -85,9 +85,7 @@ def clean_name(name: str, dom: str = "") -> str:
     n = re.sub(r"\s{2,}", " ", n)
     titleish = bool(re.search(r",|&| in [A-Z]|\bnear\b|\bbest\b|\d", n)) or len(n.split()) > 5
     if not n or n.lower() in GENERIC or len(n) < 3 or len(n) > 42 or titleish:
-        alt = name_from_domain(dom) if dom else ""
-        if alt and 3 <= len(alt) <= 42:
-            n = alt
+        n = dom.split("/")[0] if dom else ""   # the bare domain reads naturally and is always right
     return n or "your practice"
 
 
