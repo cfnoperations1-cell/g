@@ -141,7 +141,7 @@ def pick_leads(limit: int, source: Path) -> list:
     return picked
 
 
-def build(lead_row: dict, email: str, subject_t: str, body_t: str) -> EmailMessage:
+def build(lead_row: dict, email: str, subject_t: str, body_t: str, attachments=()) -> EmailMessage:
     name = clean_name(lead_row["business_name"], lead_row["website"].replace("https://", "").strip("/"))
     peps = peptide_phrase(lead_row["peptide_terms_found"])
     subject = subject_t.replace("{business_name}", name).replace("{peptides}", peps)
@@ -152,6 +152,11 @@ def build(lead_row: dict, email: str, subject_t: str, body_t: str) -> EmailMessa
     msg["To"] = email
     msg["Message-ID"] = make_msgid()
     msg.set_content(body)
+    for path in attachments:
+        import mimetypes
+        ctype, _ = mimetypes.guess_type(str(path))
+        maintype, subtype = (ctype or "application/octet-stream").split("/", 1)
+        msg.add_attachment(Path(path).read_bytes(), maintype=maintype, subtype=subtype, filename=Path(path).name)
     return msg
 
 
@@ -160,6 +165,7 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=30)
     ap.add_argument("--message-file", type=Path, default=MESSAGE, help="copy to use (emailer/message_medspa.txt or any file in emailer/medspa/)")
     ap.add_argument("--source", type=Path, default=None, help="med spa with-email CSV (default: newest in exports/)")
+    ap.add_argument("--attach", type=Path, action="append", default=[], help="file to attach (repeatable)")
     ap.add_argument("--send", action="store_true")
     ap.add_argument("--i-understand-this-sends-real-email", action="store_true")
     args = ap.parse_args()
@@ -181,7 +187,7 @@ def main() -> None:
         if new_log:
             w.writerow(["sent_at", "mode", "business_name", "state", "domain", "email", "subject"])
         for i, (score, r, email, dom) in enumerate(picked, 1):
-            msg = build(r, email, subject_t, body_t)
+            msg = build(r, email, subject_t, body_t, args.attach)
             path = DRAFTS / f"{i:02d}_{r['state'] or 'XX'}_{re.sub(r'[^a-z0-9]+', '-', dom.lower())[:40]}.eml"
             path.write_bytes(bytes(msg))
             mode = "draft"

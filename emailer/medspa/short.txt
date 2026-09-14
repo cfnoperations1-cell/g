@@ -2,7 +2,7 @@ Subject: Quick one for {business_name}
 
 Hi there,
 
-Jonathan Cole with Stratos Peptides. Saw {business_name} offers {peptides}.
+Jonathan Cole with Marinexis Biologics. Saw {business_name} offers {peptides}.
 We make those here in the US -- four labs, COA on every batch, cold-chain
 shipping, wholesale per-vial pricing.
 
@@ -10,7 +10,7 @@ Want the price sheet for what you carry? Reply "yes" and I'll send it today.
 
 Thanks,
 Jonathan Cole
-Stratos Peptides
+Marinexis Biologics
 {sender_email}
 
 --

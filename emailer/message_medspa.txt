@@ -2,7 +2,7 @@ Subject: {business_name} - US-made peptide supply for your practice
 
 Hi there,
 
-My name is Jonathan Cole with Stratos Peptides. I came across {business_name}
+My name is Jonathan Cole with Marinexis Biologics. I came across {business_name}
 and saw you offer {peptides} -- that's exactly what we supply, so I wanted to
 introduce myself.
 
@@ -12,16 +12,13 @@ below what most practices pay through a middleman. Practices use us for
 office-use stock and patient-specific orders, with a one-week turnaround even
 on large runs.
 
-If you're currently sourcing peptides and would like a price sheet for the
-products you carry, reply here and I'll send it over -- or grab five minutes
-on my calendar and I'll walk you through it.
-
-I'm a real person, too -- not a bot, not on WhatsApp. Just Jonathan Cole,
-here in Las Vegas.
+I've attached our current Made in USA wholesale catalog so you can check
+per-vial pricing on the products you carry. If it's worth a conversation,
+reply here or grab five minutes on my calendar and I'll walk you through it.
 
 Thanks,
 Jonathan Cole
-Stratos Peptides
+Marinexis Biologics
 {sender_email}
 
 --

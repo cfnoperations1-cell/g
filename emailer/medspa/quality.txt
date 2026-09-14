@@ -2,7 +2,7 @@ Subject: Where {business_name}'s peptides come from
 
 Hi there,
 
-Jonathan Cole with Stratos Peptides. I came across {business_name} and saw you
+Jonathan Cole with Marinexis Biologics. I came across {business_name} and saw you
 offer {peptides}. A question we hear from practices every week is "can you
 show me the testing?" -- so I'll lead with that.
 
@@ -15,11 +15,9 @@ peptides came from, you'll have a clean answer.
 Happy to send sample COAs and a price sheet for the products you carry. Just
 reply here, or grab five minutes on my calendar and I'll walk you through it.
 
-I'm a real person -- not a bot, not on WhatsApp. Jonathan Cole, Las Vegas.
-
 Thanks,
 Jonathan Cole
-Stratos Peptides
+Marinexis Biologics
 {sender_email}
 
 --

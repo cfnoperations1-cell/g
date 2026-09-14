@@ -2,7 +2,7 @@ Subject: {business_name} - what are you paying per vial?
 
 Hi there,
 
-My name is Jonathan Cole with Stratos Peptides. I noticed {business_name}
+My name is Jonathan Cole with Marinexis Biologics. I noticed {business_name}
 offers {peptides}, and I'll get straight to the point: most practices we talk
 to are paying a distributor markup on product that started in a lab like ours.
 
@@ -15,11 +15,9 @@ If you send me the three products you move the most of, I'll send back a
 per-vial quote the same day so you can compare it against your current cost.
 No commitment, just numbers.
 
-I'm a real person -- not a bot, not on WhatsApp. Jonathan Cole, Las Vegas.
-
 Thanks,
 Jonathan Cole
-Stratos Peptides
+Marinexis Biologics
 {sender_email}
 
 --

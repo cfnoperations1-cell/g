@@ -2,7 +2,7 @@ Subject: Backup supply for {peptides} at {business_name}
 
 Hi there,
 
-Jonathan Cole with Stratos Peptides. I saw {business_name} offers {peptides}
+Jonathan Cole with Marinexis Biologics. I saw {business_name} offers {peptides}
 and wanted to put us on your radar as a second source, even if you're happy
 with who you use today.
 
@@ -14,11 +14,9 @@ every batch, and turn around large orders in about a week.
 If it's useful, I'll send a price sheet for exactly the products you carry so
 it's sitting in your inbox the next time you need it. Just reply and say so.
 
-I'm a real person -- not a bot, not on WhatsApp. Jonathan Cole, Las Vegas.
-
 Thanks,
 Jonathan Cole
-Stratos Peptides
+Marinexis Biologics
 {sender_email}
 
 --
