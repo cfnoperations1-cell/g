@@ -39,7 +39,29 @@ FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "
 DAILY_CAP = int(os.environ.get("DAILY_CAP", "1900"))     # Google Workspace hard limit is 2,000/day
 FOLLOWUP_DAYS = int(os.environ.get("FOLLOWUP_DAYS", "3"))
 MAX_FOLLOWUPS = int(os.environ.get("MAX_FOLLOWUPS", "3"))
+FU_SHARE = float(os.environ.get("FU_SHARE", "0.5"))       # at most this fraction of a wave goes to follow-ups
 PRIORITY_DOMAINS = ["heritagelabsusa.com"]                 # "peptide veterans": the one veteran-owned vendor
+# vendors that are obviously not US-based get skipped (the pitch is US-made supply, no customs risk)
+FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it|br|hk|sg|nz|ie|ch|se|no|dk|fi|tw|jp|kr)$"
+                     r"|costarica|\buae\b|canada|europe|-uk\b|\buk-", re.I)
+# scraped page titles that are not a business name -> fall back to the bare domain
+JUNK_VENDOR = re.compile(r"click here|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount"
+                         r"|\boffers?\b|wholesale medical|nasal spray|research peptides|→|↗|adipotide|glutathione|^ghrp"
+                         r"|^pt$|^best\b|^top\b|\bshop$|\bstore$|^home$|^welcome$|^peptide$|^wholesale$|affiliate", re.I)
+
+
+FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|canada|europe|eu|costa rica|australia|india|china)\b", re.I)
+
+
+def is_foreign(domain, name=""):
+    return bool(FOREIGN.search(domain) or FOREIGN_NAME.search(name or ""))
+
+
+def clean_vendor(name, domain):
+    n = (name or "").strip()
+    if not n or len(n) < 3 or len(n.split()) > 5 or JUNK_VENDOR.search(n):
+        return domain
+    return n
 LEGACY_SENT_AT = "2026-09-14T16:00:00Z"                    # all pre-schema sends went out on 2026-09-14
 
 COLS = ["email", "domain", "audience", "mode", "via", "sent_at", "last_touch_at", "stage", "status"]
@@ -166,6 +188,8 @@ def initial_candidates(sent_rows):
         d = e.split("@", 1)[1]
         if e in done or d in done:
             continue
+        if r["audience"] == "vendor" and is_foreign(d, r.get("business_name", "")):
+            continue
         cands.append(r)
     vendors = [r for r in cands if r["audience"] == "vendor"]
     medspas = [r for r in cands if r["audience"] == "medspa"]
@@ -195,8 +219,9 @@ def cmd_next(n, out_json):
     dids = load_draft_ids(); sd = sender()
     budget = max(0, DAILY_CAP - today_count(rows)); n = min(n, budget)
     items = []
+    fu_cap = int(n * FU_SHARE + 0.999) if n else 0
     for r in due_followups(rows):
-        if len(items) >= n:
+        if len(items) >= fu_cap:
             break
         qrow = qi.get(r["email"]); aud = r["audience"] if r["audience"] in FU_TPL else "vendor"
         name = (qrow or {}).get("business_name") or r["domain"]; peps = peps_of(qrow); stage = int(r["stage"]) + 1
@@ -207,9 +232,16 @@ def cmd_next(n, out_json):
         if len(items) >= n:
             break
         e = r["email"].strip().lower()
-        items.append({"kind": "initial", "stage": 0, "audience": r["audience"], "to": e, "name": r["business_name"],
-                      "peps": peps_of(r) if r["audience"] == "medspa" else "-", "subject": r["subject"],
-                      "body": r["body"], "draftId": dids.get(e, "")})
+        name, subj, body, did = r["business_name"], r["subject"], r["body"], dids.get(e, "")
+        if r["audience"] == "vendor":
+            new = clean_vendor(name, e.split("@", 1)[1])
+            if new != name:
+                subj = orig_subject("vendor", new)
+                body = body.replace(f"I came across {name}\n", f"I came across {new}\n", 1)
+                name, did = new, ""                              # never send a draft whose name we rewrote
+        items.append({"kind": "initial", "stage": 0, "audience": r["audience"], "to": e, "name": name,
+                      "peps": peps_of(r) if r["audience"] == "medspa" else "-", "subject": subj,
+                      "body": body, "draftId": did})
     Path(out_json).write_text(json.dumps(items), encoding="utf-8")
     fu = sum(1 for i in items if i["kind"] == "fu"); ini = len(items) - fu
     print(f"BATCH {len(items)}  fu={fu} initial={ini}  (budget_left_today={budget}, cap={DAILY_CAP})")

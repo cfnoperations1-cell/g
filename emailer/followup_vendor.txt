@@ -2,7 +2,7 @@ Subject: Re: {orig_subject}
 
 Hi there,
 
-{stage_line} I reached out a few days ago about {business_name} adding a
+{stage_line} I reached out recently about {business_name} adding a
 domestic peptide source.
 
 Quick recap: we manufacture in four US labs on green-list API, every batch

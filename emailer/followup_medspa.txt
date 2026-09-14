@@ -2,7 +2,7 @@ Subject: Re: {orig_subject}
 
 Hi there,
 
-{stage_line} I reached out a few days ago about US-made peptide supply for
+{stage_line} I reached out recently about US-made peptide supply for
 {business_name} -- you carry {peptides}, and that's exactly what we
 manufacture.
 
