@@ -1,0 +1,30 @@
+Subject: {business_name} - US-made peptide supply for your practice
+
+Hi there,
+
+My name is Jonathan Cole with Stratos Peptides. I came across {business_name}
+and saw you offer {peptides} -- that's exactly what we supply, so I wanted to
+introduce myself.
+
+We run four labs here in the US. Every batch ships with a third-party COA,
+cold-chain from our facility, and per-vial wholesale pricing that lands at or
+below what most practices pay through a middleman. Practices use us for
+office-use stock and patient-specific orders, with a one-week turnaround even
+on large runs.
+
+If you're currently sourcing peptides and would like a price sheet for the
+products you carry, reply here and I'll send it over -- or grab five minutes
+on my calendar and I'll walk you through it.
+
+I'm a real person, too -- not a bot, not on WhatsApp. Just Jonathan Cole,
+here in Las Vegas.
+
+Thanks,
+Jonathan Cole
+Stratos Peptides
+{sender_email}
+
+--
+{sender_company}
+{sender_postal_address}
+{unsubscribe_line}
