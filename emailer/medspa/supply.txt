@@ -1,0 +1,27 @@
+Subject: Backup supply for {peptides} at {business_name}
+
+Hi there,
+
+Jonathan Cole with Stratos Peptides. I saw {business_name} offers {peptides}
+and wanted to put us on your radar as a second source, even if you're happy
+with who you use today.
+
+Practices bring us in for three reasons: stock-outs at their current supplier,
+a price check, or a need for both office-use vials and patient-specific
+orders from one place. We run four US labs, ship cold-chain with a COA on
+every batch, and turn around large orders in about a week.
+
+If it's useful, I'll send a price sheet for exactly the products you carry so
+it's sitting in your inbox the next time you need it. Just reply and say so.
+
+I'm a real person -- not a bot, not on WhatsApp. Jonathan Cole, Las Vegas.
+
+Thanks,
+Jonathan Cole
+Stratos Peptides
+{sender_email}
+
+--
+{sender_company}
+{sender_postal_address}
+{unsubscribe_line}

@@ -7,6 +7,7 @@ the same SMTP path, compliance checks and pacing as emailer/agent.py. Every cont
 logged to outreach_drafts/medspa/sent_log.csv so a business is never emailed twice.
 
     python -m emailer.medspa_batch --limit 30                 # drafts only
+    python -m emailer.medspa_batch --limit 30 --message-file emailer/medspa/margin.txt
     python -m emailer.medspa_batch --limit 30 --send --i-understand-this-sends-real-email
 """
 from __future__ import annotations
@@ -157,12 +158,13 @@ def build(lead_row: dict, email: str, subject_t: str, body_t: str) -> EmailMessa
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--limit", type=int, default=30)
+    ap.add_argument("--message-file", type=Path, default=MESSAGE, help="copy to use (emailer/message_medspa.txt or any file in emailer/medspa/)")
     ap.add_argument("--source", type=Path, default=None, help="med spa with-email CSV (default: newest in exports/)")
     ap.add_argument("--send", action="store_true")
     ap.add_argument("--i-understand-this-sends-real-email", action="store_true")
     args = ap.parse_args()
     source = args.source or Path(sorted(glob.glob(str(ROOT / "exports" / "medspa_peptides_with_email_*.csv")))[-1])
-    subject_t, body_t = load_message(MESSAGE)
+    subject_t, body_t = load_message(args.message_file)
     if args.send:
         if not args.i_understand_this_sends_real_email:
             raise SystemExit("--send requires --i-understand-this-sends-real-email after you have reviewed the drafts")
