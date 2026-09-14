@@ -139,7 +139,7 @@ def pick_leads(limit: int, source: Path) -> list:
     return picked
 
 
-JUNK_NAME = re.compile(r"^(follow|shipping|payment|home|shop|store|cart|checkout|about|contact|faq|blog|news|guide|review|explained|shipping and payment|price|pricing|comparison|tracker|dossier)\b|semaglutide|tirzepatide|retatrutide|bpc|tb-?500|sermorelin|ipamorelin|cjc|tesamorelin|nad|glp|pt-?141|ghk|mots|aod|epitalon|thymosin|kisspeptin|selank|semax|dsip|amino-?1mq|ss-?31|hexarelin|gonadorelin|oxytocin|melanotan|cagrilintide|acetate", re.I)
+JUNK_NAME = re.compile(r"\b(follow|shipping|payment|home|shop|store|cart|checkout|about|contact|faq|blog|news|guide|review|reviews|explained|price|pricing|comparison|compare|tracker|dossier|academy|supplier|tool|directory|list|best|top|learn|how to|what is)\b|semaglutide|tirzepatide|retatrutide|\bbpc\b|tb-?500|sermorelin|ipamorelin|cjc|tesamorelin|\bnad\b|\bglp\b|pt-?141|ghk|mots|\baod\b|epitalon|thymosin|kisspeptin|selank|semax|dsip|amino-?1mq|ss-?31|hexarelin|gonadorelin|oxytocin|melanotan|cagrilintide|acetate", re.I)
 
 def vendor_name(raw: str, dom: str) -> str:
     n = clean_name(raw, dom)
