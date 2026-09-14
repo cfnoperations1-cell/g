@@ -144,7 +144,7 @@ def pick_leads(limit: int, source: Path) -> list:
 def build(lead_row: dict, email: str, subject_t: str, body_t: str) -> EmailMessage:
     name = clean_name(lead_row["business_name"], lead_row["website"].replace("https://", "").strip("/"))
     peps = peptide_phrase(lead_row["peptide_terms_found"])
-    subject = subject_t.replace("{business_name}", name)
+    subject = subject_t.replace("{business_name}", name).replace("{peptides}", peps)
     body = render(body_t.replace("{business_name}", name).replace("{peptides}", peps))
     msg = EmailMessage()
     msg["Subject"] = subject
