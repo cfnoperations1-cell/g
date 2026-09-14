@@ -40,6 +40,7 @@ DAILY_CAP = int(os.environ.get("DAILY_CAP", "1900"))     # Google Workspace hard
 FOLLOWUP_DAYS = int(os.environ.get("FOLLOWUP_DAYS", "3"))
 MAX_FOLLOWUPS = int(os.environ.get("MAX_FOLLOWUPS", "3"))
 FU_SHARE = float(os.environ.get("FU_SHARE", "0.5"))       # at most this fraction of a wave goes to follow-ups
+FOLLOWUP_START = os.environ.get("FOLLOWUP_START", "2026-09-17T18:30:00Z")  # no follow-ups at all before this
 PRIORITY_DOMAINS = ["heritagelabsusa.com"]                 # "peptide veterans": the one veteran-owned vendor
 # vendors that are obviously not US-based get skipped (the pitch is US-made supply, no customs risk)
 FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it|br|hk|sg|nz|ie|ch|se|no|dk|fi|tw|jp|kr)$"
@@ -47,10 +48,17 @@ FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it
 # scraped page titles that are not a business name -> fall back to the bare domain
 JUNK_VENDOR = re.compile(r"click here|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount"
                          r"|\boffers?\b|wholesale medical|nasal spray|research peptides|→|↗|adipotide|glutathione|^ghrp"
-                         r"|^pt$|^best\b|^top\b|\bshop$|\bstore$|^home$|^welcome$|^peptide$|^wholesale$|affiliate", re.I)
+                         r"|^pt$|^best\b|^top\b|\bshop$|\bstore$|^home$|^welcome$|^peptide$|^wholesale$|affiliate"
+                         r"|^(high|low|new|free|fast|quality|premium|official|trusted|reliable|verified|tested|pure|safe"
+                         r"|secure|online|orders?|products?|research|labs?|login|account|cart|menu|search|sales?|deals?|prices?)$", re.I)
 
 
 FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|canada|europe|eu|costa rica|australia|india|china)\b", re.I)
+
+
+FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
+            "tutanota.com", "qq.com", "163.com", "icloud.com", "aol.com", "sudomail.com", "live.com", "msn.com"}
+GENERIC_NAMES = {"your practice", "your business"}
 
 
 def is_foreign(domain, name=""):
@@ -157,7 +165,8 @@ def peps_of(qrow):
 
 
 def orig_subject(aud, name):
-    return f"{name} - US-made peptide supply for your practice" if aud == "medspa" else f"{name} - US-made peptide supply, wholesale"
+    tail = "US-made peptide supply for your practice" if aud == "medspa" else "US-made peptide supply, wholesale"
+    return tail if name in GENERIC_NAMES else f"{name} - {tail}"
 
 
 def render_fu(aud, name, peps, stage, sd):
@@ -191,13 +200,17 @@ def initial_candidates(sent_rows):
         if r["audience"] == "vendor" and is_foreign(d, r.get("business_name", "")):
             continue
         cands.append(r)
-    vendors = [r for r in cands if r["audience"] == "vendor"]
-    medspas = [r for r in cands if r["audience"] == "medspa"]
-    ordered = vendors + medspas                                   # vendors first, then med spas
+    dids = load_draft_ids()                                       # file order = top of the Drafts folder first
+    by_email = {r["email"].strip().lower(): r for r in cands}
+    drafted = [by_email[e] for e in dids if e in by_email]
+    rest = [r for r in cands if r["email"].strip().lower() not in dids]
+    vendors = [r for r in rest if r["audience"] == "vendor"]
+    medspas = [r for r in rest if r["audience"] == "medspa"]
+    ordered = vendors + medspas                                   # after the drafts: vendors first, then med spas
     pri = [r for r in ordered if r["email"].split("@", 1)[1] in PRIORITY_DOMAINS]
-    rest = [r for r in ordered if r not in pri]
+    ordered = drafted + pri + [r for r in ordered if r not in pri]
     out, seen = [], set()
-    for r in pri + rest:                                          # one contact per domain per campaign
+    for r in ordered:                                             # one contact per domain per campaign
         d = r["email"].lower().split("@", 1)[1]
         if d in seen:
             continue
@@ -206,6 +219,8 @@ def initial_candidates(sent_rows):
 
 
 def due_followups(sent_rows):
+    if now() < parse(FOLLOWUP_START):
+        return []
     cutoff = now() - timedelta(days=FOLLOWUP_DAYS)
     due = [r for r in sent_rows
            if r["status"] == "active" and int(r["stage"]) < MAX_FOLLOWUPS and parse(r["last_touch_at"]) <= cutoff]
@@ -225,6 +240,10 @@ def cmd_next(n, out_json):
             break
         qrow = qi.get(r["email"]); aud = r["audience"] if r["audience"] in FU_TPL else "vendor"
         name = (qrow or {}).get("business_name") or r["domain"]; peps = peps_of(qrow); stage = int(r["stage"]) + 1
+        if aud == "vendor":
+            name = clean_vendor(name, r["domain"])
+        if name == r["domain"] and r["domain"] in FREEMAIL:      # a freemail domain is not a business name
+            name = "your practice" if aud == "medspa" else "your business"
         subj, body = render_fu(aud, name, peps, stage, sd)
         items.append({"kind": "fu", "stage": stage, "audience": aud, "to": r["email"], "name": name,
                       "peps": peps if aud == "medspa" else "-", "subject": subj, "body": body, "draftId": ""})
