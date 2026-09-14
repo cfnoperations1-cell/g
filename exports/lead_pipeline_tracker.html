@@ -384,8 +384,8 @@
     {k:"Bounced",        sub:"address rejected · excluded", n:8, c:"var(--block)"},
     {k:"Manual sends",   sub:"catalog sent by hand · excluded from sequence", n:7, c:"var(--queue)"},
   ];
-  const segEl=document.getElementById("seg"), total=statuses.reduce((a,b)=>a+b.n,0);
-  statuses.forEach(s=>{ const i=document.createElement("i"); i.style.width=(s.n/total*100)+"%"; i.style.background=s.c; i.title=`${s.k}: ${s.n}`; segEl.appendChild(i); });
+  const segEl=document.getElementById("seg"), statusTotal=statuses.reduce((a,b)=>a+b.n,0);
+  statuses.forEach(s=>{ const i=document.createElement("i"); i.style.width=(s.n/statusTotal*100)+"%"; i.style.background=s.c; i.title=`${s.k}: ${s.n}`; segEl.appendChild(i); });
   const sl=document.getElementById("statusList");
   statuses.forEach(s=>{ const li=document.createElement("li");
     li.innerHTML=`<span class="sw" style="background:${s.c}"></span><span><span class="lbl">${s.k}</span><br><span class="sub">${s.sub}</span></span><span class="n">${s.n}</span>`; sl.appendChild(li); });
