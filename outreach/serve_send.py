@@ -151,9 +151,15 @@ def load_draft_ids():
     return m
 
 
+def local_day(ts_iso):
+    """Calendar day in Pacific time (Jonathan's day), so the 100/day cap resets at local midnight, not UTC."""
+    from zoneinfo import ZoneInfo
+    return parse(ts_iso).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d")
+
+
 def today_count(rows):
-    t = iso(now())[:10]
-    return sum(1 for r in rows if r["last_touch_at"][:10] == t)
+    t = local_day(iso(now()))
+    return sum(1 for r in rows if local_day(r["last_touch_at"]) == t)
 
 
 # ---------- rendering ----------

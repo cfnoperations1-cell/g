@@ -6,10 +6,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import serve_send as ss
 
 AUTO = {"eliteedgebiotech.com", "ironwithin.io"}          # auto-acks, not real replies
-rows = ss.load_sent(); t = ss.iso(ss.now())[:10]
+rows = ss.load_sent(); t = ss.local_day(ss.iso(ss.now()))
 vend = sum(1 for r in rows if r["audience"] == "vendor"); ms = sum(1 for r in rows if r["audience"] == "medspa")
-init_today = sum(1 for r in rows if r["sent_at"][:10] == t)
-fu_today = sum(1 for r in rows if r["last_touch_at"][:10] == t and r["stage"] != "0" and r["sent_at"][:10] != t)
+init_today = sum(1 for r in rows if ss.local_day(r["sent_at"]) == t)
+fu_today = sum(1 for r in rows if ss.local_day(r["last_touch_at"]) == t and r["stage"] != "0" and ss.local_day(r["sent_at"]) != t)
 replied = [r for r in rows if r["status"] == "replied"]; real = [r for r in replied if r["domain"] not in AUTO]
 bounced = sum(1 for r in rows if r["status"] == "bounced"); manual = sum(1 for r in rows if r["status"] == "manual")
 active = [r for r in rows if r["status"] == "active"]; s0 = sum(1 for r in active if r["stage"] == "0"); s1 = len(active) - s0
