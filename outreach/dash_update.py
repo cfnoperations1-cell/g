@@ -31,7 +31,7 @@ sub(r'<div class="kpi bad"><div class="n mono">[\d,]+</div><div class="k">Bounce
     f'<div class="kpi bad"><div class="n mono">{bounced}</div><div class="k">Bounces</div><div class="d">{bounced/n*100:.1f}% · removed from follow-ups</div>')
 sub(r'<div class="kpi"><div class="n mono">[\d,]+</div><div class="k">Still to send</div><div class="d">[^<]*</div>',
     f'<div class="kpi"><div class="n mono">{pend:,}</div><div class="k">Still to send</div><div class="d">one contact per business · {drafts_left} already drafted</div>')
-sub(r'<div class="kpi"><div class="n mono">[\d,]+</div><div class="k">Next batch</div><div class="d">[^<]*</div>',
+sub(r'<div class="kpi"><div class="n mono">[\d,]+</div><div class="k">(?:Next batch|Per hourly wave)</div><div class="d">[^<]*</div>',
     f'<div class="kpi"><div class="n mono">{ss.HOURLY_CAP}</div><div class="k">Per hourly wave</div><div class="d">{ss.DAILY_CAP} per day cap · existing drafts first</div>')
 sub(r'n:\d+, c:"var\(--accent\)"', f'n:{len(active)}, c:"var(--accent)"')
 sub(r'sub:"[^"]*", n:\d+, c:"var\(--done\)"', f'sub:"{len(real)} real replies + {len(replied)-len(real)} auto-replies · no more automated mail", n:{len(replied)}, c:"var(--done)"')
