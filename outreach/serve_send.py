@@ -36,7 +36,8 @@ SENT = OUT / "sent_log.csv"
 DRAFT_IDS = OUT / "draft_ids.csv"
 FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "emailer" / "followup_vendor.txt"}
 
-DAILY_CAP = int(os.environ.get("DAILY_CAP", "1900"))     # Google Workspace hard limit is 2,000/day
+DAILY_CAP = int(os.environ.get("DAILY_CAP", "100"))      # ramp: 100 per day (Gmail throttled at ~220)
+HOURLY_CAP = int(os.environ.get("HOURLY_CAP", "10"))     # ramp: 10 per hourly wave
 FOLLOWUP_DAYS = int(os.environ.get("FOLLOWUP_DAYS", "3"))
 MAX_FOLLOWUPS = int(os.environ.get("MAX_FOLLOWUPS", "3"))
 FU_SHARE = float(os.environ.get("FU_SHARE", "0.5"))       # at most this fraction of a wave goes to follow-ups
@@ -232,7 +233,7 @@ def due_followups(sent_rows):
 def cmd_next(n, out_json):
     rows = load_sent(); qi = {r["email"].strip().lower(): r for r in load_queue()}
     dids = load_draft_ids(); sd = sender()
-    budget = max(0, DAILY_CAP - today_count(rows)); n = min(n, budget)
+    budget = max(0, DAILY_CAP - today_count(rows)); n = min(n, budget, HOURLY_CAP)
     items = []
     fu_cap = int(n * FU_SHARE + 0.999) if n else 0
     for r in due_followups(rows):
@@ -308,6 +309,25 @@ def cmd_mark(status, path):
     print(f"marked {n} as {status}")
 
 
+def cmd_export():
+    """Write category lists: contacted (everyone emailed), replied, bounced, and the not-yet-emailed queue."""
+    rows = load_sent()
+    def dump(name, sel, cols):
+        with open(OUT / name, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=cols); w.writeheader()
+            for r in sel: w.writerow({k: r.get(k, "") for k in cols})
+        return len(sel)
+    base = ["email", "domain", "audience", "sent_at", "last_touch_at", "stage", "status"]
+    n1 = dump("contacted.csv", [r for r in rows if r["status"] in ("active", "manual")], base)
+    n2 = dump("replied.csv", [r for r in rows if r["status"] == "replied"], base)
+    n3 = dump("bounced.csv", [r for r in rows if r["status"] == "bounced"], base)
+    pend = initial_candidates(rows)
+    n4 = dump("not_yet_emailed.csv", [{"email": r["email"], "domain": r["email"].split("@", 1)[1], "audience": r["audience"],
+                                        "business_name": r["business_name"]} for r in pend],
+              ["email", "domain", "audience", "business_name"])
+    print(f"exported contacted={n1} replied={n2} bounced={n3} not_yet_emailed={n4}")
+
+
 def cmd_stats():
     rows = load_sent()
     from collections import Counter
@@ -341,5 +361,7 @@ if __name__ == "__main__":
         cmd_record(a[1], upto, skip)
     elif a[0] == "mark":
         cmd_mark(a[1], a[2])
+    elif a[0] == "export":
+        cmd_export()
     else:
         sys.exit("usage: serve_send.py [stats | migrate | next N out.json | record batch.json [UPTO] [--skip i,j] | mark STATUS file]")

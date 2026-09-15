@@ -208,19 +208,19 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-15 03:45 UTC</b><br>
-        next batch <b>50 · Sep 15 06:00 PT</b><br>
+        UPDATED <b>2026-09-15 17:47 UTC</b><br>
+        sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">◐ Theme</button>
     </div>
   </header>
 
-  <div class="banner" role="status">
-    <span class="dot block"></span>
-    <b>Sending paused until 6:00 AM PT</b>
-    <span>Gmail throttled outbound mail after roughly 220 cold sends on Sep 14. One batch of 50 (existing drafts, by draft id) is scheduled for Sep 15 at 6:00 AM Pacific; nothing else is queued.</span>
-    <span class="when">stopped Sep 14 18:35 UTC</span>
+  <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
+    <span class="dot run"></span>
+    <b style="color:var(--run)">Ramped sending</b>
+    <span>10 emails per hourly wave, 100 per day, existing drafts first. Gmail hit its limit again this morning after 30 sends, so waves resume Sep 15 at 12:47 PM PT. Follow-ups open Sep 17.</span>
+    <span class="when">next wave 19:47 UTC</span>
   </div>
 
   <section style="margin-top:26px">
@@ -228,12 +228,12 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">375</div><div class="k">Contacts emailed</div><div class="d">324 vendors · 51 med spas</div></div>
-      <div class="kpi"><div class="n mono">219</div><div class="k">Sent today</div><div class="d">197 first-touch · 22 follow-ups</div></div>
-      <div class="kpi good"><div class="n mono">12</div><div class="k">Replies</div><div class="d">3.2% of contacts · catalog sent to all 12 · plus 2 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">10</div><div class="k">Bounces</div><div class="d">2.7% · removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">1,357</div><div class="k">Still to send</div><div class="d">1,146 vendors · 543 med spas queued</div></div>
-      <div class="kpi"><div class="n mono">50</div><div class="k">Next batch</div><div class="d">Sep 15 · 6:00 AM PT · from the 76 verified drafts</div></div>
+      <div class="kpi accent"><div class="n mono">405</div><div class="k">Contacts emailed</div><div class="d">338 vendors · 67 med spas</div></div>
+      <div class="kpi"><div class="n mono">30</div><div class="k">Sent today</div><div class="d">30 first-touch · 0 follow-ups · 70 left under the daily cap</div></div>
+      <div class="kpi good"><div class="n mono">12</div><div class="k">Replies</div><div class="d">3.0% of contacts · plus 2 auto-replies</div></div>
+      <div class="kpi bad"><div class="n mono">10</div><div class="k">Bounces</div><div class="d">2.5% · removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">1,327</div><div class="k">Still to send</div><div class="d">one contact per business · 46 already drafted</div></div>
+      <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap · existing drafts first</div></div>
     </div>
 
     <div class="grid2" style="margin-top:16px">
@@ -247,10 +247,10 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">375 tracked</span></h3>
+        <h3>Contact status <span class="count">405 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>323</b> awaiting step 1, <b>21</b> at step 1. Window opens <b>Sep 17</b>.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>353</b> awaiting step 1, <b>21</b> at step 1. Window opens <b>Sep 17</b>.</div>
       </div>
     </div>
 
@@ -379,7 +379,7 @@
 
   /* ---------- outreach: contact status ---------- */
   const statuses = [
-    {k:"Awaiting reply", sub:"eligible for follow-ups from Sep 17", n:344, c:"var(--accent)"},
+    {k:"Awaiting reply", sub:"eligible for follow-ups from Sep 17", n:374, c:"var(--accent)"},
     {k:"Replied",        sub:"12 real replies + 2 auto-replies · no more automated mail", n:14, c:"var(--done)"},
     {k:"Bounced",        sub:"address rejected · excluded", n:10, c:"var(--block)"},
     {k:"Manual sends",   sub:"catalog sent by hand · excluded from sequence", n:7, c:"var(--queue)"},
@@ -427,7 +427,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"375 sent · 50 at 6 AM PT"},
+    {name:"Send",       st:"run",   meta:"405 sent · 10/hr · 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
@@ -469,10 +469,10 @@
       {t:"Gmail drafts created and verified", s:"done", m:"86 drafts"},
       {t:"Send engine with per-contact tracking (date, step, status)", s:"done", m:"outreach/serve_send.py"},
       {t:"Reconcile log against Gmail Sent (Sep 1–14)", s:"done", m:"375 contacts"},
-      {t:"Reply & bounce detection from the inbox", s:"done", m:"12 replies · 10 bounces"},
+      {t:"Reply & bounce detection; contacted / replied / bounced lists in outreach/", s:"done", m:"rescanned every wave"},
       {t:"Follow-up copy: 3 steps, 3 days apart", s:"done", m:"opens Sep 17"},
-      {t:"Ramped batch: 50 existing drafts by draft id", s:"run", m:"scheduled Sep 15 · 6:00 AM PT"},
-      {t:"Send 100 per hour, drafts first, then vendors, then med spas", s:"block", m:"paused · Gmail throttling"},
+      {t:"Ramped sending: 10 per hour, 100 per day, drafts first", s:"run", m:"30 sent Sep 15 · waves hourly"},
+      {t:"100 per hour target", s:"block", m:"shelved · Gmail throttling"},
       {t:"Follow-up wave 1 (contacts with no reply)", s:"queue", m:"not before Sep 17"},
       {t:"Delete 14 stale Sep 10–11 drafts (old copy)", s:"queue", m:"awaiting go-ahead"},
      ]},
