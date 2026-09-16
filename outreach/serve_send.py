@@ -47,7 +47,7 @@ PRIORITY_DOMAINS = ["heritagelabsusa.com"]                 # "peptide veterans":
 FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it|br|hk|sg|nz|ie|ch|se|no|dk|fi|tw|jp|kr)$"
                      r"|costarica|\buae\b|canada|europe|-uk\b|\buk-|uk\.(com|net|org)$", re.I)
 # scraped page titles that are not a business name -> fall back to the bare domain
-JUNK_VENDOR = re.compile(r"click here|\balternative\b|^visit\b|\bdosing\b|cheapest|^wholesale peptides$|marcus hansen|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount"
+JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\b|\balternative\b|^visit\b|\bdosing\b|cheapest|^wholesale peptides$|marcus hansen|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount"
                          r"|\boffers?\b|wholesale medical|nasal spray|research peptides|→|↗|adipotide|glutathione|^ghrp"
                          r"|^pt$|^best\b|^top\b|\bshop$|\bstore$|^home$|^welcome$|^peptide$|^wholesale$|affiliate"
                          r"|^(high|low|new|free|fast|quality|premium|official|trusted|reliable|verified|tested|pure|safe"
@@ -55,7 +55,7 @@ JUNK_VENDOR = re.compile(r"click here|\balternative\b|^visit\b|\bdosing\b|cheape
 
 
 FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
-FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|canada|europe|eu|costa rica|australia|india|china)\b", re.I)
+FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing|hong kong|gmbh|ltd|ptycanada|europe|eu|costa rica|australia|india|china)\b", re.I)
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
