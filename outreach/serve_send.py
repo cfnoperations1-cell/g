@@ -55,7 +55,7 @@ JUNK_VENDOR = re.compile(r"click here|visit site|cheapest|^wholesale peptides$|m
 
 
 FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
-FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|canada|europe|eu|costa rica|australia|india|china)\b", re.I)
+FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|canada|europe|eu|costa rica|australia|india|china)\b", re.I)
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
