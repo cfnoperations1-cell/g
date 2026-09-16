@@ -45,7 +45,7 @@ FOLLOWUP_START = os.environ.get("FOLLOWUP_START", "2026-09-17T18:30:00Z")  # no 
 PRIORITY_DOMAINS = ["heritagelabsusa.com"]                 # "peptide veterans": the one veteran-owned vendor
 # vendors that are obviously not US-based get skipped (the pitch is US-made supply, no customs risk)
 FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it|br|hk|sg|nz|ie|ch|se|no|dk|fi|tw|jp|kr)$"
-                     r"|costarica|\buae\b|canada|europe|-uk\b|\buk-", re.I)
+                     r"|costarica|\buae\b|canada|europe|-uk\b|\buk-|uk\.(com|net|org)$", re.I)
 # scraped page titles that are not a business name -> fall back to the bare domain
 JUNK_VENDOR = re.compile(r"click here|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount"
                          r"|\boffers?\b|wholesale medical|nasal spray|research peptides|→|↗|adipotide|glutathione|^ghrp"
