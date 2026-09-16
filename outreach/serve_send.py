@@ -47,13 +47,14 @@ PRIORITY_DOMAINS = ["heritagelabsusa.com"]                 # "peptide veterans":
 FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it|br|hk|sg|nz|ie|ch|se|no|dk|fi|tw|jp|kr)$"
                      r"|costarica|\buae\b|canada|europe|-uk\b|\buk-|uk\.(com|net|org)$", re.I)
 # scraped page titles that are not a business name -> fall back to the bare domain
-JUNK_VENDOR = re.compile(r"click here|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount"
+JUNK_VENDOR = re.compile(r"click here|visit site|cheapest|^wholesale peptides$|marcus hansen|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount"
                          r"|\boffers?\b|wholesale medical|nasal spray|research peptides|→|↗|adipotide|glutathione|^ghrp"
                          r"|^pt$|^best\b|^top\b|\bshop$|\bstore$|^home$|^welcome$|^peptide$|^wholesale$|affiliate"
                          r"|^(high|low|new|free|fast|quality|premium|official|trusted|reliable|verified|tested|pure|safe"
                          r"|secure|online|orders?|products?|research|labs?|login|account|cart|menu|search|sales?|deals?|prices?)$", re.I)
 
 
+FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
 FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|canada|europe|eu|costa rica|australia|india|china)\b", re.I)
 
 
@@ -205,6 +206,8 @@ def initial_candidates(sent_rows):
         if e in done or d in done:
             continue
         if r["audience"] == "vendor" and is_foreign(d, r.get("business_name", "")):
+            continue
+        if e.split("@", 1)[0] in FOREIGN_LOCAL:                       # e.g. contato@ (Portuguese), kontakt@ (German)
             continue
         cands.append(r)
     dids = load_draft_ids()                                       # file order = top of the Drafts folder first
