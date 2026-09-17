@@ -208,7 +208,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-17 13:34 UTC</b><br>
+        UPDATED <b>2026-09-17 14:40 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -228,11 +228,11 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">645</div><div class="k">Contacts emailed</div><div class="d">545 vendors · 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">70</div><div class="k">Sent today</div><div class="d">70 first-touch · 0 follow-ups · 30 left under the daily cap</div></div>
+      <div class="kpi accent"><div class="n mono">655</div><div class="k">Contacts emailed</div><div class="d">555 vendors · 100 med spas</div></div>
+      <div class="kpi"><div class="n mono">80</div><div class="k">Sent today</div><div class="d">80 first-touch · 0 follow-ups · 20 left under the daily cap</div></div>
       <div class="kpi good"><div class="n mono">26</div><div class="k">Replies</div><div class="d">4.0% of contacts · plus 2 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">44</div><div class="k">Bounces</div><div class="d">6.8% · removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">1,055</div><div class="k">Still to send</div><div class="d">one contact per business · 3 already drafted</div></div>
+      <div class="kpi bad"><div class="n mono">44</div><div class="k">Bounces</div><div class="d">6.7% · removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">1,044</div><div class="k">Still to send</div><div class="d">one contact per business · 3 already drafted</div></div>
       <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap · existing drafts first</div></div>
     </div>
 
@@ -247,10 +247,10 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">645 tracked</span></h3>
+        <h3>Contact status <span class="count">655 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>546</b> awaiting step 1, <b>20</b> at step 1. Window opens <b>Sep 17</b>.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>556</b> awaiting step 1, <b>20</b> at step 1. Window opens <b>Sep 17</b>.</div>
       </div>
     </div>
 
@@ -379,7 +379,7 @@
 
   /* ---------- outreach: contact status ---------- */
   const statuses = [
-    {k:"Awaiting reply", sub:"eligible for follow-ups from Sep 17", n:566, c:"var(--accent)"},
+    {k:"Awaiting reply", sub:"eligible for follow-ups from Sep 17", n:576, c:"var(--accent)"},
     {k:"Replied",        sub:"26 real replies + 2 auto-replies · no more automated mail", n:28, c:"var(--done)"},
     {k:"Bounced",        sub:"address rejected · excluded", n:44, c:"var(--block)"},
     {k:"Manual sends",   sub:"catalog sent by hand · excluded from sequence", n:7, c:"var(--queue)"},
@@ -427,7 +427,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"645 sent · 10/hr · 100/day"},
+    {name:"Send",       st:"run",   meta:"655 sent · 10/hr · 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");

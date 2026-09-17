@@ -77,8 +77,9 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "hnhkpeptide.com",   # "Hongke Biotechnology", a Chinese supplier
                    "peakpeptide.com",   # its own site says "EU Supplier"
                    "spresearchcenter.com",  # contact number on the page is +86 (China)
-                   "peptuvia.com"}      # marketplace shipping from China warehouses,
+                   "peptuvia.com",      # marketplace shipping from China warehouses,
                                         # its front page schedules around Chinese holidays
+                   "myotrope.com"}      # its verified resellers are listed as Netherlands / Europe
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
