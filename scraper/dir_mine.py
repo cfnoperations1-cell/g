@@ -27,6 +27,18 @@ CTX = ssl.create_default_context()
 CTX.check_hostname = False
 CTX.verify_mode = ssl.CERT_NONE
 
+US_STATE_SLUG = re.compile(r"-(" + "|".join("""
+    alabama alaska arizona arkansas california colorado
+    connecticut delaware florida georgia hawaii idaho
+    illinois indiana iowa kansas kentucky louisiana
+    maine maryland massachusetts michigan minnesota mississippi
+    missouri montana nebraska nevada new-hampshire new-jersey
+    new-mexico new-york north-carolina north-dakota ohio oklahoma
+    oregon pennsylvania rhode-island south-carolina south-dakota tennessee
+    texas utah vermont virginia washington west-virginia
+    wisconsin wyoming district-of-columbia washington-dc
+""".split()) + r")/?$", re.I)
+
 # Each entry: the sitemaps that name listing pages, and the URL fragment that
 # marks a listing rather than a category or location page.
 DIRECTORIES = {
@@ -54,6 +66,11 @@ DIRECTORIES = {
                      "https://healingmaps.com/listing-sitemap2.xml",
                      "https://healingmaps.com/listing-sitemap3.xml"],
         "listing": "/listing/",
+        # Its slugs end in "-city-state", and a third of the site is ayahuasca
+        # retreats in Peru, Costa Rica and Mexico. Requiring a US state in the
+        # slug keeps the hormone and weight-loss clinics and skips the rest
+        # before a single listing page is fetched.
+        "url_must_match": US_STATE_SLUG,
     },
     "peptideclinicfinder": {
         "sitemaps": ["https://peptideclinicfinder.com/sitemap.xml"],
@@ -115,8 +132,10 @@ def listing_urls(name):
         except Exception as e:
             print(f"  sitemap failed {sm}: {type(e).__name__}")
             continue
+        keep = cfg.get("url_must_match")
         out += [u for u in re.findall(r"<loc>([^<]+)</loc>", t)
-                if cfg["listing"] in u and not u.rstrip("/").endswith(cfg["listing"].strip("/"))]
+                if cfg["listing"] in u and not u.rstrip("/").endswith(cfg["listing"].strip("/"))
+                and (not keep or keep.search(u))]
     seen, uniq = set(), []
     for u in out:
         if u not in seen:
