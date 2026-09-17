@@ -209,7 +209,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-17 23:42 UTC</b><br>
+        UPDATED <b>2026-09-17 23:51 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -275,28 +275,12 @@
 
   <section>
     <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Discovery</span><h2>Lead base</h2>
-      <span class="count">3 discovery rounds · 50 metros</span></div>
+      <span class="count">4 clinic directories &middot; search &middot; intake forms</span></div>
     <div class="kpis" style="margin-top:0">
-      <div class="kpi">
-        <div class="n mono">2,197</div>
-        <div class="k">Vendors indexed</div>
-        <div class="d">3 discovery rounds · +798 since first export</div>
-      </div>
-      <div class="kpi">
-        <div class="n mono">1,599</div>
-        <div class="k">With a real email</div>
-        <div class="d">published on the vendor's own pages</div>
-      </div>
-      <div class="kpi">
-        <div class="n mono">1,322</div>
-        <div class="k">Med spas offering peptides</div>
-        <div class="d">site-confirmed + intake forms · by state</div>
-      </div>
-      <div class="kpi">
-        <div class="n mono">1,689</div>
-        <div class="k">Verified send queue</div>
-        <div class="d">one contact per business · CAN-SPAM footer rendered</div>
-      </div>
+      <div class="kpi"><div class="n mono">2,049</div><div class="k">Verified send queue</div><div class="d">one contact per business &middot; CAN-SPAM footer rendered</div></div>
+      <div class="kpi"><div class="n mono">1,170</div><div class="k">US RUO vendors</div><div class="d">email published on the vendor's own pages</div></div>
+      <div class="kpi"><div class="n mono">879</div><div class="k">Med spas &amp; clinics</div><div class="d">site confirms they run peptides</div></div>
+      <div class="kpi"><div class="n mono">3,156</div><div class="k">Directory listings mined</div><div class="d">of 14,023 published across the directories</div></div>
     </div>
   </section>
 
@@ -807,7 +791,7 @@
 
   /* ---------- pipeline flow ---------- */
   const stages = [
-    {name:"Discover",   st:"done",  meta:"1,183 queries"},
+    {name:"Discover",   st:"run",   meta:"7 directories &middot; 3,156 read"},
     {name:"Crawl",      st:"done",  meta:"~2,400 sites"},
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
@@ -846,6 +830,9 @@
       {t:"Chromium pass on blocked sites", s:"done", m:"265 retried"},
       {t:"Parse Drive peptide-intake forms", s:"done", m:"232 leads / 40 states"},
       {t:"Merge, dedupe, split per state", s:"done", m:"exports/medspa_by_state"},
+      {t:"Mine clinic directories via their sitemaps", s:"run", m:"7 directories · 14,023 listings"},
+      {t:"Crawl each clinic's own site for a published address", s:"run", m:"~35% publish one"},
+      {t:"Gate into the queue: US, peptide-confirmed, address on the site", s:"done", m:"outreach/ingest_resolved.py"},
      ]},
     {name:"Phase 3 — Outreach campaign", status:"run", pct:70,
      tasks:[
@@ -877,13 +864,14 @@
   ];
 
   const gaps = [
-    {n:"219", t:"Gmail throttled outbound mail", d:"A new Workspace account sending ~220 cold emails in a day trips Google's limits. Let it clear (usually a day), confirm SPF/DKIM/DMARC, then ramp at 30–50 a day instead of 100 an hour."},
+    {n:"~55%", t:"Clinics that publish no address", d:"Of 658 clinics crawled in one directory batch, 332 offer only a contact form. They are recorded but never queued: a guessed address costs sending reputation, and this domain has been throttled once already."},
     {n:"14",  t:"Stale drafts in Gmail", d:"Sep 10–11 drafts carry the old copy. Don't send them by hand; the queue re-sends those contacts with the current template."},
     {n:"17",  t:"Non-US vendors skipped", d:"Foreign domains and names are excluded from the US-made, no-customs pitch. Jinan Boruimei Trading Co., Ltd. was caught by reading the site: the stored name was just \"Boruimei\"."},
     {n:"141", t:"Cloudflare-hard sites", d:"Block even a real browser — flagged in the CSV for a manual contact-page check."},
     {n:"25",  t:"No findable website", d:"Roster vendors with a name but no site; need a manual or directory lookup."},
     {n:"22",  t:"PeptideBase vendors still unreachable", d:"Of 35 US vendors from that directory never contacted, 13 are now queued. Six sites block every client, six publish no address, three could not be identified, and two are held back: one an unverified successor to an FDA-closed brand, one an address whose source page now 404s."},
-    {n:"2.7k", t:"PeptideBase provider directory unread", d:"Its homepage advertises 2,700+ clinics, telehealth companies and compounding pharmacies on a separate path from the vendor list. That is a med spa audience roughly twice the size of the current queue. The host returns 403 to every automated client, so it needs an access route or a search API key."},
+    {n:"10.9k", t:"Directory listings still unmined", d:"Seven directories publish 14,023 clinic listings between them and 3,156 have been read. The rest are the pipeline for the coming days, at roughly 900 listings a mine."},
+    {n:"4", t:"Directories checked and rejected", d:"usmedspadirectory.com gives all 611 of its spas a .example.com website, so the listings are invented. medspafind.com renders US listings in JavaScript. medicalspalocator.com answers 429 to everything. klinic.com covers wegovy, zepbound and TRT in every state but links to no clinic but its own."},
   ];
 
   const tagFor = st => st==="done"?'<span class="status-tag t-done">Complete</span>'

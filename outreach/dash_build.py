@@ -125,6 +125,32 @@ def main():
         f'<div class="d">{cap} per day cap &middot; follow-ups mixed in</div></div>',
     ])
 
+    # ---- lead base: what discovery has actually produced, counted from the queue
+    queue = read(ROOT / "outreach" / "draft_queue.csv")
+    q_vendor = sum(1 for r in queue if r.get("audience") == "vendor")
+    q_medspa = sum(1 for r in queue if r.get("audience") == "medspa")
+    mined, dirs = 0, 0
+    cur = ROOT / "scraper" / ".dir_cursor"
+    if cur.exists():
+        seen = json.loads(cur.read_text(encoding="utf-8"))
+        mined, dirs = sum(seen.values()), len(seen)
+    lead_base = "\n".join([
+        '  <section>',
+        '    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Discovery</span><h2>Lead base</h2>',
+        f'      <span class="count">{dirs} clinic directories &middot; search &middot; intake forms</span></div>',
+        '    <div class="kpis" style="margin-top:0">',
+        f'      <div class="kpi"><div class="n mono">{len(queue):,}</div><div class="k">Verified send queue</div>'
+        '<div class="d">one contact per business &middot; CAN-SPAM footer rendered</div></div>',
+        f'      <div class="kpi"><div class="n mono">{q_vendor:,}</div><div class="k">US RUO vendors</div>'
+        "<div class=\"d\">email published on the vendor's own pages</div></div>",
+        f'      <div class="kpi"><div class="n mono">{q_medspa:,}</div><div class="k">Med spas &amp; clinics</div>'
+        '<div class="d">site confirms they run peptides</div></div>',
+        f'      <div class="kpi"><div class="n mono">{mined:,}</div><div class="k">Directory listings mined</div>'
+        '<div class="d">of 14,023 published across the directories</div></div>',
+        '    </div>',
+        '  </section>',
+    ])
+
     banner = (f"10 emails per hourly wave, {cap} per day. "
               + (f"The daily cap is spent: {today} of {cap} sent this Pacific day, so the next wave sends "
                  f"after midnight PT." if left == 0
@@ -150,6 +176,7 @@ def main():
         "{{CHART_RANGE}}": rng, "{{TRACKED}}": str(emailed), "{{STATUS_FOOT}}": foot,
         "{{REPLIES_COUNT}}": rc, "{{DAYS}}": j(days), "{{STATUSES}}": j(statuses),
         "{{REPLIES}}": j(replies), "{{BOUNCES}}": j(bounces),
+        "{{LEAD_BASE}}": lead_base,
         "{{SEND_META}}": f"{emailed} sent &middot; {ss.HOURLY_CAP}/hr &middot; {cap}/day",
     }.items():
         assert k in page, f"template is missing {k}"
