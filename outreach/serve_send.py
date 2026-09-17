@@ -81,7 +81,17 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # its front page schedules around Chinese holidays
                    "myotrope.com",      # its verified resellers are listed as Netherlands / Europe
                    "24hourpeptides.com",  # prices in GBP, next-day UK shipping, UK company number
-                   "uwa-biotech.com"}   # WhatsApp contact number is +86 (China)
+                   "uwa-biotech.com",   # WhatsApp contact number is +86 (China)
+                   "modernaminos.com"}  # the only phone it publishes is +1 437, Toronto
+
+
+# Vendors we decline to approach for reasons that have nothing to do with where
+# they are. aminoasylumofficial.com presents itself as the authorized successor to
+# Amino Asylum, whose original operation was closed by FDA action in 2025, and at
+# least eight lookalike domains trade on that name. Nothing on the page proves
+# which one is the real business, and a wholesale pitch sent to the wrong one
+# lands in a stranger's inbox under Jonathan's name.
+DECLINED_DOMAINS = {"aminoasylumofficial.com"}
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
@@ -289,6 +299,8 @@ def initial_candidates(sent_rows):
         e = r["email"].strip().lower()
         d = e.split("@", 1)[1]
         if e in done or d in done:
+            continue
+        if d in DECLINED_DOMAINS:
             continue
         if r["audience"] == "vendor" and is_foreign(d, r.get("business_name", "")):
             continue
