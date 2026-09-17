@@ -14,7 +14,8 @@ import serve_send as ss
 
 ROOT = str(Path(__file__).resolve().parent.parent) + '/'
 SCRATCH = os.environ.get('RESOLVED_DIR', str(Path(__file__).resolve().parent.parent / 'scraper')) + '/'
-TPL = ROOT + 'emailer/message_vendor.txt'
+TPL = {'vendor': ROOT + 'emailer/message_vendor.txt',
+       'medspa': ROOT + 'emailer/message_medspa.txt'}
 QUEUE = ROOT + 'outreach/draft_queue.csv'
 COLS = ['audience', 'email', 'business_name', 'to', 'subject', 'body']
 # addresses that exist on pages but are never a person who reads mail
@@ -28,13 +29,14 @@ BAD_LOCAL = re.compile(r'^(no-?reply|donotreply|postmaster|abuse|webmaster|examp
                        r'sentry|wixpress|squarespace|shopify|godaddy|cloudflare)@', re.I)
 
 
-def render(name):
-    raw = open(TPL, encoding='utf-8').read()
+def render(name, audience='vendor', peptides=''):
+    raw = open(TPL[audience], encoding='utf-8').read()
     first, rest = raw.split('\n', 1)
     subject = first.split(':', 1)[1].strip()
     body = rest.lstrip('\n').rstrip('\n')
     sd = ss.DEFAULT_SENDER
     sub = {'{business_name}': name,
+           '{peptides}': peptides,
            '{sender_email}': sd['SENDER_EMAIL'],
            '{sender_company}': sd['SENDER_COMPANY'],
            '{sender_postal_address}': sd['SENDER_POSTAL_ADDRESS'],
@@ -105,11 +107,17 @@ def main(apply_it):
                 drop('business already in the campaign'); continue
             if em in seen:
                 drop('duplicate in this batch'); continue
+            aud = (r.get('audience') or 'vendor').strip().lower()
+            if aud not in TPL:
+                aud = 'vendor'
+            peps = (r.get('peptides') or '').strip()
+            if aud == 'medspa' and not peps:
+                drop('med spa with nothing we could quote back'); continue
             name = ss.clean_vendor(vendor, dom)
-            subject, body = render(name)
+            subject, body = render(name, aud, peps)
             if '{' in subject or '{' in body:
                 drop('template placeholder left unfilled'); continue
-            rows.append({'audience': 'vendor', 'email': em, 'business_name': name,
+            rows.append({'audience': aud, 'email': em, 'business_name': name,
                          'to': em, 'subject': subject, 'body': body})
             seen.add(em)
             if b:

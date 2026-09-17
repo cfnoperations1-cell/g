@@ -1,0 +1,199 @@
+# US metros for med spa discovery, roughly by population. One per line.
+New York NY
+Los Angeles CA
+Chicago IL
+Dallas TX
+Houston TX
+Washington DC
+Philadelphia PA
+Miami FL
+Atlanta GA
+Boston MA
+Phoenix AZ
+San Francisco CA
+Riverside CA
+Detroit MI
+Seattle WA
+Minneapolis MN
+San Diego CA
+Tampa FL
+Denver CO
+Baltimore MD
+St Louis MO
+Orlando FL
+Charlotte NC
+San Antonio TX
+Portland OR
+Sacramento CA
+Pittsburgh PA
+Austin TX
+Las Vegas NV
+Cincinnati OH
+Kansas City MO
+Columbus OH
+Indianapolis IN
+Cleveland OH
+Nashville TN
+San Jose CA
+Virginia Beach VA
+Providence RI
+Jacksonville FL
+Milwaukee WI
+Oklahoma City OK
+Raleigh NC
+Memphis TN
+Richmond VA
+Louisville KY
+New Orleans LA
+Salt Lake City UT
+Hartford CT
+Buffalo NY
+Birmingham AL
+Rochester NY
+Grand Rapids MI
+Tucson AZ
+Honolulu HI
+Tulsa OK
+Fresno CA
+Worcester MA
+Omaha NE
+Bridgeport CT
+Greenville SC
+Albuquerque NM
+Bakersfield CA
+Knoxville TN
+Albany NY
+New Haven CT
+Oxnard CA
+Baton Rouge LA
+Charleston SC
+Columbia SC
+North Port FL
+Cape Coral FL
+Boise ID
+Greensboro NC
+Little Rock AR
+Stockton CA
+Colorado Springs CO
+Winston-Salem NC
+Des Moines IA
+Lakeland FL
+Madison WI
+Deltona FL
+Akron OH
+Ogden UT
+Wichita KS
+Syracuse NY
+Augusta GA
+Palm Bay FL
+Toledo OH
+Jackson MS
+Harrisburg PA
+Spokane WA
+Chattanooga TN
+Scranton PA
+Youngstown OH
+Lancaster PA
+Fayetteville AR
+Portland ME
+Lexington KY
+Springfield MA
+Modesto CA
+Pensacola FL
+Lansing MI
+Myrtle Beach SC
+Visalia CA
+Reno NV
+Santa Rosa CA
+Port St Lucie FL
+Huntsville AL
+Fort Wayne IN
+Corpus Christi TX
+Asheville NC
+Salinas CA
+Fort Collins CO
+Flint MI
+Mobile AL
+Rockford IL
+Naples FL
+Savannah GA
+Peoria IL
+Eugene OR
+Salem OR
+Shreveport LA
+Gulfport MS
+Tallahassee FL
+Ann Arbor MI
+Beaumont TX
+Trenton NJ
+Boulder CO
+Green Bay WI
+Fargo ND
+Sioux Falls SD
+Lubbock TX
+Roanoke VA
+Wilmington NC
+Killeen TX
+Kalamazoo MI
+Duluth MN
+Lincoln NE
+Amarillo TX
+Charleston WV
+Evansville IN
+Waco TX
+Clarksville TN
+Columbus GA
+Hickory NC
+Olympia WA
+Fort Smith AR
+Erie PA
+South Bend IN
+Tuscaloosa AL
+Springfield MO
+Lafayette LA
+Rochester MN
+Bremerton WA
+Yakima WA
+Appleton WI
+Bellingham WA
+Manchester NH
+Gainesville FL
+Ocala FL
+Provo UT
+Santa Maria CA
+Reading PA
+Atlantic City NJ
+Anchorage AK
+Spartanburg SC
+Chico CA
+Montgomery AL
+Fayetteville NC
+Brownsville TX
+Merced CA
+Topeka KS
+Bend OR
+Redding CA
+Burlington VT
+Wausau WI
+Billings MT
+Bozeman MT
+Sarasota FL
+Scottsdale AZ
+Irvine CA
+Plano TX
+Frisco TX
+The Woodlands TX
+Bellevue WA
+Naperville IL
+Alpharetta GA
+Franklin TN
+Cary NC
+Carlsbad CA
+Newport Beach CA
+Boca Raton FL
+Fort Lauderdale FL
+West Palm Beach FL
+Jupiter FL
+Bethesda MD
+McLean VA
+Greenwich CT
