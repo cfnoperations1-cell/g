@@ -1,36 +1,48 @@
-# Peptide / compound keywords used to build search queries and to check
-# whether a candidate company's site is actually peptide-relevant.
-# One per line, # for comments. Edit freely to match what your business sells.
-BPC-157
-TB-500
-Retatrutide
+# QUOTABLE compounds: things Marinexis actually supplies, so they are safe to
+# name back to a prospect in the "I saw you offer X" line. Generic compound
+# names only. Brand-name drugs belong in discovery_terms.txt, never here: we do
+# not supply Ozempic, we supply semaglutide.
+# One per line, # for comments.
 Semaglutide
 Tirzepatide
-NAD+
-Ipamorelin
-CJC-1295
-PT-141
-Melanotan II
-GHK-Cu
-Thymosin Alpha-1
-Epithalon
-Sermorelin
-Hexarelin
-AOD-9604
-Selank
-Semax
-MOTS-c
-5-Amino-1MQ
-Tesamorelin
-Kisspeptin
-DSIP
-Adipotide
-Follistatin
-GHRP-2
-GHRP-6
-IGF-1 LR3
+Retatrutide
+Liraglutide
+Exenatide
 Cagrilintide
 Survodutide
 Mazdutide
+BPC-157
+TB-500
+Thymosin Beta-4
+Thymosin Alpha-1
+NAD+
+Ipamorelin
+Sermorelin
+Tesamorelin
+CJC-1295
+Hexarelin
+GHRP-2
+GHRP-6
+IGF-1 LR3
+MOTS-c
 SS-31
+Epithalon
+Selank
+Semax
+DSIP
+Kisspeptin
+PT-141
+Melanotan II
+Melanotan I
+GHK-Cu
+Glutathione
+AOD-9604
+5-Amino-1MQ
+Adipotide
+Follistatin
 Snap-8
+KPV
+LL-37
+Oxytocin
+Glow blend
+Wolverine blend

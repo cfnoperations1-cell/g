@@ -22,6 +22,11 @@ MEDSPA_TEMPLATES = [
     '{city} medical weight loss clinic compounded semaglutide "contact"',
     '{city} anti-aging clinic peptide therapy sermorelin ipamorelin',
     '{city} aesthetics practice GLP-1 weight loss injections email',
+    '{city} med spa Ozempic Wegovy weight loss shot clinic contact',
+    '{city} clinic Mounjaro Zepbound tirzepatide injections "email us"',
+    '{city} GLP-1 weight loss program clinic retatrutide dual agonist',
+    '{city} hormone optimization clinic peptide protocol testosterone NAD',
+    '{city} IV therapy lounge peptide injections glutathione B12 contact',
 ]
 VENDOR_TEMPLATES = [
     '"{peptide}" research peptides "research use only" buy USA COA',
@@ -42,8 +47,17 @@ def lines(name):
 
 def plan():
     """A stable, interleaved query plan: med spa and vendor queries alternate so
-    every day's batch feeds both campaigns rather than one at a time."""
+    every day's batch feeds both campaigns rather than one at a time.
+
+    Cities are shuffled with a fixed seed rather than left in population order.
+    The campaign already worked the fifty largest metros, so marching down the
+    list from New York spends searches on businesses we have contacted. A seeded
+    shuffle spreads each day's batch across the whole country while keeping the
+    plan identical run to run, which is what lets the cursor mean anything.
+    """
+    import random
     cities, peps = lines("us_metros.txt"), lines("peptide_keywords.txt")
+    random.Random(20260917).shuffle(cities)
     med = [t.format(city=c) for c in cities for t in MEDSPA_TEMPLATES]
     ven = [t.format(peptide=p) for p in peps for t in VENDOR_TEMPLATES]
     out, i, j = [], 0, 0
