@@ -79,7 +79,9 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "spresearchcenter.com",  # contact number on the page is +86 (China)
                    "peptuvia.com",      # marketplace shipping from China warehouses,
                                         # its front page schedules around Chinese holidays
-                   "myotrope.com"}      # its verified resellers are listed as Netherlands / Europe
+                   "myotrope.com",      # its verified resellers are listed as Netherlands / Europe
+                   "24hourpeptides.com",  # prices in GBP, next-day UK shipping, UK company number
+                   "uwa-biotech.com"}   # WhatsApp contact number is +86 (China)
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
