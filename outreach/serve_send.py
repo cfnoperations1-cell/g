@@ -60,13 +60,25 @@ FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhe
                           r"|shijiazhuang|shandong|jiangsu|zhejiang|hubei|hunan|henan|hebei|anhui|sichuan|guangdong"
                           r"|hong kong|gmbh|s\.?r\.?l|b\.?v\.?|pty|ltd|limited|co\.,? ?ltd|trading co"
                           r"|canada|europe|costa rica|australia|india|china)\b", re.I)
+# Place names run together inside a domain, where word boundaries never match:
+# shandongyixinpeptides.com is Shandong province. Only tokens long and distinctive
+# enough to be safe as substrings belong here -- "india" is left out because it sits
+# inside "indiana", and "uk"/"eu" are far too short to risk.
+FOREIGN_IN_DOMAIN = re.compile(
+    r"shandong|jiangsu|zhejiang|guangdong|sichuan|shaanxi|liaoning|fujian|jiangxi|guizhou"
+    r"|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing|jinan|qingdao|tianjin"
+    r"|chengdu|suzhou|ningbo|zhengzhou|changsha|kunming|dalian|shijiazhuang|xiamen"
+    r"|hongkong|chinese|gmbh|\bsarl\b", re.I)
+
 # Vendors confirmed non-US by looking at the site itself, where the stored name gives
 # nothing away. Jinan Boruimei Trading Co., Ltd. is a Chinese trading company: the
 # US-made, no-customs pitch has nothing to say to it.
 FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "hnhkpeptide.com",   # "Hongke Biotechnology", a Chinese supplier
                    "peakpeptide.com",   # its own site says "EU Supplier"
-                   "spresearchcenter.com"}  # contact number on the page is +86 (China)
+                   "spresearchcenter.com",  # contact number on the page is +86 (China)
+                   "peptuvia.com"}      # marketplace shipping from China warehouses,
+                                        # its front page schedules around Chinese holidays
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
@@ -98,7 +110,10 @@ def brand_key(domain):
 
 
 def is_foreign(domain, name=""):
-    if (domain or "").lower().lstrip("www.") in FOREIGN_DOMAINS:
+    d = (domain or "").lower()
+    if d.lstrip("www.") in FOREIGN_DOMAINS:
+        return True
+    if FOREIGN_IN_DOMAIN.search(d):
         return True
     return bool(FOREIGN.search(domain) or FOREIGN_NAME.search(name or ""))
 

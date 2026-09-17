@@ -209,7 +209,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-17 12:40 UTC</b><br>
+        UPDATED <b>2026-09-17 13:45 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -221,7 +221,7 @@
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
     <span>10 emails per hourly wave, 100 per day. Sep 16 closed at a full 100 of 100 with no Gmail block. Sending resumed for Sep 17; follow-ups open after 11:30 AM PT.</span>
-    <span class="when">60 of 100 sent today</span>
+    <span class="when">70 of 100 sent today</span>
   </div>
 
   <section style="margin-top:26px">
@@ -229,11 +229,11 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">635</div><div class="k">Contacts emailed</div><div class="d">535 vendors · 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">60</div><div class="k">Sent today</div><div class="d">60 first-touch · 0 follow-ups · 40 left under the daily cap</div></div>
-      <div class="kpi good"><div class="n mono">24</div><div class="k">Replies</div><div class="d">3.8% of contacts · plus 3 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">42</div><div class="k">Bounces</div><div class="d">6.7% · removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">1,067</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi accent"><div class="n mono">645</div><div class="k">Contacts emailed</div><div class="d">545 vendors · 100 med spas</div></div>
+      <div class="kpi"><div class="n mono">70</div><div class="k">Sent today</div><div class="d">70 first-touch · 0 follow-ups · 30 left under the daily cap</div></div>
+      <div class="kpi good"><div class="n mono">25</div><div class="k">Replies</div><div class="d">3.9% of contacts · plus 3 auto-replies</div></div>
+      <div class="kpi bad"><div class="n mono">44</div><div class="k">Bounces</div><div class="d">6.8% · removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">1,055</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap · existing drafts first</div></div>
     </div>
 
@@ -248,16 +248,16 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">635 tracked</span></h3>
+        <h3>Contact status <span class="count">645 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>539</b> awaiting step 1, <b>20</b> at step 1. Window opens <b>Sep 17</b>.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>546</b> awaiting step 1, <b>20</b> at step 1. Window opens <b>Sep 17</b>.</div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">16 warm leads · follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">17 warm leads · catalog sent to 4 · follow-ups stopped</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -381,9 +381,9 @@
 
   /* ---------- outreach: contact status ---------- */
   const statuses = [
-    {k:"Awaiting reply", sub:"eligible for follow-ups from Sep 17", n:559, c:"var(--accent)"},
-    {k:"Replied",        sub:"24 real replies + 3 auto-replies · no more automated mail", n:27, c:"var(--done)"},
-    {k:"Bounced",        sub:"address rejected · excluded", n:42, c:"var(--block)"},
+    {k:"Awaiting reply", sub:"eligible for follow-ups from Sep 17", n:566, c:"var(--accent)"},
+    {k:"Replied",        sub:"25 real replies + 3 auto-replies · no more automated mail", n:28, c:"var(--done)"},
+    {k:"Bounced",        sub:"address rejected · excluded", n:44, c:"var(--block)"},
     {k:"Manual sends",   sub:"catalog sent by hand · excluded from sequence", n:7, c:"var(--queue)"},
   ];
   const segEl=document.getElementById("seg"), statusTotal=statuses.reduce((a,b)=>a+b.n,0);
@@ -393,9 +393,10 @@
     li.innerHTML=`<span class="sw" style="background:${s.c}"></span><span><span class="lbl">${s.k}</span><br><span class="sub">${s.sub}</span></span><span class="n">${s.n}</span>`; sl.appendChild(li); });
 
   const replies = [
-    {c:"omniopeptides.com",      t:"vendor · needs answer", d:"Sep 17", e:"sales@"},
-    {c:"calmpeptides.com",       t:"vendor · needs answer", d:"Sep 17", e:"support@"},
-    {c:"vantixbio.com",           t:"vendor · needs answer", d:"Sep 17", e:"support@"},
+    {c:"sigmapeptides.com",      t:"vendor · catalog sent", d:"Sep 17", e:"support@"},
+    {c:"omniopeptides.com",      t:"vendor · catalog sent", d:"Sep 17", e:"sales@"},
+    {c:"calmpeptides.com",       t:"vendor · catalog sent", d:"Sep 17", e:"support@"},
+    {c:"vantixbio.com",           t:"vendor · catalog sent", d:"Sep 17", e:"support@"},
     {c:"peptidebureau.com",       t:"vendor · needs answer", d:"Sep 16", e:"bureau@"},
     {c:"prettypeptidecollective.com", t:"vendor", d:"Sep 11", e:"summer@"},
     {c:"onedaycompounds.com",  t:"vendor", d:"Sep 14", e:"support@"},
@@ -425,7 +426,8 @@
     {a:"info@excaliburpeptides.com", t:"vendor"}, {a:"info@kjbm.thepreptide.com", t:"vendor"}, {a:"support@mdpep.com", t:"vendor"},
     {a:"support@celvive.com", t:"vendor"}, {a:"support@chemdope.com", t:"vendor"},
     {a:"contact@peptideinsider.org", t:"vendor"}, {a:"contact@regentide.com", t:"vendor"},
-    {a:"support@titanpeptidelab.com", t:"vendor"},
+    {a:"support@titanpeptidelab.com", t:"vendor"}, {a:"hello@peptidex.app", t:"vendor"},
+    {a:"support@rarevbiolabs.com", t:"vendor"},
   ];
   const bb=document.getElementById("bounceBody");
   bounces.forEach(b=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td class="mono">${b.a}</td><td class="aud">${b.t}</td>`; bb.appendChild(tr); });
@@ -437,7 +439,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"635 sent · 10/hr · 100/day"},
+    {name:"Send",       st:"run",   meta:"645 sent · 10/hr · 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
