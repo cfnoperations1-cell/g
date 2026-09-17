@@ -109,6 +109,11 @@ def clean_vendor(name, domain):
         return domain
     if not name_matches_domain(n, domain):
         return domain
+    # A scraped "name" that is itself a hostname is no better than the domain we
+    # are writing to, and when the two disagree (regentide.net stored against
+    # contact@regentide.com) the mismatch is visible in the subject line.
+    if " " not in n and "." in n and n.lower().rstrip("/") != (domain or "").lower():
+        return domain
     return n
 LEGACY_SENT_AT = "2026-09-14T16:00:00Z"                    # all pre-schema sends went out on 2026-09-14
 
