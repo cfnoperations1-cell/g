@@ -209,7 +209,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-17 20:35 UTC</b><br>
+        UPDATED <b>{{STAMP}}</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -220,8 +220,8 @@
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
-    <span>10 emails per hourly wave, 100 per day. The daily cap is spent: 100 of 100 sent this Pacific day, so the next wave sends after midnight PT. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
-    <span class="when">cap reached &middot; next wave 07:00 UTC</span>
+    <span>{{BANNER}}</span>
+    <span class="when">{{BANNER_WHEN}}</span>
   </div>
 
   <section style="margin-top:26px">
@@ -229,17 +229,12 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">675</div><div class="k">Contacts emailed</div><div class="d">575 vendors &middot; 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">100</div><div class="k">Sent today</div><div class="d">100 first-touch &middot; 0 follow-ups &middot; daily cap reached</div></div>
-      <div class="kpi good"><div class="n mono">25</div><div class="k">Replies</div><div class="d">3.7% of contacts &middot; plus 3 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">44</div><div class="k">Bounces</div><div class="d">6.5% &middot; removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">1,035</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
-      <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap &middot; follow-ups mixed in</div></div>
+{{KPI_ROW}}
     </div>
 
     <div class="grid2" style="margin-top:16px">
       <div class="tablecard">
-        <h3>First-touch emails per day <span class="count">Sep 1 – Sep 17</span></h3>
+        <h3>First-touch emails per day <span class="count">{{CHART_RANGE}}</span></h3>
         <div class="chart-wrap">
           <div class="legend"><span><i style="background:var(--s1)"></i>Vendors</span><span><i style="background:var(--s2)"></i>Med spas</span></div>
           <div id="chart"></div>
@@ -248,16 +243,16 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">675 tracked</span></h3>
+        <h3>Contact status <span class="count">{{TRACKED}} tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>576</b> awaiting step 1, <b>20</b> at step 1, <b>334</b> due now.</div>
+        <div class="status-foot">{{STATUS_FOOT}}</div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">25 warm leads &middot; catalog sent to 4 &middot; follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">{{REPLIES_COUNT}}</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -337,53 +332,7 @@
   const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
 
   /* ---------- outreach: sends per day (first-touch only) ---------- */
-  const days = [
-      {
-          "d": "Sep 1",
-          "v": 1,
-          "m": 0
-      },
-      {
-          "d": "Sep 2",
-          "v": 12,
-          "m": 9
-      },
-      {
-          "d": "Sep 8",
-          "v": 6,
-          "m": 11
-      },
-      {
-          "d": "Sep 10",
-          "v": 84,
-          "m": 0
-      },
-      {
-          "d": "Sep 11",
-          "v": 55,
-          "m": 0
-      },
-      {
-          "d": "Sep 14",
-          "v": 166,
-          "m": 31
-      },
-      {
-          "d": "Sep 15",
-          "v": 51,
-          "m": 49
-      },
-      {
-          "d": "Sep 16",
-          "v": 100,
-          "m": 0
-      },
-      {
-          "d": "Sep 17",
-          "v": 100,
-          "m": 0
-      }
-  ];
+  const days = {{DAYS}};
   (function drawChart(){
     const W=560,H=250,L=40,R=12,T=20,B=32,ymax=200;
     const iw=W-L-R, ih=H-T-B, n=days.length, slot=iw/n, bw=Math.min(48, slot*0.6);
@@ -418,390 +367,19 @@
   })();
 
   /* ---------- outreach: contact status ---------- */
-  const statuses = [
-      {
-          "k": "Awaiting reply",
-          "sub": "eligible for follow-ups",
-          "n": 596,
-          "c": "var(--accent)"
-      },
-      {
-          "k": "Replied",
-          "sub": "25 real replies + 3 auto-replies · no more automated mail",
-          "n": 28,
-          "c": "var(--done)"
-      },
-      {
-          "k": "Bounced",
-          "sub": "address rejected · excluded",
-          "n": 44,
-          "c": "var(--block)"
-      },
-      {
-          "k": "Manual sends",
-          "sub": "handled by hand · excluded from sequence",
-          "n": 7,
-          "c": "var(--queue)"
-      }
-  ];
+  const statuses = {{STATUSES}};
   const segEl=document.getElementById("seg"), statusTotal=statuses.reduce((a,b)=>a+b.n,0);
   statuses.forEach(s=>{ const i=document.createElement("i"); i.style.width=(s.n/statusTotal*100)+"%"; i.style.background=s.c; i.title=`${s.k}: ${s.n}`; segEl.appendChild(i); });
   const sl=document.getElementById("statusList");
   statuses.forEach(s=>{ const li=document.createElement("li");
     li.innerHTML=`<span class="sw" style="background:${s.c}"></span><span><span class="lbl">${s.k}</span><br><span class="sub">${s.sub}</span></span><span class="n">${s.n}</span>`; sl.appendChild(li); });
 
-  const replies = [
-      {
-          "c": "sigmapeptides.com",
-          "t": "vendor · catalog sent",
-          "d": "Sep 17",
-          "e": "support@"
-      },
-      {
-          "c": "calmpeptides.com",
-          "t": "vendor · catalog sent",
-          "d": "Sep 17",
-          "e": "support@"
-      },
-      {
-          "c": "omniopeptides.com",
-          "t": "vendor · catalog sent",
-          "d": "Sep 17",
-          "e": "sales@"
-      },
-      {
-          "c": "protidehealth.com",
-          "t": "auto-reply",
-          "d": "Sep 17",
-          "e": "support@"
-      },
-      {
-          "c": "vantixbio.com",
-          "t": "vendor · catalog sent",
-          "d": "Sep 17",
-          "e": "support@"
-      },
-      {
-          "c": "peptidebureau.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 16",
-          "e": "bureau@"
-      },
-      {
-          "c": "peptideclub.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 16",
-          "e": "info@"
-      },
-      {
-          "c": "puritideresearch.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 16",
-          "e": "support@"
-      },
-      {
-          "c": "koipeptides.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 16",
-          "e": "support@"
-      },
-      {
-          "c": "basepeps.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 16",
-          "e": "support@"
-      },
-      {
-          "c": "perxpeptides.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 16",
-          "e": "support@"
-      },
-      {
-          "c": "wooshlabs.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 15",
-          "e": "info@"
-      },
-      {
-          "c": "10bottlevalue.co",
-          "t": "vendor · needs answer",
-          "d": "Sep 15",
-          "e": "support@"
-      },
-      {
-          "c": "restorepeptides.io",
-          "t": "vendor · needs answer",
-          "d": "Sep 2",
-          "e": "support@"
-      },
-      {
-          "c": "solyn.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "support@"
-      },
-      {
-          "c": "peptidegroupbuy.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "info@"
-      },
-      {
-          "c": "myoasislabs.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "support@"
-      },
-      {
-          "c": "ironwithin.io",
-          "t": "auto-reply",
-          "d": "Sep 14",
-          "e": "support@"
-      },
-      {
-          "c": "vantageaminos.co",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "support@"
-      },
-      {
-          "c": "eliteedgebiotech.com",
-          "t": "auto-reply",
-          "d": "Sep 14",
-          "e": "info@"
-      },
-      {
-          "c": "suaway.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "info@"
-      },
-      {
-          "c": "happypeptides.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "support@"
-      },
-      {
-          "c": "onedaycompounds.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "support@"
-      },
-      {
-          "c": "zerovariancelabs.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "support@"
-      },
-      {
-          "c": "thepeplair.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 14",
-          "e": "javik@"
-      },
-      {
-          "c": "flatironsrc.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 11",
-          "e": "support@"
-      },
-      {
-          "c": "prettypeptidecollective.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 11",
-          "e": "support@"
-      },
-      {
-          "c": "aminoamigos.com",
-          "t": "vendor · needs answer",
-          "d": "Sep 10",
-          "e": "info@"
-      }
-  ];
+  const replies = {{REPLIES}};
   const rb=document.getElementById("replyBody");
   replies.forEach(r=>{ const tr=document.createElement("tr");
     tr.innerHTML=`<td class="src-name">${r.c}</td><td class="aud">${r.t}</td><td class="mono">${r.d}</td><td class="mono">${r.e}${r.c}</td>`; rb.appendChild(tr); });
 
-  const bounces = [
-      {
-          "a": "support@rarevbiolabs.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@titanpeptidelab.com",
-          "t": "vendor"
-      },
-      {
-          "a": "contact@regentide.com",
-          "t": "vendor"
-      },
-      {
-          "a": "contact@peptideinsider.org",
-          "t": "vendor"
-      },
-      {
-          "a": "support@chemdope.com",
-          "t": "vendor"
-      },
-      {
-          "a": "george@tennesseepeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "info@polybiotech.us",
-          "t": "vendor"
-      },
-      {
-          "a": "support@pinnaclepeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "sales@purepeptidepharma.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@spartanpeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "customercare@true-peptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@elementsarms.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@lifestylepeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@rttpeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "hello@peptidex.app",
-          "t": "vendor"
-      },
-      {
-          "a": "orders@genoscience.net",
-          "t": "vendor"
-      },
-      {
-          "a": "support@prolabs.bio",
-          "t": "vendor"
-      },
-      {
-          "a": "service@peptideorders.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@celvive.com",
-          "t": "vendor"
-      },
-      {
-          "a": "contact@knowyourpeptide.com",
-          "t": "vendor"
-      },
-      {
-          "a": "info@agerejuvenation.com",
-          "t": "med spa"
-      },
-      {
-          "a": "support@mdpep.com",
-          "t": "vendor"
-      },
-      {
-          "a": "info@peptides.org",
-          "t": "vendor"
-      },
-      {
-          "a": "sales@westcoastpeptidesupply.com",
-          "t": "vendor"
-      },
-      {
-          "a": "info@usapeptidescience.com",
-          "t": "vendor"
-      },
-      {
-          "a": "info@kjbm.thepreptide.com",
-          "t": "vendor"
-      },
-      {
-          "a": "contact@navarahealthtx.com",
-          "t": "med spa"
-      },
-      {
-          "a": "hello@thegoodlifeiv.com",
-          "t": "med spa"
-      },
-      {
-          "a": "support@aminocoreresearch.com",
-          "t": "vendor"
-      },
-      {
-          "a": "sales@geopeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "info@reliablepeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "research@peptidecraft.co",
-          "t": "vendor"
-      },
-      {
-          "a": "sales@innmi.com",
-          "t": "vendor"
-      },
-      {
-          "a": "nexbiopeptix@gmail.com",
-          "t": "vendor"
-      },
-      {
-          "a": "hello@proxivalabs.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@masterspeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@peptidedirect.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@crestbiolabs.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@sqspeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@pepperlicious.com",
-          "t": "vendor"
-      },
-      {
-          "a": "info@excaliburpeptides.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@synergybiopeps.com",
-          "t": "vendor"
-      },
-      {
-          "a": "support@trustedpeptide.net",
-          "t": "vendor"
-      },
-      {
-          "a": "support@foreveryoungpharmacy.com",
-          "t": "vendor"
-      }
-  ];
+  const bounces = {{BOUNCES}};
   const bb=document.getElementById("bounceBody");
   bounces.forEach(b=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td class="mono">${b.a}</td><td class="aud">${b.t}</td>`; bb.appendChild(tr); });
 
@@ -812,7 +390,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"675 sent &middot; 10/hr &middot; 100/day"},
+    {name:"Send",       st:"run",   meta:"{{SEND_META}}"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
