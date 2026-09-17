@@ -65,12 +65,36 @@ FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhe
 # US-made, no-customs pitch has nothing to say to it.
 FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "hnhkpeptide.com",   # "Hongke Biotechnology", a Chinese supplier
-                   "peakpeptide.com"}   # its own site says "EU Supplier"
+                   "peakpeptide.com",   # its own site says "EU Supplier"
+                   "spresearchcenter.com"}  # contact number on the page is +86 (China)
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
             "tutanota.com", "qq.com", "163.com", "icloud.com", "aol.com", "sudomail.com", "live.com", "msn.com"}
 GENERIC_NAMES = {"your practice", "your business"}
+
+
+# Bases too generic to identify a business. peptide.partners and peptides.com are
+# different companies, so collapsing both to "peptide" would silence one of them.
+GENERIC_BRANDS = {"peptide", "peptides", "lab", "labs", "bio", "research", "gmail", "shop", "store"}
+
+
+def brand_key(domain):
+    """Collapse a domain to the brand behind it, or "" when that cannot be told.
+
+    A scraped queue carries one business under several hosts: arizonapeptides.us
+    and arizonapeptidesus.com are one operator, as are ms-peptides.com and
+    mspeptides.com. Emailing both is emailing one business twice. Drop the TLD,
+    the punctuation and a trailing "us"/"usa" that only marks the country.
+    """
+    base = (domain or "").lower().split(":")[0]
+    if base.startswith("www."):
+        base = base[4:]
+    base = re.sub(r"[^a-z0-9]", "", base.split(".")[0])
+    base = re.sub(r"(usa|us)$", "", base)
+    if len(base) < 6 or base in GENERIC_BRANDS:
+        return ""
+    return base
 
 
 def is_foreign(domain, name=""):
@@ -262,12 +286,18 @@ def initial_candidates(sent_rows):
     ordered = vendors + medspas                                   # after the drafts: vendors first, then med spas
     pri = [r for r in ordered if r["email"].split("@", 1)[1] in PRIORITY_DOMAINS]
     ordered = drafted + pri + [r for r in ordered if r not in pri]
-    out, seen = [], set()
+    out, seen, brands = [], set(), {brand_key(r["domain"]) for r in sent_rows} - {""}
     for r in ordered:                                             # one contact per domain per campaign
         d = r["email"].lower().split("@", 1)[1]
         if d in seen:
             continue
-        seen.add(d); out.append(r)
+        b = brand_key(d)
+        if b and b in brands:                                     # ...and one per brand behind the domain
+            continue
+        seen.add(d)
+        if b:
+            brands.add(b)
+        out.append(r)
     return out
 
 
