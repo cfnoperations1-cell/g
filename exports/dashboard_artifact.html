@@ -209,7 +209,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-17 07:15 UTC</b><br>
+        UPDATED <b>2026-09-17 08:20 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -221,7 +221,7 @@
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
     <span>10 emails per hourly wave, 100 per day. Sep 16 closed at a full 100 of 100 with no Gmail block. Sending resumed for Sep 17; follow-ups open after 11:30 AM PT.</span>
-    <span class="when">10 of 100 sent today</span>
+    <span class="when">20 of 100 sent today</span>
   </div>
 
   <section style="margin-top:26px">
@@ -229,11 +229,11 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">585</div><div class="k">Contacts emailed</div><div class="d">485 vendors · 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">10</div><div class="k">Sent today</div><div class="d">10 first-touch · 0 follow-ups · 90 left under the daily cap</div></div>
-      <div class="kpi good"><div class="n mono">21</div><div class="k">Replies</div><div class="d">3.6% of contacts · plus 2 auto-replies</div></div>
+      <div class="kpi accent"><div class="n mono">595</div><div class="k">Contacts emailed</div><div class="d">495 vendors · 100 med spas</div></div>
+      <div class="kpi"><div class="n mono">20</div><div class="k">Sent today</div><div class="d">20 first-touch · 0 follow-ups · 80 left under the daily cap</div></div>
+      <div class="kpi good"><div class="n mono">22</div><div class="k">Replies</div><div class="d">3.7% of contacts · plus 2 auto-replies</div></div>
       <div class="kpi bad"><div class="n mono">37</div><div class="k">Bounces</div><div class="d">6.3% · removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">1,135</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi"><div class="n mono">1,115</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap · existing drafts first</div></div>
     </div>
 
@@ -248,16 +248,16 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">585 tracked</span></h3>
+        <h3>Contact status <span class="count">595 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>498</b> awaiting step 1, <b>20</b> at step 1. Window opens <b>Sep 17</b>.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>507</b> awaiting step 1, <b>20</b> at step 1. Window opens <b>Sep 17</b>.</div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">13 warm leads · follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">14 warm leads · follow-ups stopped</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -381,8 +381,8 @@
 
   /* ---------- outreach: contact status ---------- */
   const statuses = [
-    {k:"Awaiting reply", sub:"eligible for follow-ups from Sep 17", n:518, c:"var(--accent)"},
-    {k:"Replied",        sub:"21 real replies + 2 auto-replies · no more automated mail", n:23, c:"var(--done)"},
+    {k:"Awaiting reply", sub:"eligible for follow-ups from Sep 17", n:527, c:"var(--accent)"},
+    {k:"Replied",        sub:"22 real replies + 2 auto-replies · no more automated mail", n:24, c:"var(--done)"},
     {k:"Bounced",        sub:"address rejected · excluded", n:37, c:"var(--block)"},
     {k:"Manual sends",   sub:"catalog sent by hand · excluded from sequence", n:7, c:"var(--queue)"},
   ];
@@ -393,6 +393,7 @@
     li.innerHTML=`<span class="sw" style="background:${s.c}"></span><span><span class="lbl">${s.k}</span><br><span class="sub">${s.sub}</span></span><span class="n">${s.n}</span>`; sl.appendChild(li); });
 
   const replies = [
+    {c:"vantixbio.com",           t:"vendor · needs answer", d:"Sep 17", e:"support@"},
     {c:"peptidebureau.com",       t:"vendor · needs answer", d:"Sep 16", e:"bureau@"},
     {c:"prettypeptidecollective.com", t:"vendor", d:"Sep 11", e:"summer@"},
     {c:"onedaycompounds.com",  t:"vendor", d:"Sep 14", e:"support@"},
@@ -430,7 +431,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"585 sent · 10/hr · 100/day"},
+    {name:"Send",       st:"run",   meta:"595 sent · 10/hr · 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
@@ -497,7 +498,7 @@
   const gaps = [
     {n:"219", t:"Gmail throttled outbound mail", d:"A new Workspace account sending ~220 cold emails in a day trips Google's limits. Let it clear (usually a day), confirm SPF/DKIM/DMARC, then ramp at 30–50 a day instead of 100 an hour."},
     {n:"14",  t:"Stale drafts in Gmail", d:"Sep 10–11 drafts carry the old copy. Don't send them by hand; the queue re-sends those contacts with the current template."},
-    {n:"7",   t:"Non-US vendors skipped", d:".ca / .uk / .is / UAE domains are excluded from the US-made, no-customs pitch."},
+    {n:"8",   t:"Non-US vendors skipped", d:"Foreign domains and names are excluded from the US-made, no-customs pitch. Jinan Boruimei Trading Co., Ltd. was caught by reading the site: the stored name was just \"Boruimei\"."},
     {n:"141", t:"Cloudflare-hard sites", d:"Block even a real browser — flagged in the CSV for a manual contact-page check."},
     {n:"25",  t:"No findable website", d:"Roster vendors with a name but no site; need a manual or directory lookup."},
   ];

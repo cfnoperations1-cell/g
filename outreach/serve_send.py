@@ -55,7 +55,15 @@ JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\
 
 
 FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
-FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing|hong kong|gmbh|ltd|ptycanada|europe|eu|costa rica|australia|india|china)\b", re.I)
+FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing"
+                          r"|jinan|qingdao|tianjin|chengdu|xi'?an|suzhou|ningbo|zhengzhou|changsha|hefei|kunming|dalian"
+                          r"|shijiazhuang|shandong|jiangsu|zhejiang|hubei|hunan|henan|hebei|anhui|sichuan|guangdong"
+                          r"|hong kong|gmbh|s\.?r\.?l|b\.?v\.?|pty|ltd|limited|co\.,? ?ltd|trading co"
+                          r"|canada|europe|costa rica|australia|india|china)\b", re.I)
+# Vendors confirmed non-US by looking at the site itself, where the stored name gives
+# nothing away. Jinan Boruimei Trading Co., Ltd. is a Chinese trading company: the
+# US-made, no-customs pitch has nothing to say to it.
+FOREIGN_DOMAINS = {"boruimei.com"}
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
@@ -64,6 +72,8 @@ GENERIC_NAMES = {"your practice", "your business"}
 
 
 def is_foreign(domain, name=""):
+    if (domain or "").lower().lstrip("www.") in FOREIGN_DOMAINS:
+        return True
     return bool(FOREIGN.search(domain) or FOREIGN_NAME.search(name or ""))
 
 
