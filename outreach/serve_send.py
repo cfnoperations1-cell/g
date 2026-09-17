@@ -122,6 +122,22 @@ def brand_key(domain):
     return base
 
 
+def contact_key(email, domain=""):
+    """What counts as "the same business" when deduplicating contacts.
+
+    One contact per domain is right for a company mailbox, but freemail is not a
+    company. Three clinics that publish a Gmail address are three businesses, and
+    keying them all on gmail.com meant the first one emailed locked out every
+    later one for good -- silently, because they simply stopped appearing in the
+    queue. Freemail contacts are therefore keyed on the address itself.
+    """
+    e = (email or "").strip().lower()
+    d = (domain or "").strip().lower() or (e.split("@", 1)[1] if "@" in e else "")
+    if d in FREEMAIL:
+        return "addr:" + e
+    return d
+
+
 def is_foreign(domain, name=""):
     d = (domain or "").lower()
     if d.lstrip("www.") in FOREIGN_DOMAINS:
@@ -293,12 +309,12 @@ def render_fu(aud, name, peps, stage, sd):
 def initial_candidates(sent_rows):
     done = set()
     for r in sent_rows:
-        done.add(r["email"]); done.add(r["domain"])
+        done.add(r["email"]); done.add(contact_key(r["email"], r["domain"]))
     cands = []
     for r in load_queue():
         e = r["email"].strip().lower()
         d = e.split("@", 1)[1]
-        if e in done or d in done:
+        if e in done or contact_key(e) in done:
             continue
         if d in DECLINED_DOMAINS:
             continue
@@ -318,7 +334,7 @@ def initial_candidates(sent_rows):
     ordered = drafted + pri + [r for r in ordered if r not in pri]
     out, seen, brands = [], set(), {brand_key(r["domain"]) for r in sent_rows} - {""}
     for r in ordered:                                             # one contact per domain per campaign
-        d = r["email"].lower().split("@", 1)[1]
+        d = contact_key(r["email"])
         if d in seen:
             continue
         b = brand_key(d)

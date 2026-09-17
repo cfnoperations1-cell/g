@@ -88,8 +88,12 @@ def main(apply_it):
 
             if st != 'ok' or not em or '@' not in em or not dom:
                 drop('no usable email'); continue
-            if em.split('@', 1)[1] != dom and dom not in em.split('@', 1)[1]:
-                drop('email not on the named domain'); continue
+            em_dom = em.split('@', 1)[1]
+            # A small clinic that publishes a Gmail address on its own contact page
+            # is giving us its real inbox, so take it. What this still rejects is an
+            # address on some unrelated third-party domain, which is somebody else's.
+            if em_dom != dom and dom not in em_dom and em_dom not in ss.FREEMAIL:
+                drop('email on an unrelated domain'); continue
             if BAD_LOCAL.match(em):
                 drop('not a real inbox'); continue
             if em.split('@', 1)[0] in ss.FOREIGN_LOCAL:
