@@ -63,7 +63,9 @@ FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhe
 # Vendors confirmed non-US by looking at the site itself, where the stored name gives
 # nothing away. Jinan Boruimei Trading Co., Ltd. is a Chinese trading company: the
 # US-made, no-customs pitch has nothing to say to it.
-FOREIGN_DOMAINS = {"boruimei.com"}
+FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
+                   "hnhkpeptide.com",   # "Hongke Biotechnology", a Chinese supplier
+                   "peakpeptide.com"}   # its own site says "EU Supplier"
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
@@ -77,9 +79,35 @@ def is_foreign(domain, name=""):
     return bool(FOREIGN.search(domain) or FOREIGN_NAME.search(name or ""))
 
 
+# Words that say nothing about WHICH business this is, so they cannot vouch for a
+# scraped name on their own.
+NAME_STOPWORDS = {"the", "and", "for", "peptide", "peptides", "research", "lab", "labs",
+                  "bio", "biotech", "biotechnology", "inc", "llc", "co", "company",
+                  "group", "usa", "shop", "store", "online", "buy", "best", "premium"}
+
+
+def name_matches_domain(name, domain):
+    """Does this scraped name plausibly belong to this domain?
+
+    Scrapers pick up whatever a page happens to say, so a title can name a
+    different business entirely -- warehousepeptides.com came back as "The Peptide
+    Lab". Telling somebody "I came across The Peptide Lab" when they are not that
+    company reads worse than naming their domain, so a name is only trusted when
+    some distinctive word in it also appears in the domain.
+    """
+    d = (domain or "").lower()
+    words = [w for w in re.split(r"[^a-z0-9]+", (name or "").lower())
+             if len(w) >= 4 and w not in NAME_STOPWORDS]
+    if not words:
+        return False
+    return any(w in d for w in words)
+
+
 def clean_vendor(name, domain):
     n = (name or "").strip()
     if not n or len(n) < 3 or len(n.split()) > 5 or JUNK_VENDOR.search(n):
+        return domain
+    if not name_matches_domain(n, domain):
         return domain
     return n
 LEGACY_SENT_AT = "2026-09-14T16:00:00Z"                    # all pre-schema sends went out on 2026-09-14
