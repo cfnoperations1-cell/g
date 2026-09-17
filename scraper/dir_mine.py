@@ -49,9 +49,33 @@ DIRECTORIES = {
         "sitemaps": ["https://www.mypeptidematch.com/sitemap.xml"],
         "listing": "/clinic/",
     },
+    "healingmaps": {
+        "sitemaps": ["https://healingmaps.com/listing-sitemap.xml",
+                     "https://healingmaps.com/listing-sitemap2.xml",
+                     "https://healingmaps.com/listing-sitemap3.xml"],
+        "listing": "/listing/",
+    },
+    "peptideclinicfinder": {
+        "sitemaps": ["https://peptideclinicfinder.com/sitemap.xml"],
+        "listing": "/clinics/",
+    },
+    "medspadirectorypro": {
+        "sitemaps": ["https://medspadirectorypro.com/sitemap.xml"],
+        "listing": "/spa/",
+    },
     # Checked and not usable: peptidefinder.us clinic pages link only to
     # themselves, and thepeptidelist.com returns 403 on provider pages. Both have
     # large sitemaps, so they look tempting; they are not worth the fetches.
+    # usmedspadirectory.com lists 611 spas and every single "website" it gives
+    # ends in .example.com -- the whole directory is invented, so nothing from it
+    # can be trusted. medspafind.com renders its US listings in JavaScript, so the
+    # clinic's own site never appears in the HTML. medicalspalocator.com claims
+    # 18,000 providers but answers 429 to everything, even its sitemap.
+    # klinic.com looks like the biggest prize of all -- 663 sitemaps covering
+    # wegovy, zepbound, saxenda and TRT in every state -- but it is a telehealth
+    # service writing city pages about itself, not a directory: its city pages
+    # carry no link to any clinic but its own. americanmedspa.org publishes
+    # articles and its sponsors, not its member spas.
 }
 
 # Links on a listing page that are never the clinic's own site.
@@ -64,7 +88,9 @@ NOT_THE_CLINIC = re.compile(
     r"squarespace|yelp|zocdoc|healthgrades|vagaro|booksy|groupon|mapquest|apple|bing|yahoo|amazon|"
     # ad, analytics and consent networks, which appear on every listing page
     r"mediavine|taboola|outbrain|adsystem|adservice|scorecardresearch|quantserve|hotjar|segment|"
-    r"onetrust|cookielaw|clarity|hubspot|intercom|calendly|linktr|bit|goo|tinyurl)\.", re.I)
+    r"onetrust|cookielaw|cookiedatabase|clarity|hubspot|intercom|calendly|linktr|bit|goo|tinyurl|"
+    # widgets and reference sites carried by healingmaps listings
+    r"vimeo|recaptcha|npiregistry|hhs|maps|nih|who|supabase|builder|example)\.", re.I)
 # anchors a directory uses for the business's own site
 WEBSITE_ANCHOR = re.compile(r">\s*(visit\s*(the\s*)?(website|site)|website|official\s*site|"
                             r"go\s*to\s*website|book|visit)\s*<", re.I)
