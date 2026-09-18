@@ -24,7 +24,7 @@ Follow-up cadence: FOLLOWUP_DAYS after the last touch, up to MAX_FOLLOWUPS per c
 never to anyone whose status is not "active" (replied / bounced / unsubscribed).
 DAILY_CAP guards Google Workspace's daily sending limit; the wave size is clipped to it.
 """
-import csv, json, os, re, sys
+import csv, html, json, os, re, sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -172,7 +172,10 @@ def name_matches_domain(name, domain):
 
 
 def clean_vendor(name, domain):
-    n = (name or "").strip()
+    # Names come out of page titles, so they arrive HTML-escaped: "Charleston
+    # Men&#x27;s Clinic", "Vital Force Therapy &amp; Wellness". Unescaped, that
+    # is what the recipient reads in the subject line of a cold email.
+    n = html.unescape(name or "").strip()
     if not n or len(n) < 3 or len(n.split()) > 5 or JUNK_VENDOR.search(n):
         return domain
     if not name_matches_domain(n, domain):
