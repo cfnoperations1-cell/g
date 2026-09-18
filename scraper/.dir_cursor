@@ -3,5 +3,7 @@
  "glp1directory": 700,
  "globalglp1": 556,
  "mypeptidematch": 1200,
- "healingmaps": 0
+ "healingmaps": 900,
+ "peptideclinicfinder": 252,
+ "medspadirectorypro": 597
 }
