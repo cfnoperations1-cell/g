@@ -209,7 +209,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-18 11:34 UTC</b><br>
+        UPDATED <b>2026-09-18 12:42 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -220,8 +220,8 @@
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
-    <span>10 emails per hourly wave, 100 per day. 50 of 100 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
-    <span class="when">50 of 100 sent today</span>
+    <span>10 emails per hourly wave, 100 per day. 60 of 100 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
+    <span class="when">60 of 100 sent today</span>
   </div>
 
   <section style="margin-top:26px">
@@ -229,11 +229,11 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">700</div><div class="k">Contacts emailed</div><div class="d">600 vendors &middot; 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">50</div><div class="k">Sent today</div><div class="d">25 first-touch &middot; 25 follow-ups &middot; 50 left under the daily cap</div></div>
-      <div class="kpi good"><div class="n mono">29</div><div class="k">Replies</div><div class="d">4.1% of contacts &middot; plus 6 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">48</div><div class="k">Bounces</div><div class="d">6.9% &middot; removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">3,242</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi accent"><div class="n mono">705</div><div class="k">Contacts emailed</div><div class="d">605 vendors &middot; 100 med spas</div></div>
+      <div class="kpi"><div class="n mono">60</div><div class="k">Sent today</div><div class="d">30 first-touch &middot; 30 follow-ups &middot; 40 left under the daily cap</div></div>
+      <div class="kpi good"><div class="n mono">31</div><div class="k">Replies</div><div class="d">4.4% of contacts &middot; plus 6 auto-replies</div></div>
+      <div class="kpi bad"><div class="n mono">48</div><div class="k">Bounces</div><div class="d">6.8% &middot; removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">3,180</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap &middot; follow-ups mixed in</div></div>
     </div>
 
@@ -248,16 +248,16 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">700 tracked</span></h3>
+        <h3>Contact status <span class="count">705 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>568</b> awaiting step 1, <b>42</b> at step 1, <b>309</b> due now.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>566</b> awaiting step 1, <b>47</b> at step 1, <b>304</b> due now.</div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">29 warm leads &middot; catalog sent to 6 &middot; follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">31 warm leads &middot; catalog sent to 8 &middot; follow-ups stopped</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -369,7 +369,7 @@
       },
       {
           "d": "Sep 18",
-          "v": 25,
+          "v": 30,
           "m": 0
       }
   ];
@@ -411,13 +411,13 @@
       {
           "k": "Awaiting reply",
           "sub": "eligible for follow-ups",
-          "n": 610,
+          "n": 613,
           "c": "var(--accent)"
       },
       {
           "k": "Replied",
-          "sub": "29 real replies + 6 auto-replies · no more automated mail",
-          "n": 35,
+          "sub": "31 real replies + 6 auto-replies · no more automated mail",
+          "n": 37,
           "c": "var(--done)"
       },
       {
@@ -441,10 +441,22 @@
 
   const replies = [
       {
+          "c": "greatlakespeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 18",
+          "e": "support@"
+      },
+      {
           "c": "biolongevitylabs.com",
-          "t": "vendor · needs answer",
+          "t": "vendor · vendor - Jonathan in conversation Sep 18; Josh Felber (Exec Chairman) from josh@, 1.5M vials/yr, wants samples + raw API and finished COAs + pricing",
           "d": "Sep 10",
           "e": "wholesale@"
+      },
+      {
+          "c": "nextlevelpharm.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 18",
+          "e": "hello@"
       },
       {
           "c": "strivepharmacy.com",
@@ -859,7 +871,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"700 sent &middot; 10/hr &middot; 100/day"},
+    {name:"Send",       st:"run",   meta:"705 sent &middot; 10/hr &middot; 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");

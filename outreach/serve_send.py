@@ -34,6 +34,7 @@ OUT = ROOT / "outreach"
 QUEUE = OUT / "draft_queue.csv"
 SENT = OUT / "sent_log.csv"
 DRAFT_IDS = OUT / "draft_ids.csv"
+_THIRD_PARTY = None
 FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "emailer" / "followup_vendor.txt"}
 
 DAILY_CAP = int(os.environ.get("DAILY_CAP", "100"))      # ramp: 100 per day (Gmail throttled at ~220)
@@ -383,6 +384,25 @@ def render_fu(aud, name, peps, stage, sd):
 
 
 # ---------- selection ----------
+def third_party():
+    """Addresses that belong to a different business than the site they came from.
+
+    The crawler records every address on a vendor's pages, and some are somebody
+    else's: lgipeptides.com publishes its marketing agency's, scientificamerican.com
+    its publisher's, and a few sites publish placeholders like jane.smith@clinic.com.
+    Built by outreach/audit_third_party.py; see that file for how the call is made.
+    """
+    global _THIRD_PARTY
+    if _THIRD_PARTY is None:
+        path = OUT / "third_party_contacts.csv"
+        if not path.exists():
+            _THIRD_PARTY = set()
+        else:
+            with open(path, newline="", encoding="utf-8") as f:
+                _THIRD_PARTY = {r["email"].strip().lower() for r in csv.DictReader(f) if r.get("email")}
+    return _THIRD_PARTY
+
+
 def initial_candidates(sent_rows):
     done = set()
     for r in sent_rows:
@@ -393,7 +413,7 @@ def initial_candidates(sent_rows):
         d = e.split("@", 1)[1]
         if e in done or contact_key(e) in done:
             continue
-        if d in DECLINED_DOMAINS or e in DECLINED_CONTACTS:
+        if d in DECLINED_DOMAINS or e in DECLINED_CONTACTS or e in third_party():
             continue
         if r["audience"] == "vendor" and is_foreign(d, r.get("business_name", "")):
             continue
