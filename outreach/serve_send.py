@@ -58,7 +58,7 @@ FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
 FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing"
                           r"|jinan|qingdao|tianjin|chengdu|xi'?an|suzhou|ningbo|zhengzhou|changsha|hefei|kunming|dalian"
                           r"|shijiazhuang|shandong|jiangsu|zhejiang|hubei|hunan|henan|hebei|anhui|sichuan|guangdong"
-                          r"|hong kong|gmbh|s\.?r\.?l|b\.?v\.?|pty|ltd|limited|co\.,? ?ltd|trading co"
+                          r"|hong kong|gmbh|s\.?r\.?l|b\.?v\.?|pty|sdn bhd|sdn\. bhd|ltd|limited|co\.,? ?ltd|trading co"
                           r"|canada|europe|costa rica|australia|india|china)\b", re.I)
 # Place names run together inside a domain, where word boundaries never match:
 # shandongyixinpeptides.com is Shandong province. Only tokens long and distinctive
@@ -96,6 +96,11 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # against two +852 (HK) WhatsApp numbers
                    "walkerchemicals.store",  # "Free delivery on orders over 250 pounds"
                    "homopeptide.co",    # "Ships from China warehouse ... 7-15 business days"
+                   "glunovabio.com",    # flies a US flag and trades as Prost Biotech; its About page
+                                        # says PROST BIOTECH SDN BHD, "Malaysian Registered Business",
+                                        # Bandar Bukit Jalil, Kuala Lumpur, and its only real number is
+                                        # +65 (Singapore). The "+1 (628) 555-0193" it gives for its
+                                        # account manager is in the 555-01xx range reserved for fiction.
                    "chapeptides.com"}   # trades as "CH Peptides Co., Ltd", but its own About page
                                         # says CHA MEDICAL TECHNOLOGY (Guangzhou) CO., LTD, with
                                         # "peptide synthesis capabilities in Guangzhou, China"
