@@ -211,12 +211,23 @@ def main():
     cur = cursors()
     known_bases, _ = lead_hunt.known()
     rows, opened = [], 0
-    per = max(1, a.limit // len(names))
+
+    # Read every sitemap first, so the limit can be shared out over the
+    # directories that still have listings. Splitting it evenly over all of them
+    # means a read-out directory silently eats its share: asking for 3,100 with
+    # four of seven exhausted returned 903.
+    pool = {n: listing_urls(n)[cur.get(n, 0):] for n in names}
+    live = [n for n in names if pool[n]]
+    take, left = {}, a.limit
+    for i, n in enumerate(live):
+        share = min(len(pool[n]), max(1, left // (len(live) - i)))
+        take[n] = share
+        left -= share
 
     for n in names:
         urls = listing_urls(n)
         start = cur.get(n, 0)
-        batch = urls[start:start + per]
+        batch = urls[start:start + take.get(n, 0)]
         print(f"{n}: {len(urls)} listings, taking {len(batch)} from offset {start}")
         with cf.ThreadPoolExecutor(max_workers=a.workers) as ex:
             for got in ex.map(clinic_of, batch):
