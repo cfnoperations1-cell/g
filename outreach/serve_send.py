@@ -97,6 +97,8 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # against two +852 (HK) WhatsApp numbers
                    "walkerchemicals.store",  # "Free delivery on orders over 250 pounds"
                    "homopeptide.co",    # "Ships from China warehouse ... 7-15 business days"
+                   "hkroids.com",       # its contact page lists a +86 China number and four
+                                        # +852 Hong Kong ones, against @hkroids.net addresses
                    "glunovabio.com",    # flies a US flag and trades as Prost Biotech; its About page
                                         # says PROST BIOTECH SDN BHD, "Malaysian Registered Business",
                                         # Bandar Bukit Jalil, Kuala Lumpur, and its only real number is
@@ -444,12 +446,27 @@ def initial_candidates(sent_rows):
     return out
 
 
+def skip_contact(email, audience="", domain=""):
+    """Should this contact be left alone, whatever stage it is at?"""
+    d = (domain or (email.split("@", 1)[1] if "@" in email else "")).lower()
+    if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
+        return True
+    if audience == "vendor" and is_foreign(d):
+        return True
+    return email.split("@", 1)[0] in FOREIGN_LOCAL
+
+
 def due_followups(sent_rows):
     if now() < parse(FOLLOWUP_START):
         return []
     cutoff = now() - timedelta(days=FOLLOWUP_DAYS)
+    # The same gates that decide who we start writing to decide who we keep
+    # writing to. A vendor only shown to be foreign after its first email --
+    # hkroids.com publishes a +86 number and four +852 ones -- was still queued
+    # for follow-ups, because the filters only ran over new candidates.
     due = [r for r in sent_rows
-           if r["status"] == "active" and int(r["stage"]) < MAX_FOLLOWUPS and parse(r["last_touch_at"]) <= cutoff]
+           if r["status"] == "active" and int(r["stage"]) < MAX_FOLLOWUPS and parse(r["last_touch_at"]) <= cutoff
+           and not skip_contact(r["email"].strip().lower(), r.get("audience", ""), r.get("domain", ""))]
     due.sort(key=lambda r: r["last_touch_at"])
     return due
 
