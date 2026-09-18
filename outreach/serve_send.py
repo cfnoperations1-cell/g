@@ -69,6 +69,11 @@ FOREIGN_IN_DOMAIN = re.compile(
     r"|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing|jinan|qingdao|tianjin"
     r"|chengdu|suzhou|ningbo|zhengzhou|changsha|kunming|dalian|shijiazhuang|xiamen"
     r"|hongkong|chinese|gmbh|\bsarl\b", re.I)
+# Country codes too short to use as substrings anywhere in a domain, but safe at the
+# front of one: uaepeptideresearch.com is Dubai, while youngeryouaesthetics.com is a
+# US med spa whose name simply runs "yoU AEsthetics" together. \buae\b in FOREIGN
+# cannot help -- a run-together domain never offers the word boundary.
+FOREIGN_DOMAIN_PREFIX = re.compile(r"^(uae|ksa|qatar|dubai|abudhabi)[a-z0-9]", re.I)
 
 # Vendors confirmed non-US by looking at the site itself, where the stored name gives
 # nothing away. Jinan Boruimei Trading Co., Ltd. is a Chinese trading company: the
@@ -85,8 +90,15 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "modernaminos.com",  # the only phone it publishes is +1 437, Toronto
                    "healtlab.com",      # every contact on its page is a +852 (Hong Kong)
                                         # WhatsApp or Telegram, against three gmail addresses
-                   "yansenpeptidesfactory.com"}  # "a leading peptide raw material manufacturer
+                   "yansenpeptidesfactory.com",  # "a leading peptide raw material manufacturer
                                         # based in China", with a Shenzhen street address
+                   "sciencepeptidelab.com",  # "Direct factory supply. No trading intermediaries."
+                                        # against two +852 (HK) WhatsApp numbers
+                   "walkerchemicals.store",  # "Free delivery on orders over 250 pounds"
+                   "homopeptide.co",    # "Ships from China warehouse ... 7-15 business days"
+                   "chapeptides.com"}   # trades as "CH Peptides Co., Ltd", but its own About page
+                                        # says CHA MEDICAL TECHNOLOGY (Guangzhou) CO., LTD, with
+                                        # "peptide synthesis capabilities in Guangzhou, China"
 
 
 # Vendors we decline to approach for reasons that have nothing to do with where
@@ -105,7 +117,8 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
 # which Jonathan has not written.
 DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "thepeptidecatalog.com",
-                    "peptidedosages.com"}
+                    "peptidedosages.com",
+                    "peptidelibrary.app"}   # "Compare Peptides, Track Research" -- a reference app
 
 # Both domain sets above are matched against the domain of the address we would
 # write to, and for a business that publishes a Gmail or Outlook address that is
@@ -114,7 +127,11 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
 DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison directory, not a supplier
                      "sec9vzion@outlook.com",        # peptidedosages.com, a dosing-chart site
                      "beatyjin51@gmail.com",         # healtlab.com, contactable only on +852 Hong Kong
-                     "wyi556911@gmail.com"}          # yansenpeptidesfactory.com, Shenzhen, China
+                     "wyi556911@gmail.com",         # yansenpeptidesfactory.com, Shenzhen, China
+                     "peptpedia@gmail.com",         # peptpedia.org, a peptide encyclopedia
+                     "productsmax16@gmail.com"}     # arizona-mall.com: an American-sounding domain
+                                                    # over "GMP Factory OEM Supply ... for Global Labs
+                                                    # and Manufacturers" -- upstream of us, not a buyer
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
@@ -163,9 +180,13 @@ def contact_key(email, domain=""):
 
 def is_foreign(domain, name=""):
     d = (domain or "").lower()
-    if d.lstrip("www.") in FOREIGN_DOMAINS:
+    # str.lstrip takes a SET of characters, not a prefix: "walkerchemicals.store"
+    # .lstrip("www.") is "alkerchemicals.store", so every domain starting with w
+    # missed this list entirely.
+    bare = d[4:] if d.startswith("www.") else d
+    if bare in FOREIGN_DOMAINS:
         return True
-    if FOREIGN_IN_DOMAIN.search(d):
+    if FOREIGN_IN_DOMAIN.search(d) or FOREIGN_DOMAIN_PREFIX.match(d):
         return True
     return bool(FOREIGN.search(domain) or FOREIGN_NAME.search(name or ""))
 
