@@ -82,7 +82,11 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "myotrope.com",      # its verified resellers are listed as Netherlands / Europe
                    "24hourpeptides.com",  # prices in GBP, next-day UK shipping, UK company number
                    "uwa-biotech.com",   # WhatsApp contact number is +86 (China)
-                   "modernaminos.com"}  # the only phone it publishes is +1 437, Toronto
+                   "modernaminos.com",  # the only phone it publishes is +1 437, Toronto
+                   "healtlab.com",      # every contact on its page is a +852 (Hong Kong)
+                                        # WhatsApp or Telegram, against three gmail addresses
+                   "yansenpeptidesfactory.com"}  # "a leading peptide raw material manufacturer
+                                        # based in China", with a Shenzhen street address
 
 
 # Vendors we decline to approach for reasons that have nothing to do with where
@@ -91,7 +95,26 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
 # least eight lookalike domains trade on that name. Nothing on the page proves
 # which one is the real business, and a wholesale pitch sent to the wrong one
 # lands in a stranger's inbox under Jonathan's name.
-DECLINED_DOMAINS = {"aminoasylumofficial.com"}
+#
+# The two peptide "catalog" sites are not suppliers or buyers: thepeptidecatalog.com
+# is a price-comparison directory ("Learn Peptides. Get the Best Price.") and
+# peptidedosages.com publishes dosing charts. Both list the peptides we make, which
+# is why the crawler scored them highly, but neither buys wholesale -- a domestic
+# supply pitch is the wrong message and spends a send on a reader, not a customer.
+# They could be worth approaching about being listed; that is a different email,
+# which Jonathan has not written.
+DECLINED_DOMAINS = {"aminoasylumofficial.com",
+                    "thepeptidecatalog.com",
+                    "peptidedosages.com"}
+
+# Both domain sets above are matched against the domain of the address we would
+# write to, and for a business that publishes a Gmail or Outlook address that is
+# "gmail.com" -- so a business excluded for any reason, geography included, slips
+# past them when it is only reachable at freemail. These are the exact addresses.
+DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison directory, not a supplier
+                     "sec9vzion@outlook.com",        # peptidedosages.com, a dosing-chart site
+                     "beatyjin51@gmail.com",         # healtlab.com, contactable only on +852 Hong Kong
+                     "wyi556911@gmail.com"}          # yansenpeptidesfactory.com, Shenzhen, China
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
@@ -169,6 +192,31 @@ def name_matches_domain(name, domain):
     if not words:
         return False
     return any(w in d for w in words)
+
+
+# Words that carry no identity on their own. A name made only of these is a page
+# title, not a business: "BULK Supply" is the first segment of "BULK Supply - AOD
+# 9604 5mg - Regenerate Peptides", and "New" is what is left of "New-U".
+GENERIC_WORDS = set("""
+    high low new free fast bulk quality premium official trusted reliable verified
+    tested pure safe secure online order orders product products research lab labs
+    login account cart menu search sale sales deal deals price prices pricing supply
+    supplies shop store home welcome peptide peptides best top usa us buy wholesale
+    the a an and of for your our inc llc co company group
+""".split())
+
+
+def usable_name(n):
+    """Is this something we can put in front of a stranger in a subject line?
+
+    A freemail host is not a business name; neither is a stub like "New" left over
+    from a truncated page title, nor a phrase whose every word is generic.
+    """
+    n = (n or "").strip()
+    if not n or len(n) < 4 or n.lower() in FREEMAIL:
+        return False
+    words = [w for w in re.split(r"[^A-Za-z0-9']+", n.lower()) if w]
+    return bool(words) and not all(w in GENERIC_WORDS for w in words)
 
 
 def clean_vendor(name, domain):
@@ -319,7 +367,7 @@ def initial_candidates(sent_rows):
         d = e.split("@", 1)[1]
         if e in done or contact_key(e) in done:
             continue
-        if d in DECLINED_DOMAINS:
+        if d in DECLINED_DOMAINS or e in DECLINED_CONTACTS:
             continue
         if r["audience"] == "vendor" and is_foreign(d, r.get("business_name", "")):
             continue
@@ -384,8 +432,17 @@ def cmd_next(n, out_json):
             break
         e = r["email"].strip().lower()
         name, subj, body, did = r["business_name"], r["subject"], r["body"], dids.get(e, "")
+        em_dom = e.split("@", 1)[1]
         if r["audience"] == "vendor":
-            new = clean_vendor(name, e.split("@", 1)[1])
+            # clean_vendor checks the name against the domain we are writing to.
+            # For a contact who publishes a Gmail or Outlook address that check is
+            # meaningless -- the name will never match "gmail.com" -- and the
+            # fallback made the subject line read "gmail.com - US-made peptide
+            # supply, wholesale". The queued name was already checked against the
+            # business's own site at ingest, so for freemail it stands as it is.
+            new = name if em_dom in FREEMAIL else clean_vendor(name, em_dom)
+            if not usable_name(new):
+                new = "your business"
             if new != name:
                 subj = orig_subject("vendor", new)
                 body = body.replace(f"I came across {name}\n", f"I came across {new}\n", 1)

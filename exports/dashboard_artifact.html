@@ -209,7 +209,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-18 02:22 UTC</b><br>
+        UPDATED <b>2026-09-18 07:12 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -220,8 +220,8 @@
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
-    <span>10 emails per hourly wave, 100 per day. The daily cap is spent: 100 of 100 sent this Pacific day, so the next wave sends after midnight PT. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
-    <span class="when">cap reached &middot; next wave 07:00 UTC</span>
+    <span>10 emails per hourly wave, 100 per day. 10 of 100 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
+    <span class="when">10 of 100 sent today</span>
   </div>
 
   <section style="margin-top:26px">
@@ -229,17 +229,17 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">675</div><div class="k">Contacts emailed</div><div class="d">575 vendors &middot; 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">100</div><div class="k">Sent today</div><div class="d">100 first-touch &middot; 0 follow-ups &middot; daily cap reached</div></div>
-      <div class="kpi good"><div class="n mono">25</div><div class="k">Replies</div><div class="d">3.7% of contacts &middot; plus 3 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">44</div><div class="k">Bounces</div><div class="d">6.5% &middot; removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">3,281</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi accent"><div class="n mono">680</div><div class="k">Contacts emailed</div><div class="d">580 vendors &middot; 100 med spas</div></div>
+      <div class="kpi"><div class="n mono">10</div><div class="k">Sent today</div><div class="d">5 first-touch &middot; 5 follow-ups &middot; 90 left under the daily cap</div></div>
+      <div class="kpi good"><div class="n mono">27</div><div class="k">Replies</div><div class="d">4.0% of contacts &middot; plus 3 auto-replies</div></div>
+      <div class="kpi bad"><div class="n mono">45</div><div class="k">Bounces</div><div class="d">6.6% &middot; removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">3,272</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap &middot; follow-ups mixed in</div></div>
     </div>
 
     <div class="grid2" style="margin-top:16px">
       <div class="tablecard">
-        <h3>First-touch emails per day <span class="count">Sep 1 – Sep 17</span></h3>
+        <h3>First-touch emails per day <span class="count">Sep 1 – Sep 18</span></h3>
         <div class="chart-wrap">
           <div class="legend"><span><i style="background:var(--s1)"></i>Vendors</span><span><i style="background:var(--s2)"></i>Med spas</span></div>
           <div id="chart"></div>
@@ -248,16 +248,16 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">675 tracked</span></h3>
+        <h3>Contact status <span class="count">680 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>576</b> awaiting step 1, <b>20</b> at step 1, <b>334</b> due now.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>573</b> awaiting step 1, <b>25</b> at step 1, <b>329</b> due now.</div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">25 warm leads &middot; catalog sent to 4 &middot; follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">27 warm leads &middot; catalog sent to 6 &middot; follow-ups stopped</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -366,6 +366,11 @@
           "d": "Sep 17",
           "v": 100,
           "m": 0
+      },
+      {
+          "d": "Sep 18",
+          "v": 5,
+          "m": 0
       }
   ];
   (function drawChart(){
@@ -406,19 +411,19 @@
       {
           "k": "Awaiting reply",
           "sub": "eligible for follow-ups",
-          "n": 596,
+          "n": 598,
           "c": "var(--accent)"
       },
       {
           "k": "Replied",
-          "sub": "25 real replies + 3 auto-replies · no more automated mail",
-          "n": 28,
+          "sub": "27 real replies + 3 auto-replies · no more automated mail",
+          "n": 30,
           "c": "var(--done)"
       },
       {
           "k": "Bounced",
           "sub": "address rejected · excluded",
-          "n": 44,
+          "n": 45,
           "c": "var(--block)"
       },
       {
@@ -435,6 +440,12 @@
     li.innerHTML=`<span class="sw" style="background:${s.c}"></span><span><span class="lbl">${s.k}</span><br><span class="sub">${s.sub}</span></span><span class="n">${s.n}</span>`; sl.appendChild(li); });
 
   const replies = [
+      {
+          "c": "aminoforge.vegas",
+          "t": "vendor · catalog sent",
+          "d": "Sep 17",
+          "e": "support@"
+      },
       {
           "c": "sigmapeptides.com",
           "t": "vendor · catalog sent",
@@ -464,6 +475,12 @@
           "t": "vendor · catalog sent",
           "d": "Sep 17",
           "e": "support@"
+      },
+      {
+          "c": "peptivaresearchlabs.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 17",
+          "e": "info@"
       },
       {
           "c": "peptidebureau.com",
@@ -609,6 +626,10 @@
     tr.innerHTML=`<td class="src-name">${r.c}</td><td class="aud">${r.t}</td><td class="mono">${r.d}</td><td class="mono">${r.e}${r.c}</td>`; rb.appendChild(tr); });
 
   const bounces = [
+      {
+          "a": "support@aminobros.com",
+          "t": "vendor"
+      },
       {
           "a": "support@rarevbiolabs.com",
           "t": "vendor"
@@ -796,7 +817,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"675 sent &middot; 10/hr &middot; 100/day"},
+    {name:"Send",       st:"run",   meta:"680 sent &middot; 10/hr &middot; 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
