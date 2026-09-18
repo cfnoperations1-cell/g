@@ -80,9 +80,23 @@ DIRECTORIES = {
         "sitemaps": ["https://medspadirectorypro.com/sitemap.xml"],
         "listing": "/spa/",
     },
+    "theivdirectory": {
+        "sitemaps": ["https://theivdirectory.com/sitemap.xml"],
+        "listing": "/provider/",
+    },
+    "verifiedantiagingclinics": {
+        "sitemaps": ["https://verifiedantiagingclinics.com/sitemap-clinics.xml",
+                     "https://verifiedantiagingclinics.com/sitemap-telehealth.xml"],
+        "listing": "/clinic",          # matches both /clinics/ and /clinic/
+    },
     # Checked and not usable: peptidefinder.us clinic pages link only to
     # themselves, and thepeptidelist.com returns 403 on provider pages. Both have
     # large sitemaps, so they look tempting; they are not worth the fetches.
+    # ivtherapymap.com lists 1,281 clinics and links to none of them -- the only
+    # external host on a listing page is googletagmanager.
+    # peptidescertified.com is abandoned: its robots.txt points the sitemap at
+    # caillou.odns.fr, an unrelated French domain. directory.worldlinkmedical.com
+    # publishes no sitemap at all.
     # usmedspadirectory.com lists 611 spas and every single "website" it gives
     # ends in .example.com -- the whole directory is invented, so nothing from it
     # can be trusted. medspafind.com renders its US listings in JavaScript, so the
@@ -107,7 +121,14 @@ NOT_THE_CLINIC = re.compile(
     r"mediavine|taboola|outbrain|adsystem|adservice|scorecardresearch|quantserve|hotjar|segment|"
     r"onetrust|cookielaw|cookiedatabase|clarity|hubspot|intercom|calendly|linktr|bit|goo|tinyurl|"
     # widgets and reference sites carried by healingmaps listings
-    r"vimeo|recaptcha|npiregistry|hhs|maps|nih|who|supabase|builder|example)\.", re.I)
+    r"vimeo|recaptcha|npiregistry|hhs|maps|nih|who|supabase|builder|example|"
+    # CDNs and analytics carried by theivdirectory listings
+    r"googleusercontent|contentsquare|squarespace-cdn|gstatic|cloudinary|imgix|"
+    # site builders' asset hosts, booking platforms and free blog hosts: a clinic
+    # reached only at one of these has no domain of its own to write to
+    r"website-files|cdn-website|wixsite|weebly|blogspot|wordpress|godaddysites|myshopify|"
+    r"mypatientnow|zenoti|mindbodyonline|squareup|acuityscheduling|setmore|"
+    r"schedulicity|janeapp|simplepractice|clinicsense|tebra|healow)\.", re.I)
 # anchors a directory uses for the business's own site
 WEBSITE_ANCHOR = re.compile(r">\s*(visit\s*(the\s*)?(website|site)|website|official\s*site|"
                             r"go\s*to\s*website|book|visit)\s*<", re.I)
