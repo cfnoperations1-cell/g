@@ -7,6 +7,11 @@ of sites publish outright placeholders like jane.smith@clinic.com. Writing a
 wholesale peptide pitch to any of them reaches the wrong company under Jonathan's
 name.
 
+It also catches the mirror-image case: a contact reachable only at a freemail
+address, published on a site that is plainly foreign. Neither FOREIGN_DOMAINS nor
+FOREIGN_FREEMAIL can see those, because the address is a perfectly ordinary
+@outlook.com and the foreign evidence is on a domain we never write to.
+
 outreach/ingest_resolved.py already refuses these for new leads. This finds the
 ones that entered the queue before that gate existed, and writes them to
 outreach/third_party_contacts.csv, which serve_send.py skips.
@@ -71,18 +76,28 @@ def main(write=False):
         em = r["email"].strip().lower()
         ed = em.split("@", 1)[1]
         sd = src.get(em)
-        if not sd or ed in ss.FREEMAIL or same_business(ed, sd):
+        if not sd:
             continue
-        rows.append({"email": em, "site": sd, "status": sent.get(em, "pending")})
-    rows.sort(key=lambda r: r["email"])
+        reason = ""
+        if ed in ss.FREEMAIL:
+            # A freemail address tells us nothing about the business, so the only
+            # thing to judge is the site it was published on. synth-peptide.com
+            # publishes an @outlook.com address and a single Hong Kong phone.
+            if r.get("audience") == "vendor" and ss.is_foreign(sd, r.get("business_name", "")):
+                reason = "foreign site"
+        elif not same_business(ed, sd):
+            reason = "third party"
+        if reason:
+            rows.append({"email": em, "site": sd, "reason": reason,
+                         "status": sent.get(em, "pending")})
+    rows.sort(key=lambda r: (r["reason"], r["email"]))
     pend = sum(1 for r in rows if r["status"] == "pending")
-    print(f"{len(rows)} contacts sit on a domain unrelated to the site they came from "
-          f"({pend} never emailed)")
+    print(f"{len(rows)} contacts should not be written to ({pend} never emailed)")
     for r in rows:
-        print(f"   {r['status']:<9} {r['email']:<44} <- {r['site']}")
+        print(f"   {r['status']:<9} {r['reason']:<12} {r['email']:<44} <- {r['site']}")
     if write:
         with open(OUT, "w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=["email", "site", "status"])
+            w = csv.DictWriter(f, fieldnames=["email", "site", "reason", "status"])
             w.writeheader()
             w.writerows(rows)
         print(f"wrote {OUT}")

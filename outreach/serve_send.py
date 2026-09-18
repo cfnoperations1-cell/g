@@ -99,6 +99,11 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "homopeptide.co",    # "Ships from China warehouse ... 7-15 business days"
                    "hkroids.com",       # its contact page lists a +86 China number and four
                                         # +852 Hong Kong ones, against @hkroids.net addresses
+                   "norcopeptide.com",  # publishes "(254) 607-7119" as if it were a US phone; that
+                                        # is its QQ number 2546077119 reformatted, and its other
+                                        # number is +852 (Hong Kong)
+                   "synth-peptide.com",  # the only phone it publishes is (852) 945-5869, Hong Kong
+                                        # dressed up as a US area code
                    "glunovabio.com",    # flies a US flag and trades as Prost Biotech; its About page
                                         # says PROST BIOTECH SDN BHD, "Malaysian Registered Business",
                                         # Bandar Bukit Jalil, Kuala Lumpur, and its only real number is
@@ -144,6 +149,11 @@ DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison director
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
             "tutanota.com", "qq.com", "163.com", "icloud.com", "aol.com", "sudomail.com", "live.com", "msn.com"}
+# Consumer mail services essentially nobody outside China uses. A US peptide brand
+# does not take its wholesale enquiries at a QQ number: norcopeptide.com published
+# 2546077119@qq.com and dressed the same digits up as the US phone "(254) 607-7119".
+FOREIGN_FREEMAIL = {"qq.com", "163.com", "126.com", "sina.com", "sina.cn", "yeah.net",
+                    "foxmail.com", "aliyun.com", "139.com", "189.cn"}
 GENERIC_NAMES = {"your practice", "your business"}
 
 
@@ -417,7 +427,7 @@ def initial_candidates(sent_rows):
             continue
         if d in DECLINED_DOMAINS or e in DECLINED_CONTACTS or e in third_party():
             continue
-        if r["audience"] == "vendor" and is_foreign(d, r.get("business_name", "")):
+        if r["audience"] == "vendor" and (is_foreign(d, r.get("business_name", "")) or d in FOREIGN_FREEMAIL):
             continue
         if e.split("@", 1)[0] in FOREIGN_LOCAL:                       # e.g. contato@ (Portuguese), kontakt@ (German)
             continue
@@ -451,7 +461,7 @@ def skip_contact(email, audience="", domain=""):
     d = (domain or (email.split("@", 1)[1] if "@" in email else "")).lower()
     if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
         return True
-    if audience == "vendor" and is_foreign(d):
+    if audience == "vendor" and (is_foreign(d) or d in FOREIGN_FREEMAIL):
         return True
     return email.split("@", 1)[0] in FOREIGN_LOCAL
 

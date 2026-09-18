@@ -209,7 +209,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-18 15:58 UTC</b><br>
+        UPDATED <b>2026-09-18 17:04 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -220,8 +220,8 @@
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
-    <span>10 emails per hourly wave, 100 per day. 90 of 100 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
-    <span class="when">90 of 100 sent today</span>
+    <span>10 emails per hourly wave, 100 per day. The daily cap is spent: 100 of 100 sent this Pacific day, so the next wave sends after midnight PT. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
+    <span class="when">cap reached &middot; next wave 07:00 UTC</span>
   </div>
 
   <section style="margin-top:26px">
@@ -229,11 +229,11 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">720</div><div class="k">Contacts emailed</div><div class="d">620 vendors &middot; 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">90</div><div class="k">Sent today</div><div class="d">45 first-touch &middot; 45 follow-ups &middot; 10 left under the daily cap</div></div>
+      <div class="kpi accent"><div class="n mono">725</div><div class="k">Contacts emailed</div><div class="d">625 vendors &middot; 100 med spas</div></div>
+      <div class="kpi"><div class="n mono">100</div><div class="k">Sent today</div><div class="d">50 first-touch &middot; 50 follow-ups &middot; daily cap reached</div></div>
       <div class="kpi good"><div class="n mono">32</div><div class="k">Replies</div><div class="d">4.4% of contacts &middot; plus 8 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">51</div><div class="k">Bounces</div><div class="d">7.1% &middot; removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">3,165</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi bad"><div class="n mono">51</div><div class="k">Bounces</div><div class="d">7.0% &middot; removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">3,148</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap &middot; follow-ups mixed in</div></div>
     </div>
 
@@ -248,10 +248,10 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">720 tracked</span></h3>
+        <h3>Contact status <span class="count">725 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>562</b> awaiting step 1, <b>60</b> at step 1, <b>307</b> due now.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>562</b> awaiting step 1, <b>65</b> at step 1, <b>297</b> due now.</div>
       </div>
     </div>
 
@@ -369,7 +369,7 @@
       },
       {
           "d": "Sep 18",
-          "v": 45,
+          "v": 50,
           "m": 0
       }
   ];
@@ -411,7 +411,7 @@
       {
           "k": "Awaiting reply",
           "sub": "eligible for follow-ups",
-          "n": 622,
+          "n": 627,
           "c": "var(--accent)"
       },
       {
@@ -901,7 +901,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"720 sent &middot; 10/hr &middot; 100/day"},
+    {name:"Send",       st:"run",   meta:"725 sent &middot; 10/hr &middot; 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
