@@ -1,0 +1,43 @@
+# Terms that qualify a med spa as a real prospect, and that get quoted back to
+# them in the opening line ("saw you offer ..."). One per line, # for comments.
+# Matched case-insensitively against the site text, so keep them lowercase-safe.
+#
+# Order matters a little: the first few matches are what the email quotes, so
+# put the products we most want to sell near the top.
+semaglutide
+tirzepatide
+retatrutide
+bpc-157
+tb-500
+ipamorelin
+cjc-1295
+sermorelin
+tesamorelin
+nad+
+glutathione
+pt-141
+ghk-cu
+thymosin alpha-1
+thymosin beta-4
+epitalon
+selank
+semax
+mots-c
+5-amino-1mq
+aod-9604
+kisspeptin
+dsip
+hexarelin
+ghrp-2
+ghrp-6
+igf-1 lr3
+cagrilintide
+survodutide
+mazdutide
+ss-31
+snap-8
+melanotan
+peptide therapy
+peptide injections
+weight loss injections
+hormone optimization

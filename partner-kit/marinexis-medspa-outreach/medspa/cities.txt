@@ -1,0 +1,83 @@
+# Metros to work through, one "City, ST" per line. discover.py walks this list
+# top to bottom, five search angles per city, and remembers where it stopped in
+# medspa/.query_progress. Reorder freely -- put your best markets at the top.
+#
+# This list leads with the states where peptide-selling med spas are densest
+# (that is where the first 429 seeded leads came from), then broadens.
+Miami, FL
+Tampa, FL
+Orlando, FL
+Jacksonville, FL
+Fort Lauderdale, FL
+Naples, FL
+Boca Raton, FL
+Los Angeles, CA
+San Diego, CA
+Orange County, CA
+San Francisco, CA
+Sacramento, CA
+Beverly Hills, CA
+Newport Beach, CA
+Dallas, TX
+Houston, TX
+Austin, TX
+San Antonio, TX
+Fort Worth, TX
+Phoenix, AZ
+Scottsdale, AZ
+Tucson, AZ
+Las Vegas, NV
+Reno, NV
+Denver, CO
+Colorado Springs, CO
+Boulder, CO
+New York, NY
+Long Island, NY
+Westchester, NY
+Atlanta, GA
+Savannah, GA
+Charlotte, NC
+Raleigh, NC
+Nashville, TN
+Memphis, TN
+Chicago, IL
+Naperville, IL
+Kansas City, MO
+St. Louis, MO
+Seattle, WA
+Bellevue, WA
+Portland, OR
+Salt Lake City, UT
+Boise, ID
+Minneapolis, MN
+Detroit, MI
+Grand Rapids, MI
+Columbus, OH
+Cleveland, OH
+Cincinnati, OH
+Indianapolis, IN
+Milwaukee, WI
+Philadelphia, PA
+Pittsburgh, PA
+Boston, MA
+Hartford, CT
+Newark, NJ
+Princeton, NJ
+Baltimore, MD
+Washington, DC
+Richmond, VA
+Virginia Beach, VA
+Charleston, SC
+Greenville, SC
+Birmingham, AL
+New Orleans, LA
+Baton Rouge, LA
+Little Rock, AR
+Oklahoma City, OK
+Tulsa, OK
+Wichita, KS
+Omaha, NE
+Des Moines, IA
+Albuquerque, NM
+Honolulu, HI
+Anchorage, AK
