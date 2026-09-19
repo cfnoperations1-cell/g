@@ -112,9 +112,30 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # Bandar Bukit Jalil, Kuala Lumpur, and its only real number is
                                         # +65 (Singapore). The "+1 (628) 555-0193" it gives for its
                                         # account manager is in the 555-01xx range reserved for fiction.
-                   "chapeptides.com"}   # trades as "CH Peptides Co., Ltd", but its own About page
+                   "chapeptides.com",   # trades as "CH Peptides Co., Ltd", but its own About page
                                         # says CHA MEDICAL TECHNOLOGY (Guangzhou) CO., LTD, with
                                         # "peptide synthesis capabilities in Guangzhou, China"
+                   "peptidechn.com",    # CHN is the country code and the site means it: "our express
+                                        # parcels will be concentrated in Hong Kong and then sent to
+                                        # the world", against a +852 WhatsApp
+                   "purepeptide99.com",  # "Wan Chai District, Hong Kong, China" under two +852
+                                        # WhatsApp numbers, and an OEM factory besides
+                   "thepeptideco.shop",  # its own title is "Buy peptides Australia online" and the
+                                        # currency selector opens on AUD
+                   "regena-peptides.com",  # "(c) 2026 Regena Peptides . Marbella", prices in EUR,
+                                        # WhatsApp +44 (UK) and +34 (Spain), free shipping over
+                                        # EUR 3,500. The .com and the "USA" shipping hub are the
+                                        # only American things about it
+                   "dcxpeptides.com",   # trades as "DC Peptide" on a .com, but its About page is
+                                        # headed "Dongcheng Technology Co., Ltd." and every number on
+                                        # the site is +852 (Hong Kong). Its inquiry form asks for your
+                                        # "Phone/WhatsApp/WeChat... (Very important)", and it sells
+                                        # custom peptide manufacturing -- upstream of us either way
+                   "lyzelabs.com"}      # publishes no address, phone or country anywhere, but its
+                                        # shipping page says every order is "dispatched directly from
+                                        # our international synthesis laboratories" and it takes UPI,
+                                        # India's payment rail. A reseller fronting overseas synthesis
+                                        # is neither US-made nor a buyer of US material
 
 
 # Vendors we decline to approach for reasons that have nothing to do with where
@@ -151,9 +172,14 @@ DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison director
                      "beatyjin51@gmail.com",         # healtlab.com, contactable only on +852 Hong Kong
                      "wyi556911@gmail.com",         # yansenpeptidesfactory.com, Shenzhen, China
                      "peptpedia@gmail.com",         # peptpedia.org, a peptide encyclopedia
-                     "productsmax16@gmail.com"}     # arizona-mall.com: an American-sounding domain
+                     "productsmax16@gmail.com",     # arizona-mall.com: an American-sounding domain
                                                     # over "GMP Factory OEM Supply ... for Global Labs
                                                     # and Manufacturers" -- upstream of us, not a buyer
+                     "hechuan1022@gmail.com",       # peptidechn.com, ships out of Hong Kong
+                     "fuguo20250808@gmail.com",     # purepeptide99.com, Wan Chai, Hong Kong
+                     "thepeptideco@proton.me"}      # thepeptideco.shop, an Australian storefront --
+                                                    # proton.me is freemail, so the domain sets above
+                                                    # cannot see it either
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
