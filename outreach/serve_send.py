@@ -126,6 +126,9 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # WhatsApp +44 (UK) and +34 (Spain), free shipping over
                                         # EUR 3,500. The .com and the "USA" shipping hub are the
                                         # only American things about it
+                   "gemaihealth.com",   # trades as Genmai Health on a .com; its About page says
+                                        # "founded in Xi'an, Shaanxi, China", and the phone in its
+                                        # header on every page is +86
                    "sulanpeptides.com",  # "SULAN Peptide Factory": eight sales contacts, every one of
                                         # them a +852 (Hong Kong) WhatsApp, and an FAQ inviting you to
                                         # "visit our factory at any time"
