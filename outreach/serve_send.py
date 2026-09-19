@@ -126,6 +126,12 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # WhatsApp +44 (UK) and +34 (Spain), free shipping over
                                         # EUR 3,500. The .com and the "USA" shipping hub are the
                                         # only American things about it
+                   "weipeptide.com",    # "Weipeptide Technology Co., Ltd", with a Factory Tour in the
+                                        # menu and +852 65670922 as its service hotline
+                   "changyuanpolypeptide.com",  # its address is Pingshan District, Shenzhen City, and
+                                        # it offers WhatsApp, WeChat and a +852 number
+                   "primewaypeptide.com",  # the site behind baiwei@usprimeway.com; the only number it
+                                        # publishes is (852) 548-1319, Hong Kong
                    "aurobiopeptide.com",  # "AuroBiopeptide Technology (Shenzhen) Co., Ltd.", Room 905,
                                         # Hi-Tech Park, Nanshan District, Shenzhen, Guangdong, behind
                                         # a +86 primary WhatsApp and three +852 backups
@@ -182,6 +188,9 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidestaff.com",     # "Remote Staffing for Peptide Operations" -- it sells
                                             # virtual assistants to peptide companies, not peptides.
                                             # The keyword crawler cannot tell those apart
+                    "usprimeway.com",       # no A record on apex or www: the address is at a dead
+                                            # host, and the site it was harvested from is the Hong
+                                            # Kong primewaypeptide.com above
                     "ilumapeptide.co",      # the domain no longer resolves at all -- no A record on
                                             # the apex or on www, while control domains answer fine.
                                             # The business is gone; a follow-up would only bounce
@@ -214,6 +223,9 @@ DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison director
                                                     # that its previous domain "was suspended".
                                                     # Distributing hGH for non-approved uses is a
                                                     # federal offence; this is not an RUO vendor
+                     "chloesong1008@gmail.com",     # weipeptide.com, a Hong Kong factory that lists six
+                                                    # gmail addresses for six named sales reps
+                     "changyuanpolypeptide@outlook.com",  # changyuanpolypeptide.com, Shenzhen
                      "gzhaiyitong@outlook.com",     # zghiyit.com, two (852) Hong Kong numbers; the
                                                     # local part is "gz" for Guangzhou and the domain
                                                     # "zg" for Zhongguo. The stored state reads
