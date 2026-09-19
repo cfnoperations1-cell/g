@@ -59,7 +59,11 @@ def main():
     replied_rows = [r for r in rows if r["status"] == "replied"]
     autos = [r for r in replied_rows if "auto" in note.get(r["email"].lower(), "")]
     real = [r for r in replied_rows if r not in autos]
-    catalog = [r for r in replied_rows if "catalog" in note.get(r["email"].lower(), "")]
+    # Accounts Jonathan has moved forward as ready to buy. These outrank every
+    # other label: a buyer who already has the catalog is still a buyer, not a
+    # "catalog sent" row to scroll past.
+    ready = [r for r in replied_rows if "ready to buy" in note.get(r["email"].lower(), "").lower()]
+    catalog = [r for r in replied_rows if "catalog" in note.get(r["email"].lower(), "") and r not in ready]
     by_aud = Counter(r["audience"] for r in rows)
     today = ss.today_count(rows)
     stages = Counter(r["stage"] for r in rows if r["status"] == "active")
@@ -88,6 +92,8 @@ def main():
     def kind(r):
         n = note.get(r["email"].lower(), "")
         base = "med spa" if r["audience"] == "medspa" else "vendor"
+        if "ready to buy" in n.lower():
+            return f"{base} &middot; READY TO BUY"
         if "auto" in n:
             return "auto-reply"
         if "catalog" in n:
@@ -98,7 +104,8 @@ def main():
 
     replies = [{"c": r["domain"], "t": kind(r), "d": day_label(r["sent_at"])[0] if r.get("sent_at") else "-",
                 "e": r["email"].split("@", 1)[0] + "@"}
-               for r in sorted(replied_rows, key=lambda x: x["last_touch_at"], reverse=True)]
+               for r in sorted(replied_rows,
+                               key=lambda x: (x in ready, x["last_touch_at"]), reverse=True)]
     bounces = [{"a": r["email"], "t": "med spa" if r["audience"] == "medspa" else "vendor"}
                for r in sorted([r for r in rows if r["status"] == "bounced"],
                                key=lambda x: x["last_touch_at"], reverse=True)]
@@ -109,6 +116,9 @@ def main():
     fu_today = sum(1 for r in rows if r.get("last_touch_at") and r["stage"] != "0"
                    and ss.local_day(r["last_touch_at"]) == ss.local_day(ss.iso(ss.now())))
 
+    ready_names = " &middot; ".join(
+        sorted({(note.get(r["email"].lower(), "").split("-", 1)[1].split(";")[0].strip()
+                 if "-" in note.get(r["email"].lower(), "") else r["domain"]) for r in ready}))
     kpi = "\n".join([
         f'      <div class="kpi accent"><div class="n mono">{emailed}</div><div class="k">Contacts emailed</div>'
         f'<div class="d">{by_aud.get("vendor",0)} vendors &middot; {by_aud.get("medspa",0)} med spas</div></div>',
@@ -121,8 +131,10 @@ def main():
         f'<div class="d">{brate:.1f}% &middot; removed from follow-ups</div></div>',
         f'      <div class="kpi"><div class="n mono">{len(queue_pending):,}</div><div class="k">Still to send</div>'
         f'<div class="d">one contact per business</div></div>',
-        f'      <div class="kpi"><div class="n mono">{ss.HOURLY_CAP}</div><div class="k">Per hourly wave</div>'
-        f'<div class="d">{cap} per day cap &middot; follow-ups mixed in</div></div>',
+        # The sending rate is already stated in the banner; what belongs in the
+        # last tile is the only number that is revenue rather than activity.
+        f'      <div class="kpi good"><div class="n mono">{len(ready)}</div><div class="k">Ready to buy</div>'
+        f'<div class="d">{ready_names or "none yet"}</div></div>',
     ])
 
     # ---- lead base: what discovery has actually produced, counted from the queue
@@ -163,8 +175,13 @@ def main():
             f"<b>{len(ss.due_followups(rows))}</b> due now.")
 
     rng = f"{days[0]['d']} – {days[-1]['d']}" if days else "no sends yet"
-    rc = (f"{len(real)} warm leads &middot; catalog sent to {len(catalog)} &middot; follow-ups stopped"
-          if catalog else f"{len(real)} warm leads &middot; follow-ups stopped")
+    bits = [f"{len(real)} warm leads"]
+    if ready:
+        bits.append(f"<b style=\"color:var(--done)\">{len(ready)} ready to buy</b>")
+    if catalog:
+        bits.append(f"catalog sent to {len(catalog)}")
+    bits.append("follow-ups stopped")
+    rc = " &middot; ".join(bits)
 
     def j(o):
         return json.dumps(o, ensure_ascii=False, indent=4).replace("\n", "\n  ")

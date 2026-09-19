@@ -209,7 +209,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-18 21:48 UTC</b><br>
+        UPDATED <b>2026-09-19 04:05 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -234,7 +234,7 @@
       <div class="kpi good"><div class="n mono">32</div><div class="k">Replies</div><div class="d">4.4% of contacts &middot; plus 8 auto-replies</div></div>
       <div class="kpi bad"><div class="n mono">51</div><div class="k">Bounces</div><div class="d">7.0% &middot; removed from follow-ups</div></div>
       <div class="kpi"><div class="n mono">3,656</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
-      <div class="kpi"><div class="n mono">10</div><div class="k">Per hourly wave</div><div class="d">100 per day cap &middot; follow-ups mixed in</div></div>
+      <div class="kpi good"><div class="n mono">2</div><div class="k">Ready to buy</div><div class="d">AminoForge, Las Vegas &middot; BioLongevity Labs</div></div>
     </div>
 
     <div class="grid2" style="margin-top:16px">
@@ -251,13 +251,13 @@
         <h3>Contact status <span class="count">725 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>562</b> awaiting step 1, <b>65</b> at step 1, <b>315</b> due now.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>562</b> awaiting step 1, <b>65</b> at step 1, <b>360</b> due now.</div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">32 warm leads &middot; catalog sent to 9 &middot; follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">32 warm leads &middot; <b style="color:var(--done)">2 ready to buy</b> &middot; catalog sent to 8 &middot; follow-ups stopped</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -441,6 +441,18 @@
 
   const replies = [
       {
+          "c": "biolongevitylabs.com",
+          "t": "vendor &middot; READY TO BUY",
+          "d": "Sep 10",
+          "e": "wholesale@"
+      },
+      {
+          "c": "aminoforge.vegas",
+          "t": "vendor &middot; READY TO BUY",
+          "d": "Sep 17",
+          "e": "support@"
+      },
+      {
           "c": "simplepeptide.com",
           "t": "auto-reply",
           "d": "Sep 10",
@@ -457,12 +469,6 @@
           "t": "vendor · catalog sent",
           "d": "Sep 18",
           "e": "support@"
-      },
-      {
-          "c": "biolongevitylabs.com",
-          "t": "vendor · vendor - CALL BOOKED Fri Sep 18 3pm EDT (Google Meet); Josh Felber, Exec Chairman, 1.5M vials/yr; wants samples + raw API and finished COAs + pricing",
-          "d": "Sep 10",
-          "e": "wholesale@"
       },
       {
           "c": "nextlevelpharm.com",
@@ -499,12 +505,6 @@
           "t": "vendor · needs answer",
           "d": "Sep 18",
           "e": "regeneratepeptides@"
-      },
-      {
-          "c": "aminoforge.vegas",
-          "t": "vendor · catalog sent",
-          "d": "Sep 17",
-          "e": "support@"
       },
       {
           "c": "sigmapeptides.com",
