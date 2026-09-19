@@ -578,6 +578,13 @@ def skip_contact(email, audience="", domain="", name=""):
     # does not send -- so the contact is dropped rather than repaired.
     if d.startswith("www."):
         return True
+    # The same class, on the other side of the @: "%20melanie@..." and
+    # "u00a0info@..." are a URL-encoded space and a non-breaking space that came
+    # out of a mailto: href. ingest_resolved normalises those away now, but
+    # anything still carrying a percent-escape or whitespace is not a readable
+    # address and must not be written to.
+    if "%" in email or re.search(r"\s", email):
+        return True
     if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
         return True
     if audience == "vendor" and (is_foreign(d, name) or d in FOREIGN_FREEMAIL):

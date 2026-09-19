@@ -47,6 +47,21 @@ def render(name, audience='vendor', peptides=''):
     return subject, body
 
 
+def normalise_email(raw):
+    """Lower-case, and undo the encodings a mailto: link leaks into an address.
+
+    Harvested addresses arrive as "%20melanie@aestheticsbymelanie.com" and
+    "u00a0info@antiagingky.com": a URL-encoded space and an escaped non-breaking
+    space, picked up from the href rather than typed by anyone. Decoding those is
+    reading what the page says, not guessing -- several rows carry the clean form
+    beside the broken one. Anything still carrying a percent-escape or whitespace
+    after this is not an address we can read, and the caller drops it.
+    """
+    em = (raw or '').strip().lower()
+    em = re.sub(r'^(?:%20|%09|%0a|%0d|u00a0|\\u00a0|&nbsp;|\s)+', '', em)
+    return em.strip()
+
+
 def known():
     bases, emails = set(), set()
     for f in ('outreach/sent_log.csv', 'outreach/not_yet_emailed.csv'):
@@ -80,7 +95,7 @@ def main(apply_it):
         for r in src:
             vendor = (r.get('vendor') or '').strip()
             dom = (r.get('domain') or '').strip().lower().lstrip('.')
-            em = (r.get('email') or '').strip().lower()
+            em = normalise_email(r.get('email'))
             st = (r.get('status') or '').strip().lower()
 
             def drop(why):
