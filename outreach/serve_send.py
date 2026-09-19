@@ -126,6 +126,15 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # WhatsApp +44 (UK) and +34 (Spain), free shipping over
                                         # EUR 3,500. The .com and the "USA" shipping hub are the
                                         # only American things about it
+                   "lipo-peptide.com",  # "Lipo-Peptide Co., Ltd.", 777 Lime Dam, Xiucheng District,
+                                        # Hangzhou, Zhejiang Province, P.R. China, two +852 numbers,
+                                        # WeChat, and "Factory direct sales" under its product photos
+                   "dlpeptides.com",    # its own <title> is "Research Peptides UK Supplier" and its
+                                        # contact page is "UK Support & Customer Enquiries", against a
+                                        # 07455 UK mobile on WhatsApp
+                   "aotaipeptide.com",  # "No.65 QiShan Street, GuangZhou, GuangDong" under a +852
+                                        # WhatsApp; calls itself "a trusted Beauty Peptide factory and
+                                        # professional cosmetic peptide manufacturer"
                    "weipeptide.com",    # "Weipeptide Technology Co., Ltd", with a Factory Tour in the
                                         # menu and +852 65670922 as its service hotline
                    "changyuanpolypeptide.com",  # its address is Pingshan District, Shenzhen City, and
@@ -232,6 +241,7 @@ DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison director
                                                     # that its previous domain "was suspended".
                                                     # Distributing hGH for non-approved uses is a
                                                     # federal offence; this is not an RUO vendor
+                     "dzseszikajerbe@gmail.com",    # aotaipeptide.com, a Guangzhou peptide factory
                      "landgb39@gmail.com",          # rop-peptide.com, a synthesis house (see above)
                      "chloesong1008@gmail.com",     # weipeptide.com, a Hong Kong factory that lists six
                                                     # gmail addresses for six named sales reps
