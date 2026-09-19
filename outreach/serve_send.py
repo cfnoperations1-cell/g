@@ -126,6 +126,11 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # WhatsApp +44 (UK) and +34 (Spain), free shipping over
                                         # EUR 3,500. The .com and the "USA" shipping hub are the
                                         # only American things about it
+                   "aurobiopeptide.com",  # "AuroBiopeptide Technology (Shenzhen) Co., Ltd.", Room 905,
+                                        # Hi-Tech Park, Nanshan District, Shenzhen, Guangdong, behind
+                                        # a +86 primary WhatsApp and three +852 backups
+                   "vivpeptide.com",    # trades as VIVA Biotechnology; the three numbers it publishes
+                                        # are all (852) Hong Kong, printed like US area codes
                    "genohopebio.com",   # its own <title> is "China HP peptide API ... HP Peptide API
                                         # Factory", the contact page is "China GLP-1 API Manufacturers
                                         # Suppliers Factory", and the phone is a mainland mobile. It
@@ -203,6 +208,17 @@ DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison director
                                                     # and Manufacturers" -- upstream of us, not a buyer
                      "hechuan1022@gmail.com",       # peptidechn.com, ships out of Hong Kong
                      "fuguo20250808@gmail.com",     # purepeptide99.com, Wan Chai, Hong Kong
+                     "godbiolab@pm.me",             # godbiolab.is sells "GODTROPIN (HGH) 240IU" and HCG
+                                                    # direct to consumers, publishes no address, phone
+                                                    # or country, and says at the top of every page
+                                                    # that its previous domain "was suspended".
+                                                    # Distributing hGH for non-approved uses is a
+                                                    # federal offence; this is not an RUO vendor
+                     "gzhaiyitong@outlook.com",     # zghiyit.com, two (852) Hong Kong numbers; the
+                                                    # local part is "gz" for Guangzhou and the domain
+                                                    # "zg" for Zhongguo. The stored state reads
+                                                    # "Georgia", which is where the GA came from
+                     "vivpeptide@gmail.com",        # vivpeptide.com, three (852) Hong Kong numbers
                      "sulanpeptides01@gmail.com",   # sulanpeptides.com, a Hong Kong factory
                      "thepeptideco@proton.me"}      # thepeptideco.shop, an Australian storefront --
                                                     # proton.me is freemail, so the domain sets above
