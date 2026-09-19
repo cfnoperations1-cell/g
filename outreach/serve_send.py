@@ -104,6 +104,9 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # number is +852 (Hong Kong)
                    "synth-peptide.com",  # the only phone it publishes is (852) 945-5869, Hong Kong
                                         # dressed up as a US area code
+                   "nutrigenixscientific.com",  # "Based in Ontario, Canada", sells "Canada's Most
+                                        # Affordable Research Peptides" and prices in CAD. Nothing in
+                                        # the domain or the stored name says so -- only the site does
                    "glunovabio.com",    # flies a US flag and trades as Prost Biotech; its About page
                                         # says PROST BIOTECH SDN BHD, "Malaysian Registered Business",
                                         # Bandar Bukit Jalil, Kuala Lumpur, and its only real number is
