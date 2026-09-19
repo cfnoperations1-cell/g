@@ -188,6 +188,15 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidestaff.com",     # "Remote Staffing for Peptide Operations" -- it sells
                                             # virtual assistants to peptide companies, not peptides.
                                             # The keyword crawler cannot tell those apart
+                    "rop-peptide.com",      # "a dedicated peptide manufacturer ... with in-house
+                                            # laboratory capabilities ... from synthesis to final
+                                            # delivery" -- it makes what we make, so it is upstream of
+                                            # us rather than a buyer. Its US presentation is also
+                                            # borrowed: the one customer testimonial, signed "Aviana
+                                            # Plummer", ends "Will definitely reorder." with a Chinese
+                                            # full-width period, so the review was typed on a Chinese
+                                            # keyboard. No address, no email at the domain, and
+                                            # WhatsApp and Telegram as the only channels
                     "usprimeway.com",       # no A record on apex or www: the address is at a dead
                                             # host, and the site it was harvested from is the Hong
                                             # Kong primewaypeptide.com above
@@ -223,6 +232,7 @@ DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison director
                                                     # that its previous domain "was suspended".
                                                     # Distributing hGH for non-approved uses is a
                                                     # federal offence; this is not an RUO vendor
+                     "landgb39@gmail.com",          # rop-peptide.com, a synthesis house (see above)
                      "chloesong1008@gmail.com",     # weipeptide.com, a Hong Kong factory that lists six
                                                     # gmail addresses for six named sales reps
                      "changyuanpolypeptide@outlook.com",  # changyuanpolypeptide.com, Shenzhen
