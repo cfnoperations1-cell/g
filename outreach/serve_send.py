@@ -126,6 +126,10 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # WhatsApp +44 (UK) and +34 (Spain), free shipping over
                                         # EUR 3,500. The .com and the "USA" shipping hub are the
                                         # only American things about it
+                   "genohopebio.com",   # its own <title> is "China HP peptide API ... HP Peptide API
+                                        # Factory", the contact page is "China GLP-1 API Manufacturers
+                                        # Suppliers Factory", and the phone is a mainland mobile. It
+                                        # is also an API factory, so upstream of us either way
                    "gemaihealth.com",   # trades as Genmai Health on a .com; its About page says
                                         # "founded in Xi'an, Shaanxi, China", and the phone in its
                                         # header on every page is +86
@@ -165,6 +169,14 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "thepeptidecatalog.com",
                     "peptidedosages.com",
                     "peptidelibrary.app",   # "Compare Peptides, Track Research" -- a reference app
+                    "genscript.com",        # GenScript is one of the largest peptide and gene
+                                            # synthesis houses in the world, headquartered in Nanjing.
+                                            # It manufactures what we manufacture, so it is a
+                                            # competitor rather than a buyer, and the only address
+                                            # harvested for it was support.eu@, its European desk
+                    "peptidestaff.com",     # "Remote Staffing for Peptide Operations" -- it sells
+                                            # virtual assistants to peptide companies, not peptides.
+                                            # The keyword crawler cannot tell those apart
                     "ilumapeptide.co",      # the domain no longer resolves at all -- no A record on
                                             # the apex or on www, while control domains answer fine.
                                             # The business is gone; a follow-up would only bounce
@@ -475,11 +487,7 @@ def initial_candidates(sent_rows):
         d = e.split("@", 1)[1]
         if e in done or contact_key(e) in done:
             continue
-        if d in DECLINED_DOMAINS or e in DECLINED_CONTACTS or e in third_party():
-            continue
-        if r["audience"] == "vendor" and (is_foreign(d, r.get("business_name", "")) or d in FOREIGN_FREEMAIL):
-            continue
-        if e.split("@", 1)[0] in FOREIGN_LOCAL:                       # e.g. contato@ (Portuguese), kontakt@ (German)
+        if skip_contact(e, r["audience"], d, r.get("business_name", "")):
             continue
         cands.append(r)
     dids = load_draft_ids()                                       # file order = top of the Drafts folder first
@@ -506,12 +514,25 @@ def initial_candidates(sent_rows):
     return out
 
 
-def skip_contact(email, audience="", domain=""):
-    """Should this contact be left alone, whatever stage it is at?"""
+def skip_contact(email, audience="", domain="", name=""):
+    """Should this contact be left alone, whatever stage it is at?
+
+    The one place these rules live. initial_candidates() used to carry its own
+    copy of them, which is how a fix could land on follow-ups and silently miss
+    first contact -- the www. rule below was written, the batch rebuilt, and
+    info@www.revitalyzemd.com came back anyway.
+    """
     d = (domain or (email.split("@", 1)[1] if "@" in email else "")).lower()
+    # A harvesting artifact: the crawler kept the "www." off the page's own URL
+    # and built "info@www.revitalyzemd.com". Mail to that host does not exist.
+    # The real address is almost certainly info@revitalyzemd.com, but almost
+    # certainly is a guess, and a guessed address is exactly what this campaign
+    # does not send -- so the contact is dropped rather than repaired.
+    if d.startswith("www."):
+        return True
     if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
         return True
-    if audience == "vendor" and (is_foreign(d) or d in FOREIGN_FREEMAIL):
+    if audience == "vendor" and (is_foreign(d, name) or d in FOREIGN_FREEMAIL):
         return True
     return email.split("@", 1)[0] in FOREIGN_LOCAL
 
@@ -526,7 +547,8 @@ def due_followups(sent_rows):
     # for follow-ups, because the filters only ran over new candidates.
     due = [r for r in sent_rows
            if r["status"] == "active" and int(r["stage"]) < MAX_FOLLOWUPS and parse(r["last_touch_at"]) <= cutoff
-           and not skip_contact(r["email"].strip().lower(), r.get("audience", ""), r.get("domain", ""))]
+           and not skip_contact(r["email"].strip().lower(), r.get("audience", ""), r.get("domain", ""),
+                                r.get("business_name", ""))]
     due.sort(key=lambda r: r["last_touch_at"])
     return due
 
