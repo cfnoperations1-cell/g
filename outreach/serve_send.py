@@ -126,6 +126,12 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # WhatsApp +44 (UK) and +34 (Spain), free shipping over
                                         # EUR 3,500. The .com and the "USA" shipping hub are the
                                         # only American things about it
+                   "sulanpeptides.com",  # "SULAN Peptide Factory": eight sales contacts, every one of
+                                        # them a +852 (Hong Kong) WhatsApp, and an FAQ inviting you to
+                                        # "visit our factory at any time"
+                   "peptiatlas.com",    # the name reads like a reference work; the site is a vendor,
+                                        # and its address is "Mingze Industrial Park, Shanghai, China"
+                                        # against a +44 UK mobile
                    "dcxpeptides.com",   # trades as "DC Peptide" on a .com, but its About page is
                                         # headed "Dongcheng Technology Co., Ltd." and every number on
                                         # the site is +852 (Hong Kong). Its inquiry form asks for your
@@ -156,6 +162,11 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "thepeptidecatalog.com",
                     "peptidedosages.com",
                     "peptidelibrary.app",   # "Compare Peptides, Track Research" -- a reference app
+                    "ilumapeptide.co",      # the domain no longer resolves at all -- no A record on
+                                            # the apex or on www, while control domains answer fine.
+                                            # The business is gone; a follow-up would only bounce
+                    "pepty.app",            # "Peptide Price Comparison | Pepty" -- it ranks other
+                                            # vendors' prices for shoppers and buys nothing itself
                     "ultimapharma.com"}     # sells "AAS, HGH, PEPTIDES": its menu is Injectable
                                             # Steroids, Oral Steroids, Peptides. Anabolic steroids are
                                             # Schedule III, and this is a direct-to-consumer storefront
@@ -177,6 +188,7 @@ DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison director
                                                     # and Manufacturers" -- upstream of us, not a buyer
                      "hechuan1022@gmail.com",       # peptidechn.com, ships out of Hong Kong
                      "fuguo20250808@gmail.com",     # purepeptide99.com, Wan Chai, Hong Kong
+                     "sulanpeptides01@gmail.com",   # sulanpeptides.com, a Hong Kong factory
                      "thepeptideco@proton.me"}      # thepeptideco.shop, an Australian storefront --
                                                     # proton.me is freemail, so the domain sets above
                                                     # cannot see it either
