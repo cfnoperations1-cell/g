@@ -13,7 +13,7 @@ scraper/lead_hunt.py takes as input.
 A cursor per directory is kept in scraper/.dir_cursor so a daily run continues
 where the last one stopped instead of re-reading the same listings.
 """
-import argparse, concurrent.futures as cf, json, re, ssl, sys, urllib.error, urllib.request, gzip
+import argparse, concurrent.futures as cf, gzip, html, json, re, ssl, sys, urllib.error, urllib.request
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -80,6 +80,76 @@ DIRECTORIES = {
         "sitemaps": ["https://medspadirectorypro.com/sitemap.xml"],
         "listing": "/spa/",
     },
+    "medspanear": {
+        # 60 per-state listing sitemaps, of which only these 51 are US states.
+        # The other nine are Baja California, Sonora, Tamaulipas, Navarre, three
+        # Italian provinces and two for Queensland; naming the US ones here means
+        # a foreign listing is never fetched in the first place.
+        "sitemaps": [
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-alabama.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-alaska.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-arizona.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-arkansas.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-california.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-colorado.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-connecticut.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-delaware.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-florida.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-georgia.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-hawaii.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-idaho.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-illinois.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-indiana.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-iowa.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-kansas.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-kentucky.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-louisiana.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-maine.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-maryland.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-massachusetts.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-michigan.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-minnesota.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-mississippi.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-missouri.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-montana.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-nebraska.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-nevada.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-new-hampshire.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-new-jersey.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-new-mexico.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-new-york.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-north-carolina.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-north-dakota.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-ohio.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-oklahoma.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-oregon.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-pennsylvania.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-rhode-island.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-south-carolina.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-south-dakota.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-tennessee.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-texas.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-utah.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-vermont.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-virginia.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-washington.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-west-virginia.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-wisconsin.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-wyoming.xml",
+                     "https://medspanear.me/api/sitemaps/sitemap-listings-district-of-columbia.xml"],
+        # Listings are /<state>/<city>/<clinic-slug>/, so there is no fixed
+        # fragment to match on; "listing" only has to appear in every URL and
+        # never at the end of one, and url_must_match does the real work.
+        "listing": "medspanear.me/",
+        "url_must_match": re.compile(r"medspanear\.me/[a-z-]+/[a-z-]+/[a-z0-9-]+/?$"),
+    },
+    "peptidesuppliermatch": {
+        "sitemaps": ["https://peptidesuppliermatch.com/sitemap.xml"],
+        # Its 50 /find/states/ pages name clinics but link to none of them; the
+        # 1,000 /find/providers/ pages carry the clinic's own site as a plain
+        # external link beside a Google Maps address, which is what we need.
+        "listing": "/find/providers/",
+    },
     "theivdirectory": {
         "sitemaps": ["https://theivdirectory.com/sitemap.xml"],
         "listing": "/provider/",
@@ -102,6 +172,17 @@ DIRECTORIES = {
     # can be trusted. medspafind.com renders its US listings in JavaScript, so the
     # clinic's own site never appears in the HTML. medicalspalocator.com claims
     # 18,000 providers but answers 429 to everything, even its sitemap.
+    # peptidemap.com publishes 4,149 URLs and none of them is a clinic: 3,814
+    # /product/ pages, plus /compare, /coupon and /encyclopedia. It is a price
+    # comparison catalogue, the same category as pepty.app.
+    # medspalocator.com claims a medspa sitemap but it holds 28 city pages, not
+    # listings, and answers 4xx to them. ivtherapydirectory.com publishes only 39
+    # county and 83 state pages -- clinics are named on them but there is no page
+    # per clinic, so it needs a list-page extractor rather than this one.
+    # A dozen likely names (bhrtdirectory, glp1clinics, hormoneclinicdirectory,
+    # regenmeddirectory and so on) have no DNS at all, and another dozen
+    # (medspadirectory, findpeptidetherapy, myhormonedoctor, usmedspas,
+    # trtclinicsnearme) are parked domains serving a one-URL "/lander" sitemap.
     # klinic.com looks like the biggest prize of all -- 663 sitemaps covering
     # wegovy, zepbound, saxenda and TRT in every state -- but it is a telehealth
     # service writing city pages about itself, not a directory: its city pages
@@ -128,7 +209,9 @@ NOT_THE_CLINIC = re.compile(
     # reached only at one of these has no domain of its own to write to
     r"website-files|cdn-website|wixsite|weebly|blogspot|wordpress|godaddysites|myshopify|"
     r"mypatientnow|zenoti|mindbodyonline|squareup|acuityscheduling|setmore|"
-    r"schedulicity|janeapp|simplepractice|clinicsense|tebra|healow)\.", re.I)
+    r"schedulicity|janeapp|simplepractice|clinicsense|tebra|healow|"
+    # agencies whose own site is linked from the listings they build
+    r"plastixmarketing)\.", re.I)
 # anchors a directory uses for the business's own site
 WEBSITE_ANCHOR = re.compile(r">\s*(visit\s*(the\s*)?(website|site)|website|official\s*site|"
                             r"go\s*to\s*website|book|visit)\s*<", re.I)
@@ -182,7 +265,9 @@ def clinic_of(url):
     except Exception:
         return None
     m = TITLE_RE.search(h)
-    title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", m.group(1))).strip() if m else ""
+    # unescape before splitting: "Aura &amp; Sol Aesthetics" must not reach the
+    # queue with the entity still in it, or it prints literally in a subject line
+    title = html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", m.group(1))).strip()) if m else ""
     # directory titles read "Clinic Name - Directory" or "Clinic Name: Profile in City"
     name = re.split(r"\s+[-|–—:]\s+|\s+\|\s+", title)[0][:70] if title else ""
     self_host = host_of(url)
