@@ -63,7 +63,11 @@ def main():
     # other label: a buyer who already has the catalog is still a buyer, not a
     # "catalog sent" row to scroll past.
     ready = [r for r in replied_rows if "ready to buy" in note.get(r["email"].lower(), "").lower()]
-    catalog = [r for r in replied_rows if "catalog" in note.get(r["email"].lower(), "") and r not in ready]
+    # A prospect who has said no is not a warm lead. Counting them together
+    # overstates the pipeline, which is the one number worth being strict about.
+    declined = [r for r in replied_rows if "declined" in note.get(r["email"].lower(), "").lower()]
+    catalog = [r for r in replied_rows if "catalog" in note.get(r["email"].lower(), "")
+               and r not in ready and r not in declined]
     by_aud = Counter(r["audience"] for r in rows)
     today = ss.today_count(rows)
     stages = Counter(r["stage"] for r in rows if r["status"] == "active")
@@ -94,13 +98,15 @@ def main():
         base = "med spa" if r["audience"] == "medspa" else "vendor"
         if "ready to buy" in n.lower():
             return f"{base} &middot; READY TO BUY"
+        if "declined" in n.lower():
+            return f"{base} &middot; declined"
         if "auto" in n:
             return "auto-reply"
         if "catalog" in n:
             return f"{base} · catalog sent"
         if "needs" in n or not n:
             return f"{base} · needs answer"
-        return f"{base} · {n}"
+        return f"{base} · {n[:48] + '...' if len(n) > 48 else n}"
 
     replies = [{"c": r["domain"], "t": kind(r), "d": day_label(r["sent_at"])[0] if r.get("sent_at") else "-",
                 "e": r["email"].split("@", 1)[0] + "@"}
@@ -175,7 +181,10 @@ def main():
             f"<b>{len(ss.due_followups(rows))}</b> due now.")
 
     rng = f"{days[0]['d']} – {days[-1]['d']}" if days else "no sends yet"
-    bits = [f"{len(real)} warm leads"]
+    warm = [r for r in real if r not in declined]
+    bits = [f"{len(warm)} warm leads"]
+    if declined:
+        bits.append(f"{len(declined)} declined")
     if ready:
         bits.append(f"<b style=\"color:var(--done)\">{len(ready)} ready to buy</b>")
     if catalog:

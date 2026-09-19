@@ -134,7 +134,13 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
 DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "thepeptidecatalog.com",
                     "peptidedosages.com",
-                    "peptidelibrary.app"}   # "Compare Peptides, Track Research" -- a reference app
+                    "peptidelibrary.app",   # "Compare Peptides, Track Research" -- a reference app
+                    "ultimapharma.com"}     # sells "AAS, HGH, PEPTIDES": its menu is Injectable
+                                            # Steroids, Oral Steroids, Peptides. Anabolic steroids are
+                                            # Schedule III, and this is a direct-to-consumer storefront
+                                            # for them, not a research peptide vendor. Outside the
+                                            # audience the campaign is for, and not a name to have
+                                            # Jonathan's pitch sitting next to.
 
 # Both domain sets above are matched against the domain of the address we would
 # write to, and for a business that publishes a Gmail or Outlook address that is
