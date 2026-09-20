@@ -343,6 +343,13 @@ def main():
         cur[n] = start + len(batch)
 
     CURSOR.write_text(json.dumps(cur, indent=1))
+    # Re-read what the campaign holds, now that the crawl is over. known_bases was
+    # read at startup, and a mine runs for the best part of an hour while the hourly
+    # waves keep ingesting leads behind it -- on Sep 20 that gap let 58 clinics
+    # through that the previous wave had queued while this mine was still crawling,
+    # and every one of them cost a full lead_hunt crawl before the ingest rejected
+    # it by email. Three file reads here save that.
+    known_bases, _ = lead_hunt.known()
     seen, keep, dupes = set(), [], 0
     for name, dom in rows:
         if dom in seen:
