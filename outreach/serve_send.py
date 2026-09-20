@@ -261,6 +261,12 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidemanagerpro.com",  # says it outright on its own About page: "Not a vendor.
                                             # We do not sell research compounds. We provide affiliate
                                             # links to independent vendors who do."
+                    "chemyo.com",           # out of business. Every URL on the domain now serves
+                                            # one page: "Chemyo permanently closed on September 8,
+                                            # 2026 ... no longer accepting new orders", with a warning
+                                            # that no other site is authorised to represent it. A
+                                            # follow-up asking them to compare wholesale pricing would
+                                            # be writing to a company that has shut its doors
                     "janoshiklab.com",      # Janoshik is an analytical laboratory, not a vendor:
                                             # its catalogue is test panels priced in dollars ("Blind
                                             # common anabolic steroid screening -- oils 120 $"), and
