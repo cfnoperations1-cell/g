@@ -132,6 +132,18 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "dlpeptides.com",    # its own <title> is "Research Peptides UK Supplier" and its
                                         # contact page is "UK Support & Customer Enquiries", against a
                                         # 07455 UK mobile on WhatsApp
+                   "faithfulbio.com",   # "Xi'an Faithful BioTech Co., Ltd", Lianhu District, Xi'an,
+                   "faithful-chemical.com",  # Shaanxi, with seven +86 WhatsApp numbers against seven
+                                        # sales aliases, and "Steroid Raw Powder" as a product category
+                                        # beside the peptides. Its stored phones read "(313) 777-0562;
+                                        # (778) 278-0648" -- those ARE the +86 mobiles 13137770562 and
+                                        # 17782780648, reformatted into US shape by our own harvester.
+                                        # A US-looking number in a discovery row can be this artifact
+                   "chemexpress.com",   # a .com with a (609) New Jersey number in its directory
+                                        # listing, but the site is a Shanghai CRO/CDMO: "3 Building,
+                                        # No. 1999, Zhangheng Road, Pudong New Area, Shanghai,
+                                        # P.R.China", +86 (21) 5895-0125, and a Shanghai ICP licence
+                                        # in the footer. It makes APIs, so upstream as well as foreign
                    "qyaobio.com",       # trades as QYAOBIO, but its own copy reads "QYAOBIO
                                         # (ChinaPeptides CO., Ltd.) is a professional peptide synthesis
                                         # company ... in China", address SHANGHAI, CHINA, phones +86.
@@ -201,6 +213,9 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidestaff.com",     # "Remote Staffing for Peptide Operations" -- it sells
                                             # virtual assistants to peptide companies, not peptides.
                                             # The keyword crawler cannot tell those apart
+                    "peptidemanagerpro.com",  # says it outright on its own About page: "Not a vendor.
+                                            # We do not sell research compounds. We provide affiliate
+                                            # links to independent vendors who do."
                     "bioxcell.com",         # Bio X Cell manufactures monoclonal antibodies for in vivo
                                             # research out of New Hampshire. It is a real US company and
                                             # not foreign, but it makes antibodies, not peptides, and
