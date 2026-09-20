@@ -139,6 +139,30 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # (778) 278-0648" -- those ARE the +86 mobiles 13137770562 and
                                         # 17782780648, reformatted into US shape by our own harvester.
                                         # A US-looking number in a discovery row can be this artifact
+                   "kilobio.com",       # "Ningbo Kilo Biotechnology Co., Ltd., a life-science
+                                        # chemistry company based in Ningbo, China", footer address
+                                        # Cixi/Yuyao, Ningbo City 315300, P.R.C., with a language
+                                        # switcher and a "Factory Area" counter. The inverse of the
+                                        # faithful-chemical artifact: its "+1 607 670 0006 (Whatsapp)"
+                                        # and "+1 801 820 0009 (Text)" are genuinely US-format numbers,
+                                        # bought to front a Chinese factory. A US number proves nothing
+                   "jpt.com",           # "JPT Peptide Technologies GmbH, Hermann-Dorner-Allee 23,
+                                        # 12489 Berlin, Germany", +49-30-6392-5500. Its stored phones
+                                        # read "(202) 895-2019; (322) 980-7878; (888) 578-2660"; 322 is
+                                        # not a US area code, because that number is the German
+                                        # +49-30-322980-7878 chopped into US shape by our harvester --
+                                        # the same artifact documented at faithful-chemical.com below.
+                                        # A peptide manufacturer in its own right, not a buyer
+                   "jitaibiotech.com",  # "Shandong Jitai Biotech Co., Ltd"; the apex serves a
+                                        # Chinese-language site and en.jitaibiotech.com gives the China
+                                        # headquarters at No. 22 Jinyu Road, National High-tech
+                                        # Development Zone, with "Contact: Mr. Li +86-18660723366".
+                                        # It makes cosmetic peptide raw material by the ton -- a
+                                        # competing supplier, and a foreign one
+                   "clarascience.com",  # its own <title> is "Research peptides -- Australian warehouse,
+                                        # documented batches", the shop reads "Most in-demand compounds
+                                        # in Australia" and "Built for Australian research"; the
+                                        # discovery row had already scored us_signal = no
                    "chemexpress.com",   # a .com with a (609) New Jersey number in its directory
                                         # listing, but the site is a Shanghai CRO/CDMO: "3 Building,
                                         # No. 1999, Zhangheng Road, Pudong New Area, Shanghai,
@@ -216,6 +240,22 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidemanagerpro.com",  # says it outright on its own About page: "Not a vendor.
                                             # We do not sell research compounds. We provide affiliate
                                             # links to independent vendors who do."
+                    "americanpeptide.co",   # not a vendor despite the name: the American Peptide
+                                            # Association, a trade body selling $199/month memberships
+                                            # with committees, a Scientific Advisory Board and "group
+                                            # purchasing opportunities with vetted vendors". It
+                                            # represents buyers, it does not buy
+                    "mypeptideuniversity.com",  # "Peptide University | Peptide Therapy
+                                            # Certification & Training" -- its About page calls it "an
+                                            # academic-grade education platform for licensed
+                                            # clinicians", with a faculty rather than a catalogue. It
+                                            # teaches peptide therapy; it does not buy peptides
+                    "biorootai.com",        # BioRoot AI: the homepage returns a <title> and no body
+                                            # text at all -- a JS-only shell we cannot read -- and the
+                                            # discovery row that produced it had already noted "reads
+                                            # like editorial/affiliate site" with no phone and an
+                                            # address scraped off the privacy page. Nothing here
+                                            # establishes a business that buys peptides
                     "bioxcell.com",         # Bio X Cell manufactures monoclonal antibodies for in vivo
                                             # research out of New Hampshire. It is a real US company and
                                             # not foreign, but it makes antibodies, not peptides, and

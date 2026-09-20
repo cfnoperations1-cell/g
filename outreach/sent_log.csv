@@ -1,5 +1,5 @@
 email,domain,audience,mode,via,sent_at,last_touch_at,stage,status
-info@houstonwellnesscenter.org,houstonwellnesscenter.org,medspa,sent,jonathan@marinexisbiologics.com,2026-09-14T16:00:00Z,2026-09-14T16:00:00Z,0,active
+info@houstonwellnesscenter.org,houstonwellnesscenter.org,medspa,sent,jonathan@marinexisbiologics.com,2026-09-14T16:00:00Z,2026-09-20T09:30:10Z,1,active
 hello@thegoodlifeiv.com,thegoodlifeiv.com,medspa,sent,jonathan@marinexisbiologics.com,2026-09-14T16:00:00Z,2026-09-14T16:00:00Z,0,bounced
 info@next-health.com,next-health.com,medspa,sent,jonathan@marinexisbiologics.com,2026-09-14T16:00:00Z,2026-09-14T16:00:00Z,0,active
 dr.cruz@orlandocityhealth.com,orlandocityhealth.com,medspa,sent,jonathan@marinexisbiologics.com,2026-09-14T16:00:00Z,2026-09-14T16:00:00Z,0,active
@@ -240,12 +240,12 @@ support@explicitresearch.com,explicitresearch.com,vendor,sent,jonathan@marinexis
 sales1@faithfulbio.com,faithfulbio.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-11T15:00:00Z,0,active
 support@hightidecompounds.com,hightidecompounds.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-20T08:18:20Z,1,active
 support@injectify.is,injectify.is,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-11T15:00:00Z,0,active
-support@ironaminos.com,ironaminos.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-11T15:00:00Z,0,active
+support@ironaminos.com,ironaminos.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-20T09:30:10Z,1,active
 info@jitaibiotech.com,jitaibiotech.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-11T15:00:00Z,0,active
 info@jpt.com,jpt.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-11T15:00:00Z,0,active
-lorenna95@hotmail.com,hotmail.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-11T15:00:00Z,0,active
-info@mammothmusclepeptides.com,mammothmusclepeptides.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-11T15:00:00Z,0,active
-josh@milehighpeptide.com,milehighpeptide.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-11T15:00:00Z,0,active
+lorenna95@hotmail.com,hotmail.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-20T09:30:10Z,1,active
+info@mammothmusclepeptides.com,mammothmusclepeptides.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-20T09:30:10Z,1,active
+josh@milehighpeptide.com,milehighpeptide.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-11T15:00:00Z,2026-09-20T09:30:10Z,1,active
 empirelabsca@gmail.com,gmail.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-10T23:59:00Z,2026-09-19T08:16:40Z,1,active
 info@eliteeons.com,eliteeons.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-10T23:59:00Z,2026-09-19T09:25:27Z,1,active
 info@regena-peptides.com,regena-peptides.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-10T23:59:00Z,2026-09-10T23:59:00Z,0,active
@@ -784,3 +784,8 @@ support@secralabs.com,secralabs.com,vendor,sent,jonathan@marinexisbiologics.com,
 support@xtpsolutions.com,xtpsolutions.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-20T08:18:20Z,2026-09-20T08:18:20Z,0,active
 info@luxuramedspa.com,luxuramedspa.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-20T08:18:20Z,2026-09-20T08:18:20Z,0,active
 info@biostrataresearch.com,biostrataresearch.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-20T08:18:20Z,2026-09-20T08:18:20Z,0,active
+contact@celtek-peptides.com,celtek-peptides.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-20T09:30:10Z,2026-09-20T09:30:10Z,0,active
+info@brellohealth.com,brellohealth.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-20T09:30:10Z,2026-09-20T09:30:10Z,0,active
+info@tvpaincenter.com,tvpaincenter.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-20T09:30:10Z,2026-09-20T09:30:10Z,0,active
+info@modernwellnessclinic.com,modernwellnessclinic.com,vendor,sent,jonathan@marinexisbiologics.com,2026-09-20T09:30:10Z,2026-09-20T09:30:10Z,0,active
+info@reviveandthrive.io,reviveandthrive.io,vendor,sent,jonathan@marinexisbiologics.com,2026-09-20T09:30:10Z,2026-09-20T09:30:10Z,0,active
