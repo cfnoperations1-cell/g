@@ -13,7 +13,7 @@ scraper/lead_hunt.py takes as input.
 A cursor per directory is kept in scraper/.dir_cursor so a daily run continues
 where the last one stopped instead of re-reading the same listings.
 """
-import argparse, concurrent.futures as cf, gzip, html, json, re, ssl, sys, urllib.error, urllib.request
+import argparse, concurrent.futures as cf, gzip, html, json, re, ssl, sys, time, urllib.error, urllib.request
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -150,6 +150,15 @@ DIRECTORIES = {
         # external link beside a Google Maps address, which is what we need.
         "listing": "/find/providers/",
     },
+    "findmyhrt": {
+        # 2,316 URLs, of which 398 are /provider/ pages; the other 1,461
+        # /hrt-providers/ URLs are state and city indexes, not listings. The
+        # provider page carries the clinic's own domain as a plain link
+        # (joinmidi.com, myalloy.com) beside RevOffers affiliate links, and
+        # revoffers is already in NOT_THE_CLINIC.
+        "sitemaps": ["https://www.findmyhrt.com/sitemap.xml"],
+        "listing": "/provider/",
+    },
     "theivdirectory": {
         "sitemaps": ["https://theivdirectory.com/sitemap.xml"],
         "listing": "/provider/",
@@ -183,6 +192,24 @@ DIRECTORIES = {
     # regenmeddirectory and so on) have no DNS at all, and another dozen
     # (medspadirectory, findpeptidetherapy, myhormonedoctor, usmedspas,
     # trtclinicsnearme) are parked domains serving a one-URL "/lander" sitemap.
+    # Probed Sep 20 and rejected, all for the same reason -- a directory that
+    # names clinics but links to none of them:
+    #   thepeptidefinders.com claims 2,140 listings; its sitemap holds 97
+    #     /clinics/<state> pages, and the only external links on them are to
+    #     glpfinders.com, longevityfinders.com, robofinders.com and
+    #     theaiagentmarket.com -- one operator's SEO network, not clinics.
+    #   peptidesnearby.com city pages carry no external host but Google fonts
+    #     and Tag Manager.
+    #   peptideassociation.org has a provider directory on the page but nothing
+    #     in its sitemap: 273 /peptides and 196 /blog URLs, no clinic pages.
+    #   peptidetreatments.com is a content site; its sitemap index names
+    #     pages, peptides, conditions, symptoms, interactions and guides, and
+    #     no provider sitemap at all.
+    #   bioidenticaldoctors.com publishes 118 flat <state>.html pages with no
+    #     page per clinic -- a list-page extractor job, like
+    #     ivtherapydirectory.com.
+    #   peptidetherapylocator.com and evexipel.com answer 403 to robots.txt and
+    #     both sitemap paths.
     # klinic.com looks like the biggest prize of all -- 663 sitemaps covering
     # wegovy, zepbound, saxenda and TRT in every state -- but it is a telehealth
     # service writing city pages about itself, not a directory: its city pages
@@ -227,25 +254,52 @@ def fetch(url, cap=600_000, timeout=20):
     return b.decode("utf-8", "replace")
 
 
-def listing_urls(name):
+def listing_urls_by_sitemap(name):
+    """{sitemap url: [listing urls]}, omitting any sitemap that would not load.
+
+    Kept per sitemap rather than concatenated because the cursor is an offset,
+    and an offset into a list assembled from several sitemaps only means the
+    same thing if every one of them loads every time. medspanear.me alone has
+    51 state sitemaps and starts resetting connections under 16 workers, so a
+    handful drop out on any given run. Concatenated, that shifts every listing
+    after the gap: some get mined twice and some are skipped for good. Per
+    sitemap, a failure costs nothing but this run's share of that one state.
+    """
     cfg = DIRECTORIES[name]
-    out = []
+    keep = cfg.get("url_must_match")
+    out, seen = {}, set()
     for sm in cfg["sitemaps"]:
-        try:
-            t = fetch(sm, cap=5_000_000, timeout=30)
-        except Exception as e:
-            print(f"  sitemap failed {sm}: {type(e).__name__}")
+        t = None
+        for attempt in range(2):
+            try:
+                t = fetch(sm, cap=5_000_000, timeout=30)
+                break
+            except Exception as e:
+                # medspanear.me resets connections when several of its 51 state
+                # sitemaps are pulled at once; the same URL fetched on its own a
+                # moment later returns 200. One unhurried retry recovers most of
+                # them, and the per-sitemap cursor means the rest cost nothing.
+                if attempt == 0:
+                    time.sleep(3)
+                    continue
+                print(f"  sitemap failed {sm}: {type(e).__name__}")
+        if t is None:
             continue
-        keep = cfg.get("url_must_match")
-        out += [u for u in re.findall(r"<loc>([^<]+)</loc>", t)
-                if cfg["listing"] in u and not u.rstrip("/").endswith(cfg["listing"].strip("/"))
-                and (not keep or keep.search(u))]
-    seen, uniq = set(), []
-    for u in out:
-        if u not in seen:
-            seen.add(u)
-            uniq.append(u)
-    return uniq
+        urls = []
+        for u in re.findall(r"<loc>([^<]+)</loc>", t):
+            if (cfg["listing"] in u and not u.rstrip("/").endswith(cfg["listing"].strip("/"))
+                    and (not keep or keep.search(u)) and u not in seen):
+                seen.add(u)
+                urls.append(u)
+        out[sm] = urls
+    return out
+
+
+def listing_urls(name):
+    urls = []
+    for v in listing_urls_by_sitemap(name).values():
+        urls += v
+    return urls
 
 
 def host_of(url):
@@ -293,10 +347,41 @@ def clinic_of(url):
 
 
 def cursors():
+    """{directory: {sitemap url: offset}}.
+
+    The file used to hold one integer per directory. Those are migrated under
+    the key "*", which means "this many listings into the directory as a whole,
+    counted the old way" -- honoured once, for directories with a single
+    sitemap, and otherwise treated as spent so nothing is re-mined wholesale.
+    """
     try:
-        return json.loads(CURSOR.read_text())
+        raw = json.loads(CURSOR.read_text())
     except Exception:
         return {}
+    return {k: ({"*": v} if isinstance(v, int) else v) for k, v in raw.items()}
+
+
+def start_offsets(cur, name, by_sm):
+    """{sitemap: how many of its listings are already mined}.
+
+    A legacy "*" offset counted into the old concatenation, so it is spent
+    greedily in the order DIRECTORIES lists the sitemaps -- exactly how it was
+    accumulated. Doing anything else would re-mine what it already covers:
+    healingmaps is finished at 2,272 and verifiedantiagingclinics stands at
+    3,149 of 4,443, and both are multi-sitemap.
+    """
+    c = cur.get(name, {})
+    out = {sm: c[sm] for sm in by_sm if sm in c}
+    left = c.get("*")
+    if left is None:
+        return {sm: out.get(sm, 0) for sm in by_sm}
+    for sm in DIRECTORIES[name]["sitemaps"]:
+        if sm in out or sm not in by_sm:
+            continue
+        n = min(left, len(by_sm[sm]))
+        out[sm] = n
+        left -= n
+    return {sm: out.get(sm, 0) for sm in by_sm}
 
 
 def main():
@@ -321,26 +406,48 @@ def main():
     # Read every sitemap first, so the limit can be shared out over the
     # directories that still have listings. Splitting it evenly over all of them
     # means a read-out directory silently eats its share: asking for 3,100 with
-    # four of seven exhausted returned 903.
-    pool = {n: listing_urls(n)[cur.get(n, 0):] for n in names}
+    # four of seven exhausted returned 903. Read once and reused below -- the
+    # loop used to fetch every sitemap a second time, which doubled the load on
+    # medspanear.me and is part of why it started resetting connections.
+    by_sm = {n: listing_urls_by_sitemap(n) for n in names}
+    off = {n: start_offsets(cur, n, by_sm[n]) for n in names}
+    unmined = {n: {sm: urls[off[n][sm]:] for sm, urls in by_sm[n].items()} for n in names}
+    pool = {n: sum(len(v) for v in unmined[n].values()) for n in names}
     live = [n for n in names if pool[n]]
     take, left = {}, a.limit
     for i, n in enumerate(live):
-        share = min(len(pool[n]), max(1, left // (len(live) - i)))
+        share = min(pool[n], max(1, left // (len(live) - i)))
         take[n] = share
         left -= share
 
     for n in names:
-        urls = listing_urls(n)
-        start = cur.get(n, 0)
-        batch = urls[start:start + take.get(n, 0)]
-        print(f"{n}: {len(urls)} listings, taking {len(batch)} from offset {start}")
+        want = take.get(n, 0)
+        batch, starts = [], {}
+        # Round-robin across the directory's sitemaps rather than draining the
+        # first: with 51 states, taking a run's whole share from Alabama would
+        # mean Wyoming is never reached.
+        rr = [sm for sm in unmined[n] if unmined[n][sm]]
+        i = 0
+        while len(batch) < want and rr:
+            sm = rr[i % len(rr)]
+            pos = starts.get(sm, 0)
+            if pos < len(unmined[n][sm]):
+                batch.append(unmined[n][sm][pos])
+                starts[sm] = pos + 1
+                i += 1
+            else:
+                rr.remove(sm)
+        if take.get(n):
+            print(f"{n}: {pool[n]} unmined across {len(by_sm[n])} sitemap(s), taking {len(batch)}")
         with cf.ThreadPoolExecutor(max_workers=a.workers) as ex:
             for got in ex.map(clinic_of, batch):
                 opened += 1
                 if got:
                     rows.append(got)
-        cur[n] = start + len(batch)
+        # Write an offset for every sitemap, not just the ones drawn from, so
+        # the legacy "*" can be retired in one go rather than lingering and
+        # being re-spent on the next run.
+        cur[n] = {sm: off[n][sm] + starts.get(sm, 0) for sm in by_sm[n]}
 
     CURSOR.write_text(json.dumps(cur, indent=1))
     # Re-read what the campaign holds, now that the crawl is over. known_bases was
