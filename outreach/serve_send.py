@@ -132,6 +132,10 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                    "dlpeptides.com",    # its own <title> is "Research Peptides UK Supplier" and its
                                         # contact page is "UK Support & Customer Enquiries", against a
                                         # 07455 UK mobile on WhatsApp
+                   "qyaobio.com",       # trades as QYAOBIO, but its own copy reads "QYAOBIO
+                                        # (ChinaPeptides CO., Ltd.) is a professional peptide synthesis
+                                        # company ... in China", address SHANGHAI, CHINA, phones +86.
+                                        # Foreign and a synthesis house both at once
                    "aotaipeptide.com",  # "No.65 QiShan Street, GuangZhou, GuangDong" under a +852
                                         # WhatsApp; calls itself "a trusted Beauty Peptide factory and
                                         # professional cosmetic peptide manufacturer"
@@ -197,6 +201,11 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidestaff.com",     # "Remote Staffing for Peptide Operations" -- it sells
                                             # virtual assistants to peptide companies, not peptides.
                                             # The keyword crawler cannot tell those apart
+                    "bioxcell.com",         # Bio X Cell manufactures monoclonal antibodies for in vivo
+                                            # research out of New Hampshire. It is a real US company and
+                                            # not foreign, but it makes antibodies, not peptides, and
+                                            # has no use for wholesale peptide supply -- and the address
+                                            # harvested for it, support@, is its website help desk
                     "rop-peptide.com",      # "a dedicated peptide manufacturer ... with in-house
                                             # laboratory capabilities ... from synthesis to final
                                             # delivery" -- it makes what we make, so it is upstream of
@@ -242,6 +251,11 @@ DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison director
                                                     # Distributing hGH for non-approved uses is a
                                                     # federal offence; this is not an RUO vendor
                      "dzseszikajerbe@gmail.com",    # aotaipeptide.com, a Guangzhou peptide factory
+                     "alex.barn001@gmail.com",      # barnpeptides.com dresses itself up as American --
+                                                    # "Business Hours Mon-Fri: 9AM-6PM EST" and a +1
+                                                    # (914) number -- but that number is its Telegram
+                                                    # handle, its WhatsApp is +852 5390 6568 (Hong
+                                                    # Kong), and its only email is this gmail address
                      "landgb39@gmail.com",          # rop-peptide.com, a synthesis house (see above)
                      "chloesong1008@gmail.com",     # weipeptide.com, a Hong Kong factory that lists six
                                                     # gmail addresses for six named sales reps
