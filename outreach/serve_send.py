@@ -139,6 +139,15 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # (778) 278-0648" -- those ARE the +86 mobiles 13137770562 and
                                         # 17782780648, reformatted into US shape by our own harvester.
                                         # A US-looking number in a discovery row can be this artifact
+                   "yuansensetech.com",  # its own FAQ: "Where are you shipping from? We ship
+                                        # from Hong Kong or Shenzhen". The stored discovery row says
+                                        # "California" with us_signal = yes, which is simply wrong --
+                                        # the row is a starting point for vetting, never the verdict
+                   "yidanbio.com",      # "Shanghai Yidan Biotechnology Co., Ltd ... The best factory
+                                        # in China", selling ANABOLIC STEROIDS, SARMS and "HGH AND
+                                        # PEPTIDES" side by side. Its stored phone "(852) 685-0531"
+                                        # is the Hong Kong +852 68505312 cut down to US shape by our
+                                        # own harvester -- the jpt.com artifact once more
                    "severnbiotech.com",  # "Severn Biotech Limited, Unit 2, Park Lane,
                                         # Kidderminster, Worcestershire, DY11 6TJ", +44 (0)1562
                                         # 825286 -- named after the English river, not a US state.
@@ -295,7 +304,21 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
 # write to, and for a business that publishes a Gmail or Outlook address that is
 # "gmail.com" -- so a business excluded for any reason, geography included, slips
 # past them when it is only reachable at freemail. These are the exact addresses.
-DECLINED_CONTACTS = {"thepeptidecatalog@gmail.com",  # price-comparison directory, not a supplier
+# Not declined and not foreign -- simply unreadable today, so not written to.
+# The campaign's rule is that we do not email a business whose site we cannot read,
+# and that has to survive the contact already being in the queue: these entered
+# before the site started refusing us. Kept separate from DECLINED_* so that a site
+# coming back up is a one-line deletion rather than an argument about whether the
+# business was ever rejected.
+HELD_CONTACTS = {
+    "pepwarehousecs@gmail.com":  # peptideswarehouse.com answers 403 to every HTML
+        "site 403s every page; only robots.txt reads, and the stored row has no US "
+        "signal and a gmail address, so nothing else vouches for it",
+}
+
+DECLINED_CONTACTS = {"yidanbiotech@gmail.com",  # Shanghai Yidan Biotechnology (see yidanbio.com
+                                            # above); on gmail, so the domain list cannot reach it
+"thepeptidecatalog@gmail.com",  # price-comparison directory, not a supplier
                      "sec9vzion@outlook.com",        # peptidedosages.com, a dosing-chart site
                      "beatyjin51@gmail.com",         # healtlab.com, contactable only on +852 Hong Kong
                      "wyi556911@gmail.com",         # yansenpeptidesfactory.com, Shenzhen, China
@@ -667,6 +690,8 @@ def skip_contact(email, audience="", domain="", name=""):
     if ".." in d or d.startswith(".") or d.endswith(".") or "." not in d:
         return True
     if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
+        return True
+    if email in HELD_CONTACTS or d in HELD_CONTACTS:
         return True
     if audience == "vendor" and (is_foreign(d, name) or d in FOREIGN_FREEMAIL):
         return True
