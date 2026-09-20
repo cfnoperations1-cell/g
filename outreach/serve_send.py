@@ -139,6 +139,12 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # (778) 278-0648" -- those ARE the +86 mobiles 13137770562 and
                                         # 17782780648, reformatted into US shape by our own harvester.
                                         # A US-looking number in a discovery row can be this artifact
+                   "severnbiotech.com",  # "Severn Biotech Limited, Unit 2, Park Lane,
+                                        # Kidderminster, Worcestershire, DY11 6TJ", +44 (0)1562
+                                        # 825286 -- named after the English river, not a US state.
+                                        # It makes molecular-biology reagents (its front page is
+                                        # selling ethidium bromide); the peptide words the crawler
+                                        # matched are catalogue entries, not a business that buys
                    "kilobio.com",       # "Ningbo Kilo Biotechnology Co., Ltd., a life-science
                                         # chemistry company based in Ningbo, China", footer address
                                         # Cixi/Yuyao, Ningbo City 315300, P.R.C., with a language
@@ -653,6 +659,12 @@ def skip_contact(email, audience="", domain="", name=""):
     # anything still carrying a percent-escape or whitespace is not a readable
     # address and must not be written to.
     if "%" in email or re.search(r"\s", email):
+        return True
+    # A third shape of the same artifact, this time in the host: the harvester
+    # produced "info@pathwayhealthnwellness..com" for a Mesa clinic. A doubled,
+    # leading or trailing dot is not a hostname that resolves, and the obvious
+    # repair -- delete one dot -- is still a guess at an address nobody has read.
+    if ".." in d or d.startswith(".") or d.endswith(".") or "." not in d:
         return True
     if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
         return True

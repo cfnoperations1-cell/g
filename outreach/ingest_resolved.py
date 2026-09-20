@@ -62,6 +62,20 @@ def normalise_email(raw):
     return em.strip()
 
 
+def same_site(em_dom, dom):
+    """Is this address on the site the listing pointed at, or on a host under it?
+
+    Either way round: a subdomain of the listing's host, or the apex the listing's
+    host hangs off. Matching is per label, so "notwellabsplus.com" never passes as
+    a parent of "charleston.wellabsplus.com" the way a bare substring test would.
+    """
+    a = (em_dom or '').strip('.').lower()
+    b = (dom or '').strip('.').lower()
+    if not a or not b:
+        return False
+    return a == b or a.endswith('.' + b) or b.endswith('.' + a)
+
+
 def known():
     bases, emails = set(), set()
     for f in ('outreach/sent_log.csv', 'outreach/not_yet_emailed.csv'):
@@ -107,7 +121,14 @@ def main(apply_it):
             # A small clinic that publishes a Gmail address on its own contact page
             # is giving us its real inbox, so take it. What this still rejects is an
             # address on some unrelated third-party domain, which is somebody else's.
-            if em_dom != dom and dom not in em_dom and em_dom not in ss.FREEMAIL:
+            # dom is the host the listing gave us, em_dom the host of the address
+            # printed on the page. They match outright, or one contains the other:
+            # dom inside em_dom is a subdomain of the site (mail.foo.com on foo.com),
+            # and em_dom inside dom is the site's own apex reached from a subdomain
+            # listing -- "charleston.wellabsplus.com" publishing hello@wellabsplus.com
+            # is the clinic's own inbox, not a stranger's. Only the first direction
+            # used to be allowed, which silently dropped every city-subdomain listing.
+            if not same_site(em_dom, dom) and em_dom not in ss.FREEMAIL:
                 drop('email on an unrelated domain'); continue
             if BAD_LOCAL.match(em):
                 drop('not a real inbox'); continue
