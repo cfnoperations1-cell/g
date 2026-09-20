@@ -34,6 +34,7 @@ OUT = ROOT / "outreach"
 QUEUE = OUT / "draft_queue.csv"
 SENT = OUT / "sent_log.csv"
 DRAFT_IDS = OUT / "draft_ids.csv"
+EXPECTED = OUT / "exclusions_expected.txt"
 _THIRD_PARTY = None
 FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "emailer" / "followup_vendor.txt"}
 
@@ -139,6 +140,11 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # (778) 278-0648" -- those ARE the +86 mobiles 13137770562 and
                                         # 17782780648, reformatted into US shape by our own harvester.
                                         # A US-looking number in a discovery row can be this artifact
+                   "lanhubio.com",      # its About page: "In response to China's Belt and Road
+                                        # Initiative, Lanhu has actively expanded into international
+                                        # markets". Its two sales aliases, saleshua@ and saleszhang@,
+                                        # are Chinese surnames used as role addresses -- the same
+                                        # pattern as the seven at faithful-chemical.com below
                    "yuansensetech.com",  # its own FAQ: "Where are you shipping from? We ship
                                         # from Hong Kong or Shenzhen". The stored discovery row says
                                         # "California" with us_signal = yes, which is simply wrong --
@@ -255,6 +261,13 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidemanagerpro.com",  # says it outright on its own About page: "Not a vendor.
                                             # We do not sell research compounds. We provide affiliate
                                             # links to independent vendors who do."
+                    "janoshiklab.com",      # Janoshik is an analytical laboratory, not a vendor:
+                                            # its catalogue is test panels priced in dollars ("Blind
+                                            # common anabolic steroid screening -- oils 120 $"), and
+                                            # it describes itself as "harm reduction chemical analysis".
+                                            # It analyses other people's peptides; it does not buy any.
+                                            # The crawler matched semaglutide, tirzepatide and
+                                            # retatrutide because those are the assays it sells
                     "americanpeptide.co",   # not a vendor despite the name: the American Peptide
                                             # Association, a trade body selling $199/month memberships
                                             # with committees, a Scientific Advisory Board and "group
@@ -316,7 +329,16 @@ HELD_CONTACTS = {
         "signal and a gmail address, so nothing else vouches for it",
 }
 
-DECLINED_CONTACTS = {"yidanbiotech@gmail.com",  # Shanghai Yidan Biotechnology (see yidanbio.com
+DECLINED_CONTACTS = {"support@adminnurapeptide.com",  # the host does not exist: no DNS record
+                                            # at all, while nurapeptide.com resolves. Our harvester
+                                            # glued "admin" onto the domain, the same fabrication as
+                                            # info@www.revitalyzemd.com. The row's all_emails carries
+                                            # the real support@ and wholesale@nurapeptide.com, so this
+                                            # is a recoverable Florida vendor -- but swapping the
+                                            # address here would be us choosing who to write to, and
+                                            # that is Jonathan's to do deliberately, not ours in
+                                            # passing. Flagged in reply_notes.csv
+                     "yidanbiotech@gmail.com",  # Shanghai Yidan Biotechnology (see yidanbio.com
                                             # above); on gmail, so the domain list cannot reach it
 "thepeptidecatalog@gmail.com",  # price-comparison directory, not a supplier
                      "sec9vzion@outlook.com",        # peptidedosages.com, a dosing-chart site
@@ -715,7 +737,35 @@ def due_followups(sent_rows):
 
 
 # ---------- commands ----------
+def check_exclusions():
+    """Every address we have promised not to write to must still be refused.
+
+    These lists are edited by hand, one entry per wave, and a bad edit is silent:
+    on Sep 20 a new DECLINED_CONTACTS entry was pasted over the top of
+    yidanbiotech@gmail.com -- a Shanghai steroid vendor blocked an hour earlier --
+    and it reappeared in the very next batch. Nothing failed; the set was simply
+    one member smaller. So before a wave is built, assert that each listed address
+    is actually refused, and stop rather than build a batch on a broken list.
+    """
+    want = []
+    try:
+        for line in open(EXPECTED, encoding="utf-8"):
+            line = line.strip()
+            if line and not line.startswith("#"):
+                want.append(line)
+    except FileNotFoundError:
+        sys.exit(f"{EXPECTED} is missing -- it is the only copy that can catch a "
+                 "deleted exclusion, so a wave must not be built without it")
+    bad = [e for e in want
+           if not skip_contact(e if "@" in e else "someone@" + e, "vendor",
+                               e.split("@", 1)[1] if "@" in e else e, "")]
+    if bad:
+        sys.exit(f"{len(bad)} exclusion(s) listed in {EXPECTED} are no longer refused: "
+                 + ", ".join(bad[:8]) + ("..." if len(bad) > 8 else ""))
+
+
 def cmd_next(n, out_json):
+    check_exclusions()
     rows = load_sent(); qi = {r["email"].strip().lower(): r for r in load_queue()}
     dids = load_draft_ids(); sd = sender()
     budget = max(0, DAILY_CAP - today_count(rows)); n = min(n, budget, HOURLY_CAP)

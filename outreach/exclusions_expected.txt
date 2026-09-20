@@ -1,0 +1,100 @@
+# Every address and domain the campaign has decided not to write to.
+#
+# This file exists to be redundant. The lists live in serve_send.py, edited by
+# hand a line at a time; on Sep 20 a new entry was pasted over the top of
+# yidanbiotech@gmail.com -- a Shanghai steroid vendor blocked an hour earlier --
+# and it silently reappeared in the next batch. Nothing failed, because a set
+# that loses a member is still a valid set. Checking the code against itself
+# cannot catch that; checking it against a second copy can.
+#
+# serve_send.py refuses to build a wave unless every line below is still
+# refused. Removing something from here is a deliberate act: do it only when the
+# entry is genuinely being un-blocked, and say why in the commit.
+alex.barn001@gmail.com
+beatyjin51@gmail.com
+changyuanpolypeptide@outlook.com
+chloesong1008@gmail.com
+dzseszikajerbe@gmail.com
+fuguo20250808@gmail.com
+godbiolab@pm.me
+gzhaiyitong@outlook.com
+hechuan1022@gmail.com
+landgb39@gmail.com
+peptpedia@gmail.com
+productsmax16@gmail.com
+sec9vzion@outlook.com
+sulanpeptides01@gmail.com
+support@adminnurapeptide.com
+thepeptidecatalog@gmail.com
+thepeptideco@proton.me
+vivpeptide@gmail.com
+wyi556911@gmail.com
+yidanbiotech@gmail.com
+americanpeptide.co
+aminoasylumofficial.com
+biorootai.com
+bioxcell.com
+genscript.com
+ilumapeptide.co
+janoshiklab.com
+mypeptideuniversity.com
+peptidedosages.com
+peptidelibrary.app
+peptidemanagerpro.com
+peptidestaff.com
+pepty.app
+rop-peptide.com
+thepeptidecatalog.com
+ultimapharma.com
+usprimeway.com
+24hourpeptides.com
+aotaipeptide.com
+aurobiopeptide.com
+boruimei.com
+changyuanpolypeptide.com
+chapeptides.com
+chemexpress.com
+clarascience.com
+dcxpeptides.com
+dlpeptides.com
+faithful-chemical.com
+faithfulbio.com
+gemaihealth.com
+genohopebio.com
+glunovabio.com
+healtlab.com
+hkroids.com
+hnhkpeptide.com
+homopeptide.co
+jitaibiotech.com
+jpt.com
+kilobio.com
+lanhubio.com
+lipo-peptide.com
+lyzelabs.com
+modernaminos.com
+myotrope.com
+norcopeptide.com
+nutrigenixscientific.com
+peakpeptide.com
+peptiatlas.com
+peptidechn.com
+peptuvia.com
+primewaypeptide.com
+purepeptide99.com
+qyaobio.com
+regena-peptides.com
+sciencepeptidelab.com
+severnbiotech.com
+spresearchcenter.com
+sulanpeptides.com
+synth-peptide.com
+thepeptideco.shop
+uwa-biotech.com
+vivpeptide.com
+walkerchemicals.store
+weipeptide.com
+yansenpeptidesfactory.com
+yidanbio.com
+yuansensetech.com
+pepwarehousecs@gmail.com
