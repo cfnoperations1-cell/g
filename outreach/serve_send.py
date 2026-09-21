@@ -49,7 +49,7 @@ FU_SHARE = float(os.environ.get("FU_SHARE", "0"))         # fraction of a wave t
 FOLLOWUP_START = os.environ.get("FOLLOWUP_START", "2026-09-17T18:30:00Z")  # no follow-ups at all before this
 PRIORITY_DOMAINS = ["heritagelabsusa.com"]                 # "peptide veterans": the one veteran-owned vendor
 # vendors that are obviously not US-based get skipped (the pitch is US-made supply, no customs risk)
-FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it|br|hk|sg|nz|ie|ch|se|no|dk|fi|tw|jp|kr)$"
+FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it|br|hk|sg|nz|ie|ch|se|no|dk|fi|tw|jp|kr|to)$"
                      r"|costarica|french|german|british|canad|austral|europe|\buae\b|canada|europe|-uk\b|\buk-|uk\.(com|net|org)$", re.I)
 # scraped page titles that are not a business name -> fall back to the bare domain
 JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\b|\balternative\b|^visit\b|\bdosing\b|cheapest|^wholesale peptides$|marcus hansen|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount|use code|^code\b|save \d|\d+% off|free shipping"
@@ -78,7 +78,12 @@ FOREIGN_IN_DOMAIN = re.compile(
 # front of one: uaepeptideresearch.com is Dubai, while youngeryouaesthetics.com is a
 # US med spa whose name simply runs "yoU AEsthetics" together. \buae\b in FOREIGN
 # cannot help -- a run-together domain never offers the word boundary.
-FOREIGN_DOMAIN_PREFIX = re.compile(r"^(uae|ksa|qatar|dubai|abudhabi)[a-z0-9]", re.I)
+FOREIGN_DOMAIN_PREFIX = re.compile(r"^(uae|ksa|qatar|dubai|abudhabi|hk)[a-z0-9]", re.I)
+# "hk" joins them because of hkburson.com, whose harvested name is "Hong Kong Burson
+# PolyPeptide RD Limited" -- both "hong kong" and "limited" are in FOREIGN_NAME, yet
+# nothing fired, because the queue row stores the DOMAIN in business_name and the
+# harvested name never reaches the gate. Any gate that reads the name is blind in
+# that case, so the domain has to carry the signal by itself.
 
 # Vendors confirmed non-US by looking at the site itself, where the stored name gives
 # nothing away. Jinan Boruimei Trading Co., Ltd. is a Chinese trading company: the
@@ -148,6 +153,32 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # says us_signal = yes; it is the second follow-up in two
                                         # waves that would have sent the no-customs-risk pitch to a
                                         # company outside the US for the second time
+                   "hkburson.com",      # "Hong Kong Burson PolyPeptide RD Limited", reachable at
+                                        # pj91920107@icloud.com, phones (852) 667-1708 and
+                                        # (861) 926-3496. Pinned as well as prefix-matched
+                   # --- Hong Kong dial code posing as a US area code -------------------
+                   # Each of these publishes a phone written "(852) xxx-xxxx". 852 is Hong
+                   # Kong's country calling code and is not an assigned NANP area code, so
+                   # the number cannot be a US line however it is punctuated. 75 harvested
+                   # vendors carry one; these are the ones still live after every other
+                   # gate. The queue has no phone column, so this cannot be checked at send
+                   # time -- the evidence lives in the exports and the verdict lives here.
+                   # Note the harvested us_signal_on_site says "yes" for several of them
+                   # (and for Zhengzhou Lan Yun and Jinan Wanfushun, which are Chinese on
+                   # their face), so that column does not outvote the dial code.
+                   "anlianpeptide.com",     # Anlian Peptide, (852) 133-1115
+                   "bantingpeptide.com",    # BanTing Peptide, two 852 lines
+                   "peptidesfactorycn.com", # Peptide Factory CN -- "cn" is in the name too
+                   "peptidesourcehub.com",  # Peptide Source Hub, (852) 449-0001
+                   "qianmiaopeptide.com",   # Qianmiao Peptide, (852) 448-7845
+                   "reta-peptide.com",      # Reta-Peptide: an 852 line beside (582) 090-3569,
+                                            # which is not an assigned area code either
+                   "splabcenter.com",       # SP Lab, two 852 lines beside a Chicago 773
+                   "suppeptide.com",        # SUP Peptide, (852) 843-2247; contact "alice" and a
+                                            # supvip188@gmail.com second address
+                   "wanxipeptide.com",      # Wanxi Peptides, (852) 646-2746, and the harvested
+                                            # country is "unknown (not stated on list)"
+                   # -------------------------------------------------------------------
                    "jiudingbio.com",    # stored name "Chongqing Jiuding Biotechnology": Chongqing is
                                         # a Chinese municipality the FOREIGN_NAME list lacked until
                                         # this row surfaced; both regexes carry it now, and the
@@ -312,6 +343,32 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                                             # that no other site is authorised to represent it. A
                                             # follow-up asking them to compare wholesale pricing would
                                             # be writing to a company that has shut its doors
+                    "biochemapi.com",       # "BiochemAPI" -- API is active pharmaceutical ingredient,
+                                            # so the name says it supplies the raw material we supply.
+                                            # The genscript and btbiolabs case: our side of the trade,
+                                            # and the row states no US signal and no country
+                    "dragon-pharma.com",    # "Dragon Pharma" is a widely known anabolic steroid label,
+                                            # not a peptide business, and the row carries no US signal
+                                            # and no stated country. Nothing in the catalog is aimed at
+                                            # an AAS brand and the geography does not clear either
+                    "peptidedropship.com",  # the harvested name is its own page title, "BPC-157
+                                            # Wholesale Supplier with COAs | PeptideDropship" -- it
+                                            # sells the pitch we sell, so it is a competitor, and the
+                                            # only contact is a personal gmail (ahsanmilan080@)
+                    "charlestonhealthspan.com",  # the harvested vendor name is not a name at all,
+                                            # it is the title of the page we scraped: 'Why "Research
+                                            # Peptides" Are a Dangerous Health Risk - Charleston ...'
+                                            # A clinic publishing a warning against research peptides
+                                            # is not a wholesale buyer of them
+                    "bioboostx.com",        # harvested name is the link label "Visit BioBoostX ->",
+                                            # no US signal, and both phones are impossible as US
+                                            # lines: "(551) 040-0976" has an exchange starting with
+                                            # 0, which NANP does not allow, and 590 is Guadeloupe,
+                                            # not an assigned area code. Fabricated contact details
+                    "henganpeptidefactory.com",  # "Hengan Peptide Factory", reachable only at an
+                                            # outlook.com address, country not stated. A peptide
+                                            # factory offering OEM supply is our side of the trade,
+                                            # the btbiolabs and genscript case, not a buyer
                     "janoshiik.com",        # typo-variant of janoshiklab.com below (Janoshik
                                             # analytical lab, spelled with a doubled i); same lab,
                                             # same reason: it tests peptides, it does not buy them
@@ -400,7 +457,24 @@ HELD_CONTACTS = {
         "signal and a gmail address, so nothing else vouches for it",
 }
 
-DECLINED_CONTACTS = {"ukpeptidesupply99@gmail.com",  # the address itself says UK; \buk\b in
+# A vendor whose own name calls it a peptide factory is offering OEM/raw-material
+# supply -- the same side of the trade we are on, so there is nothing to sell it.
+# The name is the evidence, which is why this is a pattern and not a domain list:
+# "Hengan Peptide Factory" reaches us at outlook.com and "Peptide Factory CN" at a
+# .com, so neither a domain nor a TLD rule would catch both.
+FACTORY_NAME = re.compile(r"\bpeptides?\s+factory\b", re.I)
+
+DECLINED_CONTACTS = {"pj91920107@icloud.com",  # the only address for hkburson.com (Hong Kong
+                                            # Burson PolyPeptide RD Limited); on icloud.com, so
+                                            # neither the domain entry nor the hk prefix reaches it
+                     "ahsanmilan080@gmail.com",  # the only address for peptidedropship.com below;
+                                            # on gmail, so the domain entry cannot reach it
+                     "henganpeptidefactory@outlook.com",  # "Hengan Peptide Factory" -- an OEM
+                                            # supplier, our side of the trade. FACTORY_NAME above
+                                            # catches it from the name, but the address is on
+                                            # outlook.com, so nothing catches it when the name is
+                                            # absent -- which is exactly how the tripwire found it
+                     "ukpeptidesupply99@gmail.com",  # the address itself says UK; \buk\b in
                                             # FOREIGN cannot see it inside a run-together local part,
                                             # and the queue held it under the name "Visit Site"
                      "regenwellph@gmail.com",  # Regenwell PH, Philippines (see regenwellph.com
@@ -799,6 +873,8 @@ def skip_contact(email, audience="", domain="", name=""):
     if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
         return True
     if email in HELD_CONTACTS or d in HELD_CONTACTS:
+        return True
+    if FACTORY_NAME.search(name or ""):
         return True
     if audience == "vendor" and (is_foreign(d, name) or d in FOREIGN_FREEMAIL):
         return True
