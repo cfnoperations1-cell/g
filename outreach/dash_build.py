@@ -122,9 +122,21 @@ def main():
     fu_today = sum(1 for r in rows if r.get("last_touch_at") and r["stage"] != "0"
                    and ss.local_day(r["last_touch_at"]) == ss.local_day(ss.iso(ss.now())))
 
-    ready_names = " &middot; ".join(
-        sorted({(note.get(r["email"].lower(), "").split("-", 1)[1].split(";")[0].strip()
-                 if "-" in note.get(r["email"].lower(), "") else r["domain"]) for r in ready}))
+    def ready_label(r):
+        """The shortest true name for a ready-to-buy account: whoever we deal with.
+
+        The note opens "READY TO BUY - <who>" and then keeps going, so take up to
+        the first sentence or clause break and no further. Four of these share one
+        tile; a note that ran on turned the tile into a paragraph.
+        """
+        n = note.get(r["email"].lower(), "")
+        head = n.split("-", 1)[1] if "-" in n else ""
+        for sep in (".", ";", ","):
+            head = head.split(sep)[0]
+        head = head.strip()
+        return head if 2 < len(head) <= 28 else r["domain"]
+
+    ready_names = " &middot; ".join(sorted({ready_label(r) for r in ready}))
     kpi = "\n".join([
         f'      <div class="kpi accent"><div class="n mono">{emailed}</div><div class="k">Contacts emailed</div>'
         f'<div class="d">{by_aud.get("vendor",0)} vendors &middot; {by_aud.get("medspa",0)} med spas</div></div>',
@@ -151,7 +163,10 @@ def main():
     cur = ROOT / "scraper" / ".dir_cursor"
     if cur.exists():
         seen = json.loads(cur.read_text(encoding="utf-8"))
-        mined, dirs = sum(seen.values()), len(seen)
+        # Each directory's cursor is now {sitemap url: offset}; it used to be a
+        # bare integer, and old files still hold those.
+        mined = sum(sum(v.values()) if isinstance(v, dict) else v for v in seen.values())
+        dirs = len(seen)
     lead_base = "\n".join([
         '  <section>',
         '    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Discovery</span><h2>Lead base</h2>',
@@ -165,6 +180,63 @@ def main():
         '<div class="d">site confirms they run peptides</div></div>',
         f'      <div class="kpi"><div class="n mono">{mined:,}</div><div class="k">Directory listings mined</div>'
         '<div class="d">of 14,023 published across the directories</div></div>',
+        '    </div>',
+        '  </section>',
+    ])
+
+    # ---- catalog tab: who has actually been sent the catalog and pricing.
+    # Read from its own file because these went out by hand from Gmail and are
+    # nowhere in the send log -- the campaign's automated mail carries no
+    # attachment at all.
+    esc = html.escape
+    cat_rows = read(ROOT / "outreach" / "catalog_sent.csv")
+    cat_rows.sort(key=lambda r: (r.get("sent", ""), r.get("company", "")), reverse=True)
+    n_full = sum(1 for r in cat_rows if r.get("package") == "full")
+
+    def cat_note(t):
+        t = esc(t)
+        for word in ("READY TO BUY",):
+            t = t.replace(word, f"<b>{word}</b>")
+        for word in ("DECLINED", "Walking away"):
+            t = t.replace(word, f"<i>{word}</i>")
+        return t
+
+    cat_body = "\n".join(
+        f'          <tr><td class="src-name">{esc(r.get("company",""))}</td>'
+        f'<td class="mono">{esc(r.get("email",""))}</td>'
+        f'<td class="mono">{esc(r.get("sent",""))}</td>'
+        f'<td><span class="pkg {esc(r.get("package","partial"))}">'
+        f'{"catalog + pricing + FAQ + COA" if r.get("package")=="full" else "part"}</span></td>'
+        f'<td class="note">{cat_note(r.get("note",""))}</td></tr>'
+        for r in cat_rows)
+    catalog_panel = "\n".join([
+        '  <section style="margin-top:26px">',
+        '    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Outreach</span>'
+        '<h2>Catalog sent</h2>',
+        f'      <span class="count">{len(cat_rows)} businesses &middot; sent by hand, one reply at a time</span></div>',
+        '    <div class="kpis" style="margin-top:0">',
+        f'      <div class="kpi accent"><div class="n mono">{len(cat_rows)}</div>'
+        '<div class="k">Have the catalog</div>'
+        f'<div class="d">{round(100*len(cat_rows)/max(emailed,1),1)}% of {emailed:,} contacts emailed</div></div>',
+        f'      <div class="kpi"><div class="n mono">{n_full}</div><div class="k">Full package</div>'
+        '<div class="d">catalog, price list, FAQ and COA examples</div></div>',
+        f'      <div class="kpi"><div class="n mono">{len(cat_rows)-n_full}</div><div class="k">Partial</div>'
+        '<div class="d">catalog only, a price sheet, or a COA</div></div>',
+        f'      <div class="kpi good"><div class="n mono">{len(ready)}</div><div class="k">Ready to buy</div>'
+        f'<div class="d">{ready_names or "none yet"}</div></div>',
+        '    </div>',
+        '    <div class="tablecard" style="margin-top:16px">',
+        '      <h3>Every business that has our pricing '
+        '<span class="count">newest first &middot; none of this went out automatically</span></h3>',
+        '      <div style="overflow-x:auto">',
+        '      <table>',
+        '        <thead><tr><th>Business</th><th>Sent to</th><th>Date</th><th>Package</th>'
+        '<th>Where it stands</th></tr></thead>',
+        '        <tbody>',
+        cat_body,
+        '        </tbody>',
+        '      </table>',
+        '      </div>',
         '    </div>',
         '  </section>',
     ])
@@ -203,6 +275,7 @@ def main():
         "{{REPLIES_COUNT}}": rc, "{{DAYS}}": j(days), "{{STATUSES}}": j(statuses),
         "{{REPLIES}}": j(replies), "{{BOUNCES}}": j(bounces),
         "{{LEAD_BASE}}": lead_base,
+        "{{CATALOG}}": catalog_panel, "{{CATALOG_COUNT}}": str(len(cat_rows)),
         "{{SEND_META}}": f"{emailed} sent &middot; {ss.HOURLY_CAP}/hr &middot; {cap}/day",
     }.items():
         assert k in page, f"template is missing {k}"

@@ -186,6 +186,22 @@
   .status-foot{padding:10px 16px 14px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
   .status-foot b{color:var(--ink);font-weight:600}
 
+  /* tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;border-bottom:1px solid var(--border);padding-bottom:12px}
+  .tab{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+    background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:999px;
+    padding:7px 15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .tab:hover{border-color:var(--border-strong);color:var(--ink)}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+  .tab .n{font-variant-numeric:tabular-nums;font-weight:700}
+  .pkg{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;
+    padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .pkg.full{color:var(--accent-ink);background:var(--accent-soft)}
+  .pkg.partial{color:var(--queue);background:var(--queue-soft)}
+  td.note{color:var(--muted);font-size:12.5px}
+  td.note b{color:var(--done);font-weight:600}
+  td.note i{color:var(--block);font-style:normal;font-weight:600}
   footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);
     font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
 
@@ -209,13 +225,22 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-20 21:47 UTC</b><br>
+        UPDATED <b>2026-09-21 00:07 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">◐ Theme</button>
     </div>
   </header>
+
+  <div class="tabs" role="tablist" aria-label="Dashboard views">
+    <button class="tab" id="tab-btn-pipeline" role="tab" aria-selected="true"
+            aria-controls="panel-pipeline">Pipeline</button>
+    <button class="tab" id="tab-btn-catalog" role="tab" aria-selected="false"
+            aria-controls="panel-catalog">Catalog sent <span class="n">34</span></button>
+  </div>
+
+  <div id="panel-pipeline" role="tabpanel" aria-labelledby="tab-btn-pipeline">
 
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
@@ -234,7 +259,7 @@
       <div class="kpi good"><div class="n mono">41</div><div class="k">Replies</div><div class="d">5.0% of contacts &middot; plus 16 auto-replies</div></div>
       <div class="kpi bad"><div class="n mono">62</div><div class="k">Bounces</div><div class="d">7.5% &middot; removed from follow-ups</div></div>
       <div class="kpi"><div class="n mono">3,931</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
-      <div class="kpi good"><div class="n mono">2</div><div class="k">Ready to buy</div><div class="d">AminoForge, Las Vegas &middot; BioLongevity Labs</div></div>
+      <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
     </div>
 
     <div class="grid2" style="margin-top:16px">
@@ -257,7 +282,7 @@
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">38 warm leads &middot; 3 declined &middot; <b style="color:var(--done)">2 ready to buy</b> &middot; catalog sent to 20 &middot; follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">38 warm leads &middot; 3 declined &middot; <b style="color:var(--done)">4 ready to buy</b> &middot; catalog sent to 20 &middot; follow-ups stopped</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -310,6 +335,65 @@
       </div>
     </div>
   </section>
+
+  </div><!-- /panel-pipeline -->
+
+  <div id="panel-catalog" role="tabpanel" aria-labelledby="tab-btn-catalog" hidden>
+  <section style="margin-top:26px">
+    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Outreach</span><h2>Catalog sent</h2>
+      <span class="count">34 businesses &middot; sent by hand, one reply at a time</span></div>
+    <div class="kpis" style="margin-top:0">
+      <div class="kpi accent"><div class="n mono">34</div><div class="k">Have the catalog</div><div class="d">4.1% of 825 contacts emailed</div></div>
+      <div class="kpi"><div class="n mono">18</div><div class="k">Full package</div><div class="d">catalog, price list, FAQ and COA examples</div></div>
+      <div class="kpi"><div class="n mono">16</div><div class="k">Partial</div><div class="d">catalog only, a price sheet, or a COA</div></div>
+      <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
+    </div>
+    <div class="tablecard" style="margin-top:16px">
+      <h3>Every business that has our pricing <span class="count">newest first &middot; none of this went out automatically</span></h3>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Business</th><th>Sent to</th><th>Date</th><th>Package</th><th>Where it stands</th></tr></thead>
+        <tbody>
+          <tr><td class="src-name">Daavy Research</td><td class="mono">daavyresearchpeptides@gmail.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note"><i>Walking away</i> over the 3000 MOQ: &quot;Thats $44400! Seriously?&quot;</td></tr>
+          <tr><td class="src-name">Canlab International</td><td class="mono">support@canlabintl.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Replied 9 min after first contact asking for the complete price list</td></tr>
+          <tr><td class="src-name">Boss Peptides</td><td class="mono">info@bosspeptide.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Martin Shorey. Asked &quot;You have to order 3000?&quot;, corrected to 100; now negotiating box sizes</td></tr>
+          <tr><td class="src-name">Treasure Coast Peptides</td><td class="mono">patrick@treasurecoastpeptides.com</td><td class="mono">2026-09-19</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for catalogue and pricing</td></tr>
+          <tr><td class="src-name">Platinum Lion Peptides</td><td class="mono">platinumlionpeptides@gmail.com</td><td class="mono">2026-09-19</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Sent as a standalone &quot;Catalog and info&quot; mail</td></tr>
+          <tr><td class="src-name">Longevity Pros</td><td class="mono">support@longevityprolabs.com</td><td class="mono">2026-09-19</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Phil Moody. <b>READY TO BUY</b> - orders 100 at a time; call still to happen</td></tr>
+          <tr><td class="src-name">Gel Labs</td><td class="mono">info@gel-labs.com</td><td class="mono">2026-09-19</td><td><span class="pkg partial">part</span></td><td class="note">Gregg Snyder. Catalog and price list, plus WhatsApp number</td></tr>
+          <tr><td class="src-name">Simon&#x27;s Compounding</td><td class="mono">contact@simonsrx.com</td><td class="mono">2026-09-18</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked about SLU-PP-332 caps or tabs; we do not offer orals</td></tr>
+          <tr><td class="src-name">PPP Peptides</td><td class="mono">ppppeptides@gmail.com</td><td class="mono">2026-09-18</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Matt. Open to discussing a partnership if pricing works</td></tr>
+          <tr><td class="src-name">Next Level Pharm</td><td class="mono">jim@nextlevelpharm.com</td><td class="mono">2026-09-18</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Jim asked for the price list outright</td></tr>
+          <tr><td class="src-name">Great Lakes Peptides</td><td class="mono">lawrence@greatlakespeptides.com</td><td class="mono">2026-09-18</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Lawrence asked to see all products with prices</td></tr>
+          <tr><td class="src-name">BioLongevity Labs</td><td class="mono">josh@biolongevitylabs.com</td><td class="mono">2026-09-18</td><td><span class="pkg partial">part</span></td><td class="note">COA example only. <b>READY TO BUY</b> - already buys US from 3 labs</td></tr>
+          <tr><td class="src-name">Vantix Bio</td><td class="mono">support@vantixbio.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note"><i>DECLINED</i>: &quot;pricing and MOQ far above where we are at right now&quot;</td></tr>
+          <tr><td class="src-name">Sigma Peptides</td><td class="mono">support@sigmapeptides.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Interested; asked how we prove US manufacture and about bac water pricing</td></tr>
+          <tr><td class="src-name">Peptiva Research Labs</td><td class="mono">info@peptivaresearchlabs.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for custom COAs with their company name</td></tr>
+          <tr><td class="src-name">Peptide Bureau</td><td class="mono">johanlarsen2001@gmail.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Told MOQ 100 and 2-week lead time; later asked about dropship - unanswered</td></tr>
+          <tr><td class="src-name">Omnio Peptides</td><td class="mono">Chad@omniopeptides.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Chad wants backup sourcing and small custom runs</td></tr>
+          <tr><td class="src-name">Calm Peptides</td><td class="mono">support@calmpeptides.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for a call, gave 631-848-1055</td></tr>
+          <tr><td class="src-name">AminoForge</td><td class="mono">support@aminoforge.vegas</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note"><b>READY TO BUY</b>. Las Vegas, currently sourcing from Texas</td></tr>
+          <tr><td class="src-name">Puritide Research</td><td class="mono">brian@puritideresearch.com</td><td class="mono">2026-09-16</td><td><span class="pkg partial">part</span></td><td class="note">Brian: &quot;Send the catalog my way please&quot;</td></tr>
+          <tr><td class="src-name">Peptide Group Buy</td><td class="mono">info@peptidegroupbuy.com</td><td class="mono">2026-09-16</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for legal entity and state of formation in writing; chased once, silent since</td></tr>
+          <tr><td class="src-name">PeRx Peptides</td><td class="mono">support@perxpeptides.com</td><td class="mono">2026-09-16</td><td><span class="pkg partial">part</span></td><td class="note">Philadelphia Peptide Therapy. Catalog and FAQ</td></tr>
+          <tr><td class="src-name">Pretty Peptide Collective</td><td class="mono">summer@prettypeptidecollective.com</td><td class="mono">2026-09-15</td><td><span class="pkg partial">part</span></td><td class="note">Summer: &quot;Definitely interested&quot;</td></tr>
+          <tr><td class="src-name">Oneday Compounds</td><td class="mono">support@onedaycompounds.com</td><td class="mono">2026-09-15</td><td><span class="pkg partial">part</span></td><td class="note">Will asked for a price list</td></tr>
+          <tr><td class="src-name">Zero Variance Labs</td><td class="mono">mdauphinee@zerovariancelabs.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Quoted MOQ &quot;100 to 1000 units&quot; - a third figure</td></tr>
+          <tr><td class="src-name">Vantage Aminos</td><td class="mono">support@vantageaminos.co</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Asked for catalog and pricing sheet</td></tr>
+          <tr><td class="src-name">Suaway Lab Research</td><td class="mono">info@suaway.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Challenged the US-manufacturing claim; answered with sourcing detail</td></tr>
+          <tr><td class="src-name">Solyn</td><td class="mono">support@solyn.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Replied: &quot;about 3-4x what I currently pay&quot;</td></tr>
+          <tr><td class="src-name">Restore Peptides</td><td class="mono">support@restorepeptides.io</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Their GM said some of the prices seemed high</td></tr>
+          <tr><td class="src-name">Oasis Labs</td><td class="mono">support@myoasislabs.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Wanted a side-by-side comparison</td></tr>
+          <tr><td class="src-name">Mindful Research</td><td class="mono">support@happypeptides.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Asked for pricing</td></tr>
+          <tr><td class="src-name">Flatirons Research</td><td class="mono">support@flatironsrc.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Tom. Reported our mail was not reaching them - unresolved</td></tr>
+          <tr><td class="src-name">Amino Amigos</td><td class="mono">info@aminoamigos.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Asked where we are based; told South Carolina and California</td></tr>
+          <tr><td class="src-name">The Peptide Plug</td><td class="mono">Hello@thepeptideplug.ai</td><td class="mono">2026-09-01</td><td><span class="pkg partial">part</span></td><td class="note">Catalogs for 100, 2000+ and 503a, after a phone call</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+  </div><!-- /panel-catalog -->
 
   <footer>
     <span>Peptide Lead Pipeline · outreach/serve_send.py · outreach/sent_log.csv</span>
@@ -451,6 +535,18 @@
 
   const replies = [
       {
+          "c": "bosspeptide.com",
+          "t": "vendor &middot; READY TO BUY",
+          "d": "Sep 19",
+          "e": "info@"
+      },
+      {
+          "c": "longevityprolabs.com",
+          "t": "vendor &middot; READY TO BUY",
+          "d": "Sep 19",
+          "e": "support@"
+      },
+      {
           "c": "biolongevitylabs.com",
           "t": "vendor &middot; READY TO BUY",
           "d": "Sep 10",
@@ -532,18 +628,6 @@
           "c": "treasurecoastpeptides.com",
           "t": "vendor · catalog sent",
           "d": "Sep 10",
-          "e": "support@"
-      },
-      {
-          "c": "bosspeptide.com",
-          "t": "vendor · JONATHAN IS HANDLING. Catalog sent Sep 20 02:54;...",
-          "d": "Sep 19",
-          "e": "info@"
-      },
-      {
-          "c": "longevityprolabs.com",
-          "t": "vendor · JONATHAN IS HANDLING - CALL ATTEMPTED, FAILED. S...",
-          "d": "Sep 19",
           "e": "support@"
       },
       {
@@ -1170,6 +1254,36 @@
   const g=document.getElementById("gaps");
   gaps.forEach(x=>{ const d=document.createElement("div"); d.className="gap";
     d.innerHTML=`<span class="g-n">${x.n}</span><span class="g-t"><b>${x.t}</b>${x.d}</span>`; g.appendChild(d); });
+
+  // tabs. The pipeline panel is the one rendered visible in the HTML, so the
+  // page reads correctly before this runs at all; the remembered choice is a
+  // per-viewer convenience and never the source of truth.
+  (function tabs(){
+    const defs=[["pipeline",document.getElementById("tab-btn-pipeline")],
+                ["catalog",document.getElementById("tab-btn-catalog")]];
+    function show(name){
+      defs.forEach(([n,btn])=>{
+        const panel=document.getElementById("panel-"+n);
+        const on = n===name;
+        btn.setAttribute("aria-selected", on?"true":"false");
+        panel.hidden=!on;
+      });
+      try{ localStorage.setItem("plt-tab",name); }catch(e){}
+    }
+    defs.forEach(([n,btn])=>{
+      btn.addEventListener("click",()=>show(n));
+      btn.addEventListener("keydown",e=>{
+        if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return;
+        e.preventDefault();
+        const i=defs.findIndex(d=>d[0]===n);
+        const next=defs[(i+(e.key==="ArrowRight"?1:defs.length-1))%defs.length];
+        next[1].focus(); show(next[0]);
+      });
+    });
+    let saved=null;
+    try{ saved=localStorage.getItem("plt-tab"); }catch(e){}
+    if(saved && defs.some(d=>d[0]===saved)) show(saved);
+  })();
 
   // theme toggle: cycles system → light → dark
   const root=document.documentElement, btn=document.getElementById("themeBtn");

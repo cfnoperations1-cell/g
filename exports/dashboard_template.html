@@ -186,6 +186,22 @@
   .status-foot{padding:10px 16px 14px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
   .status-foot b{color:var(--ink);font-weight:600}
 
+  /* tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;border-bottom:1px solid var(--border);padding-bottom:12px}
+  .tab{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+    background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:999px;
+    padding:7px 15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .tab:hover{border-color:var(--border-strong);color:var(--ink)}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+  .tab .n{font-variant-numeric:tabular-nums;font-weight:700}
+  .pkg{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;
+    padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .pkg.full{color:var(--accent-ink);background:var(--accent-soft)}
+  .pkg.partial{color:var(--queue);background:var(--queue-soft)}
+  td.note{color:var(--muted);font-size:12.5px}
+  td.note b{color:var(--done);font-weight:600}
+  td.note i{color:var(--block);font-style:normal;font-weight:600}
   footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);
     font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
 
@@ -216,6 +232,15 @@
       <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">◐ Theme</button>
     </div>
   </header>
+
+  <div class="tabs" role="tablist" aria-label="Dashboard views">
+    <button class="tab" id="tab-btn-pipeline" role="tab" aria-selected="true"
+            aria-controls="panel-pipeline">Pipeline</button>
+    <button class="tab" id="tab-btn-catalog" role="tab" aria-selected="false"
+            aria-controls="panel-catalog">Catalog sent <span class="n">{{CATALOG_COUNT}}</span></button>
+  </div>
+
+  <div id="panel-pipeline" role="tabpanel" aria-labelledby="tab-btn-pipeline">
 
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
@@ -296,6 +321,12 @@
       </div>
     </div>
   </section>
+
+  </div><!-- /panel-pipeline -->
+
+  <div id="panel-catalog" role="tabpanel" aria-labelledby="tab-btn-catalog" hidden>
+{{CATALOG}}
+  </div><!-- /panel-catalog -->
 
   <footer>
     <span>Peptide Lead Pipeline · outreach/serve_send.py · outreach/sent_log.csv</span>
@@ -478,6 +509,36 @@
   const g=document.getElementById("gaps");
   gaps.forEach(x=>{ const d=document.createElement("div"); d.className="gap";
     d.innerHTML=`<span class="g-n">${x.n}</span><span class="g-t"><b>${x.t}</b>${x.d}</span>`; g.appendChild(d); });
+
+  // tabs. The pipeline panel is the one rendered visible in the HTML, so the
+  // page reads correctly before this runs at all; the remembered choice is a
+  // per-viewer convenience and never the source of truth.
+  (function tabs(){
+    const defs=[["pipeline",document.getElementById("tab-btn-pipeline")],
+                ["catalog",document.getElementById("tab-btn-catalog")]];
+    function show(name){
+      defs.forEach(([n,btn])=>{
+        const panel=document.getElementById("panel-"+n);
+        const on = n===name;
+        btn.setAttribute("aria-selected", on?"true":"false");
+        panel.hidden=!on;
+      });
+      try{ localStorage.setItem("plt-tab",name); }catch(e){}
+    }
+    defs.forEach(([n,btn])=>{
+      btn.addEventListener("click",()=>show(n));
+      btn.addEventListener("keydown",e=>{
+        if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return;
+        e.preventDefault();
+        const i=defs.findIndex(d=>d[0]===n);
+        const next=defs[(i+(e.key==="ArrowRight"?1:defs.length-1))%defs.length];
+        next[1].focus(); show(next[0]);
+      });
+    });
+    let saved=null;
+    try{ saved=localStorage.getItem("plt-tab"); }catch(e){}
+    if(saved && defs.some(d=>d[0]===saved)) show(saved);
+  })();
 
   // theme toggle: cycles system → light → dark
   const root=document.documentElement, btn=document.getElementById("themeBtn");
