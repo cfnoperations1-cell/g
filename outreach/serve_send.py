@@ -261,6 +261,10 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidemanagerpro.com",  # says it outright on its own About page: "Not a vendor.
                                             # We do not sell research compounds. We provide affiliate
                                             # links to independent vendors who do."
+                    "muscleandbrawn.com",   # "Muscle + Brawn | Buy Peptides, SARMs, TRT, And
+                                            # Coaching" -- the page we harvested was its article "4
+                                            # Best Peptide Vendors Compared In 2026". It reviews
+                                            # vendors and sells coaching; it does not buy peptides
                     "chemyo.com",           # out of business. Every URL on the domain now serves
                                             # one page: "Chemyo permanently closed on September 8,
                                             # 2026 ... no longer accepting new orders", with a warning
@@ -279,6 +283,11 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                                             # with committees, a Scientific Advisory Board and "group
                                             # purchasing opportunities with vetted vendors". It
                                             # represents buyers, it does not buy
+                    "empiremedicaltraining.com",  # "Empire Medical Training: Hands-On CME
+                                            # Courses for Physicians, Nurses & Dentists", whose
+                                            # Academy of Functional Medicine sells the "Most Complete
+                                            # Peptide Course". It trains the clinicians who buy
+                                            # peptides; it is not one of them
                     "mypeptideuniversity.com",  # "Peptide University | Peptide Therapy
                                             # Certification & Training" -- its About page calls it "an
                                             # academic-grade education platform for licensed
@@ -330,6 +339,10 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
 # coming back up is a one-line deletion rather than an argument about whether the
 # business was ever rejected.
 HELD_CONTACTS = {
+    "testing@vanguardlaboratory.com":  # 403 on every page, so unreadable today, and
+        "the address is testing@ and the name is Vanguard Laboratory -- most likely an "
+        "analytical lab selling assays like janoshiklab.com, which is not a buyer. Held "
+        "rather than declined because nothing could actually be read to confirm it",
     "pepwarehousecs@gmail.com":  # peptideswarehouse.com answers 403 to every HTML
         "site 403s every page; only robots.txt reads, and the stored row has no US "
         "signal and a gmail address, so nothing else vouches for it",
@@ -499,6 +512,15 @@ def clean_vendor(name, domain):
     # Men&#x27;s Clinic", "Vital Force Therapy &amp; Wellness". Unescaped, that
     # is what the recipient reads in the subject line of a cold email.
     n = html.unescape(name or "").strip()
+    # A "name" that is an address is a harvest artifact, not a business: the
+    # contact page for universalbiolabs.com yielded "\u2709\ufe0f support@
+    # universalbiolabs.com", which would have gone out as the subject line of a
+    # cold email. Leading pictographs are the same artifact, picked up off a
+    # decorated heading. Neither is worth repairing -- the domain is a true name
+    # for the business and the template already uses it for most rows.
+    n = re.sub(r"^[^\w(]+", "", n).strip()
+    if "@" in n:
+        return domain
     if not n or len(n) < 3 or len(n.split()) > 5 or JUNK_VENDOR.search(n):
         return domain
     if not name_matches_domain(n, domain):

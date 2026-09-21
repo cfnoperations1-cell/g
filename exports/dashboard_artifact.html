@@ -225,7 +225,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-21 00:07 UTC</b><br>
+        UPDATED <b>2026-09-21 07:13 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -237,7 +237,7 @@
     <button class="tab" id="tab-btn-pipeline" role="tab" aria-selected="true"
             aria-controls="panel-pipeline">Pipeline</button>
     <button class="tab" id="tab-btn-catalog" role="tab" aria-selected="false"
-            aria-controls="panel-catalog">Catalog sent <span class="n">34</span></button>
+            aria-controls="panel-catalog">Catalog sent <span class="n">39</span></button>
   </div>
 
   <div id="panel-pipeline" role="tabpanel" aria-labelledby="tab-btn-pipeline">
@@ -245,8 +245,8 @@
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
-    <span>10 emails per hourly wave, 100 per day. The daily cap is spent: 100 of 100 sent this Pacific day, so the next wave sends after midnight PT. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
-    <span class="when">cap reached &middot; next wave 07:00 UTC</span>
+    <span>10 emails per hourly wave, 100 per day. 10 of 100 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
+    <span class="when">10 of 100 sent today</span>
   </div>
 
   <section style="margin-top:26px">
@@ -254,17 +254,17 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">825</div><div class="k">Contacts emailed</div><div class="d">725 vendors &middot; 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">100</div><div class="k">Sent today</div><div class="d">50 first-touch &middot; 50 follow-ups &middot; daily cap reached</div></div>
-      <div class="kpi good"><div class="n mono">41</div><div class="k">Replies</div><div class="d">5.0% of contacts &middot; plus 16 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">62</div><div class="k">Bounces</div><div class="d">7.5% &middot; removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">3,931</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi accent"><div class="n mono">830</div><div class="k">Contacts emailed</div><div class="d">730 vendors &middot; 100 med spas</div></div>
+      <div class="kpi"><div class="n mono">10</div><div class="k">Sent today</div><div class="d">5 first-touch &middot; 5 follow-ups &middot; 90 left under the daily cap</div></div>
+      <div class="kpi good"><div class="n mono">46</div><div class="k">Replies</div><div class="d">5.5% of contacts &middot; plus 17 auto-replies</div></div>
+      <div class="kpi bad"><div class="n mono">63</div><div class="k">Bounces</div><div class="d">7.6% &middot; removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">3,923</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
     </div>
 
     <div class="grid2" style="margin-top:16px">
       <div class="tablecard">
-        <h3>First-touch emails per day <span class="count">Sep 1 – Sep 20</span></h3>
+        <h3>First-touch emails per day <span class="count">Sep 1 – Sep 21</span></h3>
         <div class="chart-wrap">
           <div class="legend"><span><i style="background:var(--s1)"></i>Vendors</span><span><i style="background:var(--s2)"></i>Med spas</span></div>
           <div id="chart"></div>
@@ -273,16 +273,16 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">825 tracked</span></h3>
+        <h3>Contact status <span class="count">830 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>542</b> awaiting step 1, <b>157</b> at step 1, <b>399</b> due now.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>537</b> awaiting step 1, <b>160</b> at step 1, <b>402</b> due now.</div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">38 warm leads &middot; 3 declined &middot; <b style="color:var(--done)">4 ready to buy</b> &middot; catalog sent to 20 &middot; follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">43 warm leads &middot; 3 declined &middot; <b style="color:var(--done)">4 ready to buy</b> &middot; catalog sent to 21 &middot; follow-ups stopped</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -341,10 +341,10 @@
   <div id="panel-catalog" role="tabpanel" aria-labelledby="tab-btn-catalog" hidden>
   <section style="margin-top:26px">
     <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Outreach</span><h2>Catalog sent</h2>
-      <span class="count">34 businesses &middot; sent by hand, one reply at a time</span></div>
+      <span class="count">39 businesses &middot; sent by hand, one reply at a time</span></div>
     <div class="kpis" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">34</div><div class="k">Have the catalog</div><div class="d">4.1% of 825 contacts emailed</div></div>
-      <div class="kpi"><div class="n mono">18</div><div class="k">Full package</div><div class="d">catalog, price list, FAQ and COA examples</div></div>
+      <div class="kpi accent"><div class="n mono">39</div><div class="k">Have the catalog</div><div class="d">4.7% of 830 contacts emailed</div></div>
+      <div class="kpi"><div class="n mono">23</div><div class="k">Full package</div><div class="d">catalog, price list, FAQ and COA examples</div></div>
       <div class="kpi"><div class="n mono">16</div><div class="k">Partial</div><div class="d">catalog only, a price sheet, or a COA</div></div>
       <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
     </div>
@@ -354,6 +354,11 @@
       <table>
         <thead><tr><th>Business</th><th>Sent to</th><th>Date</th><th>Package</th><th>Where it stands</th></tr></thead>
         <tbody>
+          <tr><td class="src-name">Research Peptide Market</td><td class="mono">Kevin@peptribe.us</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Kevin Castello: &quot;Glad to take a look&quot;</td></tr>
+          <tr><td class="src-name">Research Chem Co</td><td class="mono">info@researchchem.co</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">&quot;Sure I&#x27;d love to hear more&quot;</td></tr>
+          <tr><td class="src-name">Novaglo Research</td><td class="mono">novaglo@novagloresearch.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for bulk discounts, payment methods and testing policy; discount tiers still unanswered</td></tr>
+          <tr><td class="src-name">Molecular Solutions Peptides</td><td class="mono">chris@mspeptides.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Chris, the owner. Asked how long we have been in business and where we source API - only the API part was answered</td></tr>
+          <tr><td class="src-name">Elyria Bio</td><td class="mono">support@elyriabio.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Charles Enderle asked for the catalogue</td></tr>
           <tr><td class="src-name">Daavy Research</td><td class="mono">daavyresearchpeptides@gmail.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note"><i>Walking away</i> over the 3000 MOQ: &quot;Thats $44400! Seriously?&quot;</td></tr>
           <tr><td class="src-name">Canlab International</td><td class="mono">support@canlabintl.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Replied 9 min after first contact asking for the complete price list</td></tr>
           <tr><td class="src-name">Boss Peptides</td><td class="mono">info@bosspeptide.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Martin Shorey. Asked &quot;You have to order 3000?&quot;, corrected to 100; now negotiating box sizes</td></tr>
@@ -465,6 +470,11 @@
           "d": "Sep 20",
           "v": 50,
           "m": 0
+      },
+      {
+          "d": "Sep 21",
+          "v": 5,
+          "m": 0
       }
   ];
   (function drawChart(){
@@ -505,19 +515,19 @@
       {
           "k": "Awaiting reply",
           "sub": "eligible for follow-ups",
-          "n": 699,
+          "n": 697,
           "c": "var(--accent)"
       },
       {
           "k": "Replied",
-          "sub": "41 real replies + 16 auto-replies · no more automated mail",
-          "n": 57,
+          "sub": "46 real replies + 17 auto-replies · no more automated mail",
+          "n": 63,
           "c": "var(--done)"
       },
       {
           "k": "Bounced",
           "sub": "address rejected · excluded",
-          "n": 62,
+          "n": 63,
           "c": "var(--block)"
       },
       {
@@ -559,8 +569,38 @@
           "e": "support@"
       },
       {
+          "c": "elyriabio.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "nicerx.com",
+          "t": "auto-reply",
+          "d": "Sep 20",
+          "e": "help@"
+      },
+      {
+          "c": "mspeptides.com",
+          "t": "vendor · CATALOG SENT Sep 20 23:58 - GOOD QUESTIONS, PART...",
+          "d": "Sep 20",
+          "e": "support@"
+      },
+      {
+          "c": "novagloresearch.com",
+          "t": "vendor · CATALOG SENT Sep 20 23:59. \"We are open to somet...",
+          "d": "Sep 20",
+          "e": "support@"
+      },
+      {
           "c": "canlabintl.com",
           "t": "vendor · NEEDS JONATHAN - replied Sep 20, nine minutes af...",
+          "d": "Sep 20",
+          "e": "info@"
+      },
+      {
+          "c": "researchchem.co",
+          "t": "vendor · CATALOG SENT Sep 20 23:58. Replied \"Sure I'd lov...",
           "d": "Sep 20",
           "e": "info@"
       },
@@ -629,6 +669,12 @@
           "t": "vendor · catalog sent",
           "d": "Sep 10",
           "e": "support@"
+      },
+      {
+          "c": "researchpeptidemarket.com",
+          "t": "vendor · CATALOG SENT Sep 20 23:58. Kevin Castello replie...",
+          "d": "Sep 19",
+          "e": "contact@"
       },
       {
           "c": "limitlesslifenootropics.com",
@@ -882,6 +928,10 @@
     tr.innerHTML=`<td class="src-name">${r.c}</td><td class="aud">${r.t}</td><td class="mono">${r.d}</td><td class="mono">${r.e}${r.c}</td>`; rb.appendChild(tr); });
 
   const bounces = [
+      {
+          "a": "support@somapeptides.com",
+          "t": "vendor"
+      },
       {
           "a": "contact@celtek-peptides.com",
           "t": "vendor"
@@ -1141,7 +1191,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"825 sent &middot; 10/hr &middot; 100/day"},
+    {name:"Send",       st:"run",   meta:"830 sent &middot; 10/hr &middot; 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
