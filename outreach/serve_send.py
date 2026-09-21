@@ -140,6 +140,17 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # (778) 278-0648" -- those ARE the +86 mobiles 13137770562 and
                                         # 17782780648, reformatted into US shape by our own harvester.
                                         # A US-looking number in a discovery row can be this artifact
+                   "revivpeptides.com",  # "Buy Peptides Canada Online ... Reviv Peptides is a
+                                        # Canadian supplier of research peptides. Every batch ships
+                                        # from our Vancouver lab", with testimonials from Calgary,
+                                        # Edmonton, Winnipeg and Ontario. It had already been sent
+                                        # the no-customs-risk pitch once before anyone read the site
+                   "nobledragons.com",  # not a peptide business at all: "Estate Direct - Single
+                                        # Origin Artisan Chinese Teas". Its order subdomain carries a
+                                        # "China warehouse holiday shipping notice ... enhanced
+                                        # customs inspections ... shipping pauses September 25 -
+                                        # October 7", which is the peptuvia.com pattern exactly. The
+                                        # stored row calls it California with us_signal = yes
                    "lanhubio.com",      # its About page: "In response to China's Belt and Road
                                         # Initiative, Lanhu has actively expanded into international
                                         # markets". Its two sales aliases, saleshua@ and saleszhang@,
@@ -261,6 +272,20 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "peptidemanagerpro.com",  # says it outright on its own About page: "Not a vendor.
                                             # We do not sell research compounds. We provide affiliate
                                             # links to independent vendors who do."
+                    "riteaid.com",          # the actual Rite Aid: a national retail pharmacy
+                                            # chain, reached because it publishes health articles
+                                            # ("KPV Peptide: Benefits, Dosage & 2026 Legal Status").
+                                            # hello@riteaid.com is not a corporate contact and the
+                                            # stored phone is a (863) Florida number, not theirs.
+                                            # A cold wholesale API pitch to a public company at a
+                                            # harvested address does us no good at all
+                    "weightlossproviderguide.com",  # "Best GLP-1 Providers Compared (2026)", whose
+                                            # contact page is headed "Editorial & Media" and whose
+                                            # about page introduces "Our Editorial Team". It ranks
+                                            # providers for readers; it does not buy peptides
+                    "bulknaturalswholesale.com",  # "Bulk Organic Body Butters, Carrier & Essential
+                                            # Oils". It wholesales cosmetic ingredients and the
+                                            # crawler matched it on a NAD+ supplement listing
                     "muscleandbrawn.com",   # "Muscle + Brawn | Buy Peptides, SARMs, TRT, And
                                             # Coaching" -- the page we harvested was its article "4
                                             # Best Peptide Vendors Compared In 2026". It reviews
@@ -339,6 +364,10 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
 # coming back up is a one-line deletion rather than an argument about whether the
 # business was ever rejected.
 HELD_CONTACTS = {
+    "customersupport@coffeeandpeppers.com":  # every path now returns one 54KB
+        "\"coffeeandpeppers.com - Access\" gate page, so there is nothing to read; and the "
+        "name is not evidence of a peptide business either way. It was emailed once before "
+        "the gate went up",
     "testing@vanguardlaboratory.com":  # 403 on every page, so unreadable today, and
         "the address is testing@ and the name is Vanguard Laboratory -- most likely an "
         "analytical lab selling assays like janoshiklab.com, which is not a buyer. Held "
