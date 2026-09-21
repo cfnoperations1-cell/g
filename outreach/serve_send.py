@@ -42,7 +42,10 @@ DAILY_CAP = int(os.environ.get("DAILY_CAP", "100"))      # ramp: 100 per day (Gm
 HOURLY_CAP = int(os.environ.get("HOURLY_CAP", "10"))     # ramp: 10 per hourly wave
 FOLLOWUP_DAYS = int(os.environ.get("FOLLOWUP_DAYS", "3"))
 MAX_FOLLOWUPS = int(os.environ.get("MAX_FOLLOWUPS", "3"))
-FU_SHARE = float(os.environ.get("FU_SHARE", "0.5"))       # at most this fraction of a wave goes to follow-ups
+# Follow-ups are OFF. Jonathan, Sep 21: "do not send any follow up emails without
+# my approval" -- every wave is first contact only until he says otherwise. The
+# default is 0 rather than an env var so a scheduled wave cannot drift back.
+FU_SHARE = float(os.environ.get("FU_SHARE", "0"))         # fraction of a wave that may be follow-ups
 FOLLOWUP_START = os.environ.get("FOLLOWUP_START", "2026-09-17T18:30:00Z")  # no follow-ups at all before this
 PRIORITY_DOMAINS = ["heritagelabsusa.com"]                 # "peptide veterans": the one veteran-owned vendor
 # vendors that are obviously not US-based get skipped (the pitch is US-made supply, no customs risk)
@@ -140,6 +143,15 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # (778) 278-0648" -- those ARE the +86 mobiles 13137770562 and
                                         # 17782780648, reformatted into US shape by our own harvester.
                                         # A US-looking number in a discovery row can be this artifact
+                   "regenwellph.com",   # "Research Peptides Philippines | COA-Tested, Nationwide
+                                        # Delivery -- Regenwell PH", priced in PHP. The stored row
+                                        # says us_signal = yes; it is the second follow-up in two
+                                        # waves that would have sent the no-customs-risk pitch to a
+                                        # company outside the US for the second time
+                   "btbiolabs.com",     # "B2B Peptide Raw Material Supply for Global Buyers", sold
+                                        # OEM/ODM through a WhatsApp quote line on +1 343 635 6770 --
+                                        # a 343 is Ontario, the modernaminos.com pattern. It supplies
+                                        # raw material to brands, which is our side of the trade
                    "revivpeptides.com",  # "Buy Peptides Canada Online ... Reviv Peptides is a
                                         # Canadian supplier of research peptides. Every batch ships
                                         # from our Vancouver lab", with testimonials from Calgary,
@@ -377,7 +389,9 @@ HELD_CONTACTS = {
         "signal and a gmail address, so nothing else vouches for it",
 }
 
-DECLINED_CONTACTS = {"support@adminnurapeptide.com",  # the host does not exist: no DNS record
+DECLINED_CONTACTS = {"regenwellph@gmail.com",  # Regenwell PH, Philippines (see regenwellph.com
+                                            # above); on gmail, so the domain list cannot reach it
+                     "support@adminnurapeptide.com",  # the host does not exist: no DNS record
                                             # at all, while nurapeptide.com resolves. Our harvester
                                             # glued "admin" onto the domain, the same fabrication as
                                             # info@www.revitalyzemd.com. The row's all_emails carries
