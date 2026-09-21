@@ -61,7 +61,7 @@ JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\
 
 FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
 FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing"
-                          r"|jinan|qingdao|tianjin|chengdu|xi'?an|suzhou|ningbo|zhengzhou|changsha|hefei|kunming|dalian"
+                          r"|jinan|qingdao|tianjin|chengdu|xi'?an|suzhou|ningbo|zhengzhou|changsha|hefei|kunming|dalian|chongqing"
                           r"|shijiazhuang|shandong|jiangsu|zhejiang|hubei|hunan|henan|hebei|anhui|sichuan|guangdong"
                           r"|hong kong|gmbh|s\.?r\.?l|b\.?v\.?|pty|sdn bhd|sdn\. bhd|ltd|limited|co\.,? ?ltd|trading co"
                           r"|canada|europe|costa rica|australia|india|china)\b", re.I)
@@ -72,7 +72,7 @@ FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhe
 FOREIGN_IN_DOMAIN = re.compile(
     r"shandong|jiangsu|zhejiang|guangdong|sichuan|shaanxi|liaoning|fujian|jiangxi|guizhou"
     r"|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing|jinan|qingdao|tianjin"
-    r"|chengdu|suzhou|ningbo|zhengzhou|changsha|kunming|dalian|shijiazhuang|xiamen"
+    r"|chongqing|chengdu|suzhou|ningbo|zhengzhou|changsha|kunming|dalian|shijiazhuang|xiamen"
     r"|hongkong|chinese|gmbh|\bsarl\b", re.I)
 # Country codes too short to use as substrings anywhere in a domain, but safe at the
 # front of one: uaepeptideresearch.com is Dubai, while youngeryouaesthetics.com is a
@@ -148,6 +148,10 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # says us_signal = yes; it is the second follow-up in two
                                         # waves that would have sent the no-customs-risk pitch to a
                                         # company outside the US for the second time
+                   "jiudingbio.com",    # stored name "Chongqing Jiuding Biotechnology": Chongqing is
+                                        # a Chinese municipality the FOREIGN_NAME list lacked until
+                                        # this row surfaced; both regexes carry it now, and the
+                                        # domain is pinned here so the fix does not rest on the name
                    "btbiolabs.com",     # "B2B Peptide Raw Material Supply for Global Buyers", sold
                                         # OEM/ODM through a WhatsApp quote line on +1 343 635 6770 --
                                         # a 343 is Ontario, the modernaminos.com pattern. It supplies
@@ -308,6 +312,13 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                                             # that no other site is authorised to represent it. A
                                             # follow-up asking them to compare wholesale pricing would
                                             # be writing to a company that has shut its doors
+                    "janoshiik.com",        # typo-variant of janoshiklab.com below (Janoshik
+                                            # analytical lab, spelled with a doubled i); same lab,
+                                            # same reason: it tests peptides, it does not buy them
+                    "lumalexlaw.com",       # the domain says it: a law firm. It surfaced through a
+                                            # directory listing, not a peptide business
+                    "verifiedcreditcardprocessing.com",  # a payment processor -- the domain is
+                                            # the business description. Not a peptide buyer
                     "janoshiklab.com",      # Janoshik is an analytical laboratory, not a vendor:
                                             # its catalogue is test panels priced in dollars ("Blind
                                             # common anabolic steroid screening -- oils 120 $"), and
