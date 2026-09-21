@@ -54,7 +54,7 @@ FOREIGN = re.compile(r"\.(ca|uk|co\.uk|is|cn|ae|eu|au|de|fr|in|mx|nl|ru|pl|es|it
 # scraped page titles that are not a business name -> fall back to the bare domain
 JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\b|\balternative\b|^visit\b|\bdosing\b|cheapest|^wholesale peptides$|marcus hansen|view source|^source$|^usa$|^recovery$|^peptides?$|^buy\b|for sale|coupon|discount|use code|^code\b|save \d|\d+% off|free shipping"
                          r"|\boffers?\b|wholesale medical|nasal spray|research peptides|→|↗|adipotide|glutathione|^ghrp"
-                         r"|^pt$|^best\b|^top\b|\bshop$|\bstore$|^home$|^welcome$|^peptide$|^wholesale$|affiliate"
+                         r"|^pt$|^best\b|^top\b|\bshop$|\bstore$|^home$|^welcome$|^peptide$|^wholesale$|affiliate|^visit site$"
                          r"|^(high|low|new|free|fast|quality|premium|official|trusted|reliable|verified|tested|pure|safe"
                          r"|secure|online|orders?|products?|research|labs?|login|account|cart|menu|search|sales?|deals?|prices?)$", re.I)
 
@@ -389,7 +389,10 @@ HELD_CONTACTS = {
         "signal and a gmail address, so nothing else vouches for it",
 }
 
-DECLINED_CONTACTS = {"regenwellph@gmail.com",  # Regenwell PH, Philippines (see regenwellph.com
+DECLINED_CONTACTS = {"ukpeptidesupply99@gmail.com",  # the address itself says UK; \buk\b in
+                                            # FOREIGN cannot see it inside a run-together local part,
+                                            # and the queue held it under the name "Visit Site"
+                     "regenwellph@gmail.com",  # Regenwell PH, Philippines (see regenwellph.com
                                             # above); on gmail, so the domain list cannot reach it
                      "support@adminnurapeptide.com",  # the host does not exist: no DNS record
                                             # at all, while nurapeptide.com resolves. Our harvester
