@@ -343,6 +343,14 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                                             # that no other site is authorised to represent it. A
                                             # follow-up asking them to compare wholesale pricing would
                                             # be writing to a company that has shut its doors
+                    "checkpeptide.com",     # harvested name is "CheckPeptide - Trusted Testing ...",
+                                            # and the address is labs@. An analytical lab that tests
+                                            # other people's peptides, the janoshiklab case below --
+                                            # it sells assays, it does not buy peptides
+                    "nuvellolabs.com",      # both phones are impossible as US lines: "(516) 147-3085"
+                                            # has an exchange starting with 1, which NANP forbids, and
+                                            # 568 is not an assigned area code. The bioboostx case --
+                                            # fabricated contact details, so nothing here is checkable
                     "biochemapi.com",       # "BiochemAPI" -- API is active pharmaceutical ingredient,
                                             # so the name says it supplies the raw material we supply.
                                             # The genscript and btbiolabs case: our side of the trade,

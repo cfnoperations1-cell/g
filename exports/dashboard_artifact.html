@@ -225,7 +225,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-21 17:04 UTC</b><br>
+        UPDATED <b>2026-09-21 18:08 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -237,7 +237,7 @@
     <button class="tab" id="tab-btn-pipeline" role="tab" aria-selected="true"
             aria-controls="panel-pipeline">Pipeline</button>
     <button class="tab" id="tab-btn-catalog" role="tab" aria-selected="false"
-            aria-controls="panel-catalog">Catalog sent <span class="n">42</span></button>
+            aria-controls="panel-catalog">Catalog sent <span class="n">43</span></button>
   </div>
 
   <div id="panel-pipeline" role="tabpanel" aria-labelledby="tab-btn-pipeline">
@@ -245,8 +245,8 @@
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
-    <span>10 emails per hourly wave, 100 per day. 90 of 100 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
-    <span class="when">90 of 100 sent today</span>
+    <span>10 emails per hourly wave, 100 per day. The daily cap is spent: 100 of 100 sent this Pacific day, so the next wave sends after midnight PT. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
+    <span class="when">cap reached &middot; next wave 07:00 UTC</span>
   </div>
 
   <section style="margin-top:26px">
@@ -254,11 +254,11 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">905</div><div class="k">Contacts emailed</div><div class="d">805 vendors &middot; 100 med spas</div></div>
-      <div class="kpi"><div class="n mono">90</div><div class="k">Sent today</div><div class="d">80 first-touch &middot; 10 follow-ups &middot; 10 left under the daily cap</div></div>
-      <div class="kpi good"><div class="n mono">49</div><div class="k">Replies</div><div class="d">5.4% of contacts &middot; plus 20 auto-replies</div></div>
+      <div class="kpi accent"><div class="n mono">915</div><div class="k">Contacts emailed</div><div class="d">815 vendors &middot; 100 med spas</div></div>
+      <div class="kpi"><div class="n mono">100</div><div class="k">Sent today</div><div class="d">90 first-touch &middot; 10 follow-ups &middot; daily cap reached</div></div>
+      <div class="kpi good"><div class="n mono">50</div><div class="k">Replies</div><div class="d">5.5% of contacts &middot; plus 20 auto-replies</div></div>
       <div class="kpi bad"><div class="n mono">70</div><div class="k">Bounces</div><div class="d">7.7% &middot; removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">3,822</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi"><div class="n mono">3,810</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
     </div>
 
@@ -273,16 +273,16 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">905 tracked</span></h3>
+        <h3>Contact status <span class="count">915 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>595</b> awaiting step 1, <b>164</b> at step 1, <b>459</b> due now.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>604</b> awaiting step 1, <b>164</b> at step 1, <b>467</b> due now.</div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="tablecard">
-        <h3>Replies <span class="count">46 warm leads &middot; 3 declined &middot; <b style="color:var(--done)">4 ready to buy</b> &middot; catalog sent to 25 &middot; follow-ups stopped</span></h3>
+        <h3>Replies <span class="count">47 warm leads &middot; 3 declined &middot; <b style="color:var(--done)">4 ready to buy</b> &middot; catalog sent to 26 &middot; follow-ups stopped</span></h3>
         <table>
           <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
           <tbody id="replyBody"></tbody>
@@ -341,10 +341,10 @@
   <div id="panel-catalog" role="tabpanel" aria-labelledby="tab-btn-catalog" hidden>
   <section style="margin-top:26px">
     <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Outreach</span><h2>Catalog sent</h2>
-      <span class="count">42 businesses &middot; sent by hand, one reply at a time</span></div>
+      <span class="count">43 businesses &middot; sent by hand, one reply at a time</span></div>
     <div class="kpis" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">42</div><div class="k">Have the catalog</div><div class="d">4.6% of 905 contacts emailed</div></div>
-      <div class="kpi"><div class="n mono">26</div><div class="k">Full package</div><div class="d">catalog, price list, FAQ and COA examples</div></div>
+      <div class="kpi accent"><div class="n mono">43</div><div class="k">Have the catalog</div><div class="d">4.7% of 915 contacts emailed</div></div>
+      <div class="kpi"><div class="n mono">27</div><div class="k">Full package</div><div class="d">catalog, price list, FAQ and COA examples</div></div>
       <div class="kpi"><div class="n mono">16</div><div class="k">Partial</div><div class="d">catalog only, a price sheet, or a COA</div></div>
       <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
     </div>
@@ -354,6 +354,7 @@
       <table>
         <thead><tr><th>Business</th><th>Sent to</th><th>Date</th><th>Package</th><th>Where it stands</th></tr></thead>
         <tbody>
+          <tr><td class="src-name">Scantifix</td><td class="mono">contact@scantifix.com</td><td class="mono">2026-09-21</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Thom K Jensen asked to see what we can do; Norwegian sign-off, Wyoming phone and address on the harvested row</td></tr>
           <tr><td class="src-name">Precisely Peptides</td><td class="mono">support@preciselypeptides.com</td><td class="mono">2026-09-21</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Vaughn asked for pricing and whether facilities are cGMP; replied 83% above their current USA cGMP pricing</td></tr>
           <tr><td class="src-name">Evo Peptides US</td><td class="mono">info@evopeptidesus.com</td><td class="mono">2026-09-21</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for the inventory; catalog sent the next minute</td></tr>
           <tr><td class="src-name">BetterLife Bioscience</td><td class="mono">support@betterlifebioscience.com</td><td class="mono">2026-09-21</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">John: asked for the catalog after the first contact</td></tr>
@@ -476,7 +477,7 @@
       },
       {
           "d": "Sep 21",
-          "v": 80,
+          "v": 90,
           "m": 0
       }
   ];
@@ -518,13 +519,13 @@
       {
           "k": "Awaiting reply",
           "sub": "eligible for follow-ups",
-          "n": 759,
+          "n": 768,
           "c": "var(--accent)"
       },
       {
           "k": "Replied",
-          "sub": "49 real replies + 20 auto-replies · no more automated mail",
-          "n": 69,
+          "sub": "50 real replies + 20 auto-replies · no more automated mail",
+          "n": 70,
           "c": "var(--done)"
       },
       {
@@ -570,6 +571,12 @@
           "t": "vendor &middot; READY TO BUY",
           "d": "Sep 17",
           "e": "support@"
+      },
+      {
+          "c": "scantifix.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 21",
+          "e": "contact@"
       },
       {
           "c": "preciselypeptides.com",
@@ -1258,7 +1265,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"905 sent &middot; 10/hr &middot; 100/day"},
+    {name:"Send",       st:"run",   meta:"915 sent &middot; 10/hr &middot; 100/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
