@@ -150,6 +150,48 @@ DIRECTORIES = {
         # external link beside a Google Maps address, which is what we need.
         "listing": "/find/providers/",
     },
+    "auravenu": {
+        # 4,649 US listings at a bare /listings/ path, plus 1,234 Australian ones
+        # under /au/listings/. The fragment alone would take both, so
+        # url_must_match pins the listing to the root: a clinic page reached
+        # through /au/ carries a .com.au site (capsclinic.com.au on the one
+        # sampled), which the foreign gate would reject later at a full crawl's
+        # cost. Cheaper to never fetch it.
+        "sitemaps": ["https://auravenu.com/sitemap-0.xml"],
+        "listing": "/listings/",
+        "url_must_match": re.compile(r"auravenu\.com/listings/"),
+    },
+    "medspalistings": {
+        # 1,406 /listings/ pages inside a 9,907-URL sitemap that is mostly
+        # /states and /city rollups. Coverage of the clinic's own site is
+        # partial -- one sampled listing links med-i-spa.com, the next links
+        # only the operator's own nap5k.com and a Square booking page -- so
+        # expect a lower yield per listing here than the peptide directories.
+        "sitemaps": ["https://medspalistings.com/sitemap.xml"],
+        "listing": "/listings/",
+    },
+    "medspafind": {
+        # Small and mostly Canadian: 705 URLs, of which 514 are /ca/ and only
+        # 184 /us/. The listing fragment is the country segment itself, which
+        # is what keeps the Canadian majority out before it is fetched.
+        "sitemaps": ["https://medspafind.com/medspas-sitemap.xml"],
+        "listing": "/us/",
+    },
+    "peptidefinder": {
+        # 1,541 URLs, of which 881 are /clinic/ pages; the rest are /peptides
+        # compound pages and a handful of two-letter state indexes. The clinic
+        # page carries the clinic's own domain as a plain link and nothing else
+        # outbound -- ways2well.com is the only external host on the Ways2Well
+        # page -- so this extractor reads it without any special handling.
+        "sitemaps": ["https://peptidefinder.us/sitemap.xml"],
+        "listing": "/clinic/",
+    },
+    "glp1almanac": {
+        # Small: 124 URLs, 52 of them /providers/ pages. Worth the one pass it
+        # costs, and the cursor means it is skipped cheaply thereafter.
+        "sitemaps": ["https://glp1almanac.com/sitemap.xml"],
+        "listing": "/providers/",
+    },
     "findmyhrt": {
         # 2,316 URLs, of which 398 are /provider/ pages; the other 1,461
         # /hrt-providers/ URLs are state and city indexes, not listings. The
@@ -210,6 +252,27 @@ DIRECTORIES = {
     #     ivtherapydirectory.com.
     #   peptidetherapylocator.com and evexipel.com answer 403 to robots.txt and
     #     both sitemap paths.
+    # Probed Sep 21, same failure mode -- listed but not linked:
+    #   thepeptidelist.com publishes 379 /providers/ pages in a 1,409-URL
+    #     sitemap, which would be the best find of the night, but the provider
+    #     pages answer 403 to a direct fetch while the sitemap serves fine. It
+    #     needs a different fetcher, not a different config, so it is parked
+    #     here rather than added.
+    #   glp1clinics.org advertises "9,700+ clinics in 2,000+ cities" and its
+    #     sitemap holds 101 /glp1-clinics/<state> pages -- state rollups, the
+    #     bioidenticaldoctors.com shape, so a list-page extractor job.
+    #   pathtopeptides.com is a content site: 480 URLs, all flat .html guides
+    #     like /where-to-buy-tirzepatide.html, with Spanish duplicates.
+    #   peptidebase.io answers 403 to both sitemap paths despite advertising
+    #     2,226 providers.
+    #   glp-1finder.com (59 URLs) and glp1.healthcare (114) are too small to
+    #     carry a per-clinic page and hold city pages instead.
+    #   testosteronereplacementdoctors.com and bioidenticalhormonedoctors.com
+    #     are one operator on the same Avada WordPress theme, and both publish a
+    #     seven-URL page sitemap -- home, contact, about, privacy, disclaimer
+    #     and "join the directory". The provider listings never appear in it.
+    #   trtanswers.com is a 15-page content site (/trt-labs-explained.html and
+    #     the like), and trtclinicguide.com does not answer at all.
     # klinic.com looks like the biggest prize of all -- 663 sitemaps covering
     # wegovy, zepbound, saxenda and TRT in every state -- but it is a telehealth
     # service writing city pages about itself, not a directory: its city pages
@@ -230,6 +293,9 @@ NOT_THE_CLINIC = re.compile(
     r"onetrust|cookielaw|cookiedatabase|clarity|hubspot|intercom|calendly|linktr|bit|goo|tinyurl|"
     # widgets and reference sites carried by healingmaps listings
     r"vimeo|recaptcha|npiregistry|hhs|maps|nih|who|supabase|builder|example|"
+    # medspalistings.com puts its operator's own nap5k.com on listing pages,
+    # sometimes as the only outbound link, so it would be read as the clinic
+    r"nap5k|auravenu|medspalistings|medspafind|ahrefs|squareup|glp1almanac|"
     # CDNs and analytics carried by theivdirectory listings
     r"googleusercontent|contentsquare|squarespace-cdn|gstatic|cloudinary|imgix|"
     # site builders' asset hosts, booking platforms and free blog hosts: a clinic

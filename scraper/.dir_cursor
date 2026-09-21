@@ -1,13 +1,93 @@
 {
- "semaglutidenearme": 3000,
- "glp1directory": 2116,
- "globalglp1": 556,
- "mypeptidematch": 4724,
- "healingmaps": 2272,
- "peptideclinicfinder": 252,
- "medspadirectorypro": 597,
- "verifiedantiagingclinics": 3524,
- "theivdirectory": 3524,
- "medspanear": 665,
- "peptidesuppliermatch": 625
+ "semaglutidenearme": {
+  "https://semaglutidenearme.org/wp-sitemap-posts-gd_place-1.xml": 2000,
+  "https://semaglutidenearme.org/wp-sitemap-posts-gd_place-2.xml": 1000
+ },
+ "glp1directory": {
+  "https://glp1directory.com/provider-sitemap.xml": 1000,
+  "https://glp1directory.com/provider-sitemap2.xml": 1000,
+  "https://glp1directory.com/provider-sitemap3.xml": 116
+ },
+ "globalglp1": {
+  "https://globalglp1.com/sitemap-clinics.xml": 553
+ },
+ "mypeptidematch": {
+  "https://www.mypeptidematch.com/sitemap.xml": 4724
+ },
+ "healingmaps": {
+  "https://healingmaps.com/listing-sitemap.xml": 758,
+  "https://healingmaps.com/listing-sitemap2.xml": 769,
+  "https://healingmaps.com/listing-sitemap3.xml": 745
+ },
+ "peptideclinicfinder": {
+  "https://peptideclinicfinder.com/sitemap.xml": 252
+ },
+ "medspadirectorypro": {
+  "https://medspadirectorypro.com/sitemap.xml": 597
+ },
+ "verifiedantiagingclinics": {
+  "https://verifiedantiagingclinics.com/sitemap-clinics.xml": 3764,
+  "https://verifiedantiagingclinics.com/sitemap-telehealth.xml": 0
+ },
+ "theivdirectory": {
+  "https://theivdirectory.com/sitemap.xml": 3764
+ },
+ "medspanear": {
+  "https://medspanear.me/api/sitemaps/sitemap-listings-alabama.xml": 289,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-alaska.xml": 131,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-arizona.xml": 250,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-arkansas.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-california.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-colorado.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-connecticut.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-delaware.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-florida.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-georgia.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-hawaii.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-idaho.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-illinois.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-indiana.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-iowa.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-kansas.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-kentucky.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-louisiana.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-maine.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-maryland.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-massachusetts.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-michigan.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-minnesota.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-mississippi.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-missouri.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-montana.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-nebraska.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-nevada.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-new-hampshire.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-new-jersey.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-new-mexico.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-new-york.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-north-carolina.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-north-dakota.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-ohio.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-oklahoma.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-oregon.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-pennsylvania.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-rhode-island.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-south-carolina.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-south-dakota.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-tennessee.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-texas.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-vermont.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-virginia.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-washington.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-west-virginia.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-wisconsin.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-wyoming.xml": 5,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-district-of-columbia.xml": 5
+ },
+ "peptidesuppliermatch": {
+  "https://peptidesuppliermatch.com/sitemap.xml": 865
+ },
+ "findmyhrt": {
+  "https://www.findmyhrt.com/sitemap.xml": 240
+ }
 }
