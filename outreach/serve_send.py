@@ -60,12 +60,16 @@ JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\
 
 
 FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
-# Company-form suffixes that only ever sit at the END of a name, where matching
-# them loosely would be wrong: "AB" is Swedish (aktiebolag) and identifies
-# Innovagen AB of Lund, but \bab\b anywhere in a name would also hit the queue's
-# "AB Hormone", a US clinic. "Oy" is Finnish and "AS" Norwegian, both with the
-# same problem loose. Anchored, they are safe.
-FOREIGN_SUFFIX = re.compile(r"\s(ab|oy|oyj|a/?s|nv|spa|sa)\.?$", re.I)
+# Company-form suffixes that only ever sit at the END of a name: "AB" is Swedish
+# (aktiebolag) and identifies Innovagen AB of Lund, but \bab\b anywhere in a
+# name would also hit the queue's "AB Hormone", a US clinic, so it is anchored.
+# This list is deliberately short, because the first version was not and it was
+# a bad mistake: it carried "spa" for the Italian Societa per Azioni, which
+# matched 246 queue rows -- every US business called "... Med Spa", the single
+# largest audience in the campaign -- and "sa", which matched "Weight Loss SA",
+# San Antonio. Both are gone. Anything ambiguous in English belongs in
+# FOREIGN_DOMAINS as a named domain with its evidence, not in a pattern.
+FOREIGN_SUFFIX = re.compile(r"\s(ab|oy|oyj|a/s|gmbh|s\.a\.|n\.v\.)\.?$", re.I)
 FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing"
                           r"|jinan|qingdao|tianjin|chengdu|xi'?an|suzhou|ningbo|zhengzhou|changsha|hefei|kunming|dalian|chongqing"
                           r"|shijiazhuang|shandong|jiangsu|zhejiang|hubei|hunan|henan|hebei|anhui|sichuan|guangdong"
