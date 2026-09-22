@@ -370,6 +370,31 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     # publish about the compounds we sell. A blanket .org rule would be
                     # wrong -- 55 live queue rows are .org and most are real clinics
                     # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "nowpatient.com",       # "Semaglutide Prices and Options Compared" -- a price
+                                            # comparison site. Its first phone, "(300) 061-4000", is
+                                            # doubly impossible: 300 is unassigned and the exchange
+                                            # starts with 0. Its second uses 345, the Cayman Islands
+                    "sermorelin.com",       # "Sermorelin Dosage Calculator & Chart" -- a calculator,
+                                            # the pepcalc.app and peptidecalc.io case
+                    "theguardian.com",      # the Guardian. The page harvested is its investigation,
+                                            # "labs test thousands of unregulated subst[ances]", and the
+                                            # address is a reporting desk. A newspaper looking into this
+                                            # trade is the last place to send a cold wholesale pitch
+                    "frierlevitt.com",      # a healthcare law firm, and the page harvested is "Lilly
+                                            # Retatrutide Lawsuits Target RUO Pe[ptide sellers]" -- it
+                                            # writes about suits against businesses like the ones we
+                                            # sell to. Worse than lumalexlaw.com, same rule
+                    "americanpeptidesociety.org",  # the American Peptide Society: a scientific society,
+                                            # and what we harvested was its own links directory
+                    "polypeptide.com",      # two failures at once. The address is cdmo.sales@, so the
+                                            # business names itself a contract manufacturer, and the
+                                            # stored row belongs to someone else entirely -- "Changyuan
+                                            # Polypeptide" with an (852) Hong Kong phone, one of the 75
+                    "peptidecalc.io",       # "Open PeptideCalc.io ->" is a link label, and the phone
+                                            # "(673) 973-7107" uses 673, which is Brunei's country code
+                                            # and not an assigned NANP area code. A calculator, not a buyer
+                    "peptidesbook.net",     # "Peptides Book", no US signal, and an (861) phone -- the
+                                            # same unassigned code that gave away tnjone.com
                     "boulderpeptide.org",   # the Boulder Peptide Foundation, a nonprofit that runs a
                                             # peptide therapeutics symposium. The a4pc.org and a4m
                                             # case: it convenes the field, it does not buy in it
