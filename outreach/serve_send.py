@@ -59,6 +59,14 @@ JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\
                          r"|secure|online|orders?|products?|research|labs?|login|account|cart|menu|search|sales?|deals?|prices?)$", re.I)
 
 
+# Mailboxes that exist for law and machinery, never for a conversation. The row
+# that prompted this was arbitration-notices@ro.co -- Ro's legal service address,
+# where a wholesale pitch is both useless and rude. "compliance@" is deliberately
+# NOT here: four live rows use it and a compliance officer is a real person who
+# can forward a mail, unlike a no-reply box.
+NON_CONTACT_LOCAL = re.compile(
+    r"^(arbitration|legal|dmca|abuse|postmaster|copyright|no-?reply|donotreply|unsubscribe|webmaster|hostmaster|mailer-daemon)([.\-_]\w+)*$", re.I)
+MAIL_ARTIFACT_HOST = re.compile(r"^(www|reply|no-?reply|mail|email|bounce|notifications?)\.", re.I)
 LOCAL_PART_OK = re.compile(r"^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+$")
 FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
 # Company-form suffixes that only ever sit at the END of a name: "AB" is Swedish
@@ -362,6 +370,26 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     # publish about the compounds we sell. A blanket .org rule would be
                     # wrong -- 55 live queue rows are .org and most are real clinics
                     # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "boulderpeptide.org",   # the Boulder Peptide Foundation, a nonprofit that runs a
+                                            # peptide therapeutics symposium. The a4pc.org and a4m
+                                            # case: it convenes the field, it does not buy in it
+                    "genosphere-biotech.com",  # reachable only at info.uk@, and its single
+                                            # phone is "(594) 147-8456": 594 is French Guiana's
+                                            # country code and the exchange 147 starts with 1,
+                                            # which NANP forbids. Two independent impossibilities
+                                            # in one number. Genosphere is a Paris company
+                    "forbes.com",           # Forbes. The harvested page is "A Guide To The Best
+                                            # Nootropics, Recommended By Experts" and the address is
+                                            # accolades@, which is their awards desk
+                    "seamlesschex.com",     # "Best Payment Processor for Peptides in 2026" -- a payment
+                                            # processor courting peptide sellers, the
+                                            # verifiedcreditcardprocessing.com case. It banks them
+                    "verifiedrxsolutions.com",  # "503B Outsourcing Facility | FDA-Registered". A 503B
+                                            # compounds and fills to order, which is our side of the
+                                            # trade and a far more regulated one
+                    "peptidescores.com",    # the stored vendor name for this domain is "UK-Peptides".
+                                            # The canpeptide.com shape -- the row describes some other
+                                            # business -- and what it describes is British
                     "legionathletics.com",  # a sports supplement brand, and the page harvested is one
                                             # of its explainers, "What Are SARMs? Side Effects, Before
                                             # & After Results". It sells protein and writes about the
@@ -614,7 +642,11 @@ HELD_CONTACTS = {
 # .com, so neither a domain nor a TLD rule would catch both.
 FACTORY_NAME = re.compile(r"\bpeptides?\s+factory\b", re.I)
 
-DECLINED_CONTACTS = {"pj91920107@icloud.com",  # the only address for hkburson.com (Hong Kong
+DECLINED_CONTACTS = {"amelia.tide518@gmail.com",  # the only address for "Wingem Polypeptide
+                                            # Biotech", whose two phones are both (852) Hong Kong
+                                            # lines and whose row carries no US signal. On gmail,
+                                            # so no domain rule can reach it
+                     "pj91920107@icloud.com",  # the only address for hkburson.com (Hong Kong
                                             # Burson PolyPeptide RD Limited); on icloud.com, so
                                             # neither the domain entry nor the hk prefix reaches it
                      "ahsanmilan080@gmail.com",  # the only address for peptidedropship.com below;
@@ -1005,7 +1037,11 @@ def skip_contact(email, audience="", domain="", name=""):
     # The real address is almost certainly info@revitalyzemd.com, but almost
     # certainly is a guess, and a guessed address is exactly what this campaign
     # does not send -- so the contact is dropped rather than repaired.
-    if d.startswith("www."):
+    # "reply." joins it: the queue carried support@reply.wittmerrejuvenationclinic.com,
+    # a transactional subdomain a mail platform sends FROM and which usually does
+    # not accept mail. Same artifact, same treatment -- dropped, not rewritten to
+    # the bare domain, because that would be guessing at the address.
+    if MAIL_ARTIFACT_HOST.match(d):
         return True
     # The same class, on the other side of the @: "%20melanie@..." and
     # "u00a0info@..." are a URL-encoded space and a non-breaking space that came
@@ -1035,13 +1071,20 @@ def skip_contact(email, audience="", domain="", name=""):
     local = email.split("@", 1)[0] if "@" in email else ""
     if not local or not LOCAL_PART_OK.match(local):
         return True
+    if NON_CONTACT_LOCAL.match(local):
+        return True
     if FACTORY_NAME.search(name or ""):
         return True
     if FOREIGN_SUFFIX.search((name or "").strip()):
         return True
     if audience == "vendor" and (is_foreign(d, name) or d in FOREIGN_FREEMAIL):
         return True
-    return email.split("@", 1)[0] in FOREIGN_LOCAL
+    # Separator-insensitive: the set is written with hyphens, but the queue held
+    # info.uk@genosphere-biotech.com, and "info.uk" is the same local part as
+    # "info-uk" with a different punctuation mark. Normalising both to "-" means
+    # one entry covers every spelling the harvester produces.
+    local = re.sub(r"[._]", "-", email.split("@", 1)[0].lower())
+    return local in FOREIGN_LOCAL
 
 
 def due_followups(sent_rows):
