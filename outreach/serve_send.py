@@ -370,6 +370,13 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     # publish about the compounds we sell. A blanket .org rule would be
                     # wrong -- 55 live queue rows are .org and most are real clinics
                     # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "selfhacked.com",       # "4 Benefits of Follistatin + Side Effects" -- a health
+                                            # content and affiliate site with no US signal. The
+                                            # nootropicsexpert.com case
+                    "validatedpeptides.com",  # "Peptide Supplier Directory | Manufacturers, Vendors
+                                            # & CDMOs" -- it lists suppliers for a living, which is
+                                            # thepeptidecatalog.com again. Its phone column even
+                                            # holds a URL rather than a number
                     "olympiapharmacy.com",  # the page harvested is its own explainer, "What is a 503B
                                             # Pharmacy?". A 503B compounds and fills to order, the
                                             # verifiedrxsolutions.com case
