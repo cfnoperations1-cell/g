@@ -177,6 +177,40 @@ DIRECTORIES = {
         "sitemaps": ["https://medspafind.com/medspas-sitemap.xml"],
         "listing": "/us/",
     },
+    "longevityclinicfinder": {
+        # 13,951 clinic pages, the largest single directory found so far after
+        # medspanear. Its listing pages also carry "related clinic" links, so the
+        # clinic's own site is not the only outbound host -- the Hormone Center
+        # page links hormonecenter.net a dozen times alongside two other clinics.
+        # That is survivable here only because pick_site prefers a link the page
+        # labels "Visit website" over any other, which the related links are not.
+        # Worth re-checking the first ingest for name/domain mismatches.
+        "sitemaps": ["https://www.longevityclinicfinder.com/sitemap/clinics.xml"],
+        "listing": "/clinics/",
+    },
+    "trtguide": {
+        # 2,852 URLs, 2,643 of them /clinics/ pages. Both sampled listings link
+        # the clinic's own domain plainly (limitlessmewellness.com,
+        # agelessmenshealth.com). Slugs carry a Google Place id on the end, which
+        # is harmless here -- the extractor reads the page, not the slug.
+        "sitemaps": ["https://trtguide.com/sitemap.xml"],
+        "listing": "/clinics/",
+    },
+    "hormonemap": {
+        # 1,954 URLs, 1,000 of them /clinics/. Coverage is patchy -- one of two
+        # sampled listings had no outbound host at all -- so expect a lower yield
+        # per listing than trtguide. dir_mine drops the ones with no website.
+        "sitemaps": ["https://hormonemap.com/sitemap.xml"],
+        "listing": "/clinics/",
+    },
+    "ivhealthclinics": {
+        # 4,982 URLs, of which 3,144 are /clinics/ pages -- the biggest find
+        # since medspanear. The clinic page carries the business's own domain as
+        # a plain link (the 4Ever Young Midtown Atlanta page links
+        # 4everyoungantiaging.com), so the existing extractor reads it unchanged.
+        "sitemaps": ["https://ivhealthclinics.com/sitemap.xml"],
+        "listing": "/clinics/",
+    },
     "peptidefinder": {
         # 1,541 URLs, of which 881 are /clinic/ pages; the rest are /peptides
         # compound pages and a handful of two-letter state indexes. The clinic
@@ -252,6 +286,25 @@ DIRECTORIES = {
     #     ivtherapydirectory.com.
     #   peptidetherapylocator.com and evexipel.com answer 403 to robots.txt and
     #     both sitemap paths.
+    # Probed Sep 22:
+    #   ivtherapymap.com has 1,282 /clinics/ pages and looks ideal until you
+    #     open one: three sampled listings (Drip Hydration San Diego, Bounce
+    #     Hydration Houston, IV Essence San Antonio) carry exactly one outbound
+    #     host between them, ivtherapyfinder.com -- the operator's own network,
+    #     never the clinic. The thepeptidefinders.com pattern.
+    #   findlongevitymd.com runs a WordPress directory plugin whose listing
+    #     sitemap holds exactly one entry. Nothing to mine.
+    #   trt-finder.com (658 /clinic/ pages) is international: the second listing
+    #     sampled was androclinics.com.au, a Sydney clinic, and the first carried
+    #     no outbound host at all. The foreign gate would catch the .com.au ones
+    #     eventually, but only after a full crawl each, and nothing in the
+    #     listing URL says which country a page is, so there is no cheap filter.
+    #   trtscout.com and findlocaltrtdoctors.com serve no sitemap.
+    #   well-viahealth.com serves no sitemap at any of the usual paths.
+    #   thepeptidelist.com was retried with full browser headers and a referer
+    #     and still answers 403 "Your request was blocked" on provider pages
+    #     while serving its sitemap. Still needs a different fetcher.
+    #   extension.health is an 11-URL clinic site, not a directory.
     # Probed Sep 21, same failure mode -- listed but not linked:
     #   thepeptidelist.com publishes 379 /providers/ pages in a 1,409-URL
     #     sitemap, which would be the best find of the night, but the provider
@@ -296,6 +349,9 @@ NOT_THE_CLINIC = re.compile(
     # medspalistings.com puts its operator's own nap5k.com on listing pages,
     # sometimes as the only outbound link, so it would be read as the clinic
     r"nap5k|auravenu|medspalistings|medspafind|ahrefs|squareup|glp1almanac|"
+    # smbpulse.co is longevityclinicfinder's own operator domain and sits on
+    # every one of its 13,951 listing pages
+    r"smbpulse|longevityclinicfinder|ivhealthclinics|trtguide|hormonemap|"
     # CDNs and analytics carried by theivdirectory listings
     r"googleusercontent|contentsquare|squarespace-cdn|gstatic|cloudinary|imgix|"
     # site builders' asset hosts, booking platforms and free blog hosts: a clinic
