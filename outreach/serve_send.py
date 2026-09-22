@@ -370,6 +370,16 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     # publish about the compounds we sell. A blanket .org rule would be
                     # wrong -- 55 live queue rows are .org and most are real clinics
                     # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "olympiapharmacy.com",  # the page harvested is its own explainer, "What is a 503B
+                                            # Pharmacy?". A 503B compounds and fills to order, the
+                                            # verifiedrxsolutions.com case
+                    "rx.com",               # the stored vendor name for this domain is "Alpha Biologix".
+                                            # Nothing in the row describes rx.com itself, which is the
+                                            # canpeptide.com and peptidescores.com shape
+                    "aminowell.com",        # its phone is "(709) 293-2520" -- 709 is Newfoundland and
+                                            # Labrador -- while the harvested state says Florida. The
+                                            # sussex-research.com case: a valid NANP code that is not
+                                            # a US one, and a row contradicting itself
                     "nowpatient.com",       # "Semaglutide Prices and Options Compared" -- a price
                                             # comparison site. Its first phone, "(300) 061-4000", is
                                             # doubly impossible: 300 is unassigned and the exchange
@@ -762,6 +772,13 @@ def brand_key(domain):
         base = base[4:]
     base = re.sub(r"[^a-z0-9]", "", base.split(".")[0])
     base = re.sub(r"(usa|us)$", "", base)
+    # ...and a trailing plural. paradigm-peptide.com and paradigmpeptides.com both
+    # reached one batch as "Paradigm Peptide", which is what surfaced this. Checked
+    # against the whole live queue before it went in: exactly seven brands differ
+    # only by a final "s" -- genetic/geneticpeptides, peptidemind(s), edgepeptide(s),
+    # phoenixpeptide(s), paradigmpeptide(s), totalbodyaesthetic(s), pureiv(s) -- and
+    # every one is the same business twice, so this merges nothing it should not.
+    base = re.sub(r"s$", "", base)
     if len(base) < 6 or base in GENERIC_BRANDS:
         return ""
     return base
