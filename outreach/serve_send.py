@@ -361,6 +361,24 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     # publish about the compounds we sell. A blanket .org rule would be
                     # wrong -- 55 live queue rows are .org and most are real clinics
                     # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "amcdefenselaw.com",    # a criminal defence firm, and the page harvested is "The
+                                            # DOJ also prosecuted Tailor Made Compound[ing]" -- it
+                                            # writes about prosecutions in this exact industry. The
+                                            # lumalexlaw.com case, with an edge to it
+                    "sussex-research.com",  # both phones are 613, which is Ottawa. A reminder that a
+                                            # VALID area code is not a US one: NANP covers Canada and
+                                            # the Caribbean, so 613, 416, 604 and the rest pass every
+                                            # "is this a real area code" check while being foreign.
+                                            # The harvested state says New Hampshire; the numbers do not
+                    "bocsci.com",           # its only phone is "(221) 892-7121" and 221 is not an
+                                            # assigned NANP area code, so the number cannot be a US
+                                            # line. Same tell as the 852 cluster and nuvellolabs
+                    "vivabiotech.com",      # stored name is the link label "See Website", no phone
+                                            # and no US signal. ViVa Biotech is a contract research
+                                            # organisation -- the bioduro.com case in every respect
+                    "hubmeded.com",         # "SNAP-8 Peptide: A Non-Invasive Botox Alternative" from
+                                            # a medical education hub, as the domain spells out. The
+                                            # a4m.com case: it teaches about the compounds
                     "bioduro.com",          # the row says nothing -- the stored name is the link
                                             # label "See Website" and there is no phone -- but
                                             # BioDuro is a contract research and manufacturing
