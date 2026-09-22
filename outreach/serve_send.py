@@ -343,6 +343,24 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                                             # that no other site is authorised to represent it. A
                                             # follow-up asking them to compare wholesale pricing would
                                             # be writing to a company that has shut its doors
+                    "safemedicines.org",    # the Partnership for Safe Medicines: a .org advocacy
+                                            # group campaigning against counterfeit and unsafe drug
+                                            # supply, reachable at editors@. The harvested row is the
+                                            # title of an explainer, "What is a 503B outsourcing
+                                            # facility", and its phone column holds a URL. Not a buyer,
+                                            # and the last organisation to cold-pitch peptides to
+                    "risingtrends.co",      # the harvested name is a sentence out of an article --
+                                            # 'A 2025 lab analysis of "research-only" p...' -- and
+                                            # there is no US signal. A site writing about the
+                                            # category, not one buying in it
+                    "nootropicsexpert.com", # "The Most Comprehensive Nootropics List" -- one writer's
+                                            # affiliate content site, reachable at david@. The
+                                            # muscleandbrawn.com and healingmaps.com case: it writes
+                                            # about compounds, it does not stock them
+                    "tnjone.com",           # "TN Jone", no US signal, no stated country, and one of
+                                            # its two phones is "(861) 806-..." -- 861 is not an
+                                            # assigned NANP area code, the same tell as wanfs.cn
+                                            # (Jinan Wanfushun), which carries an 861 line too
                     "checkpeptide.com",     # harvested name is "CheckPeptide - Trusted Testing ...",
                                             # and the address is labs@. An analytical lab that tests
                                             # other people's peptides, the janoshiklab case below --
