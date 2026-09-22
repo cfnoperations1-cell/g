@@ -343,6 +343,33 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                                             # that no other site is authorised to represent it. A
                                             # follow-up asking them to compare wholesale pricing would
                                             # be writing to a company that has shut its doors
+                    # Health journalism and advocacy .orgs keep surfacing because they
+                    # publish about the compounds we sell. A blanket .org rule would be
+                    # wrong -- 55 live queue rows are .org and most are real clinics
+                    # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "freedomdiagnosticstesting.com",  # "Freedom Diagnostics Testing - Reliable.
+                                            # Ac[curate]" -- a testing lab, the fourth of them this
+                                            # week after checkpeptide, cellorigins and janoshiklab.
+                                            # It sells results, not product
+                    "medshadow.org",        # MedShadow Foundation, a nonprofit covering drug side
+                                            # effects; the harvested name is one of its headlines,
+                                            # "FDA Recalls and Warnings: Glutathione Peptide ..."
+                    "healthletic.io",       # "Complete List of Peptides and What They Do" -- an
+                                            # affiliate content site, the nootropicsexpert.com case
+                    "cambrex.com",          # the harvested name is a press release headline, "Cambrex
+                                            # Expands Peptide Manufactur[ing]". Cambrex is a contract
+                                            # manufacturer that makes peptides to order -- the genscript
+                                            # case exactly, our side of the trade rather than a buyer
+                    "canpeptide.com",       # the row does not describe this domain at all: it stores
+                                            # the vendor name "American Peptides" (americanpeptide.co is
+                                            # already declined below), a Louisiana area code and the
+                                            # state California. Nothing in it vouches for canpeptide.com,
+                                            # whose own name reads Canadian, so there is no US evidence
+                                            # to send on
+                    "cellorigins.com",      # "Cell Origins | Expert Phage Display ..." -- phage display
+                                            # is an antibody discovery service. A services lab like
+                                            # checkpeptide.com and janoshiklab.com: it runs assays for
+                                            # other people, it does not buy peptides wholesale
                     "safemedicines.org",    # the Partnership for Safe Medicines: a .org advocacy
                                             # group campaigning against counterfeit and unsafe drug
                                             # supply, reachable at editors@. The harvested row is the
