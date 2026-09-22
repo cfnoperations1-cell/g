@@ -59,6 +59,7 @@ JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\
                          r"|secure|online|orders?|products?|research|labs?|login|account|cart|menu|search|sales?|deals?|prices?)$", re.I)
 
 
+LOCAL_PART_OK = re.compile(r"^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+$")
 FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
 # Company-form suffixes that only ever sit at the END of a name: "AB" is Swedish
 # (aktiebolag) and identifies Innovagen AB of Lund, but \bab\b anywhere in a
@@ -361,6 +362,13 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     # publish about the compounds we sell. A blanket .org rule would be
                     # wrong -- 55 live queue rows are .org and most are real clinics
                     # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "legionathletics.com",  # a sports supplement brand, and the page harvested is one
+                                            # of its explainers, "What Are SARMs? Side Effects, Before
+                                            # & After Results". It sells protein and writes about the
+                                            # category; it does not stock research peptides
+                    "rapidfulfillment.com", # "White Label Peptides | Dropshipping | No ..." -- it
+                                            # offers exactly what we offer, under someone else's label.
+                                            # The peptidedropship.com case: a supplier, not a buyer
                     "amcdefenselaw.com",    # a criminal defence firm, and the page harvested is "The
                                             # DOJ also prosecuted Tailor Made Compound[ing]" -- it
                                             # writes about prosecutions in this exact industry. The
@@ -1015,6 +1023,17 @@ def skip_contact(email, audience="", domain="", name=""):
     if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
         return True
     if email in HELD_CONTACTS or d in HELD_CONTACTS:
+        return True
+    # An address the harvester mangled is a guaranteed bounce, and bounces cost
+    # sending reputation on a domain that has already been throttled once. The row
+    # that prompted this was stored as "email:peptinovas@outlook.com", with the
+    # label glued to the front of the local part. Only one live row matches today,
+    # but the check is free and cannot produce a false positive: every character
+    # RFC 5321 allows unquoted in a local part is in the class below. It refuses
+    # rather than repairs -- stripping the prefix would be guessing at an address,
+    # which this campaign never does.
+    local = email.split("@", 1)[0] if "@" in email else ""
+    if not local or not LOCAL_PART_OK.match(local):
         return True
     if FACTORY_NAME.search(name or ""):
         return True
