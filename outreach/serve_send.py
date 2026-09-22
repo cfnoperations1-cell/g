@@ -38,7 +38,14 @@ EXPECTED = OUT / "exclusions_expected.txt"
 _THIRD_PARTY = None
 FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "emailer" / "followup_vendor.txt"}
 
-DAILY_CAP = int(os.environ.get("DAILY_CAP", "100"))      # ramp: 100 per day (Gmail throttled at ~220)
+DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/day for the next week
+# AUDIENCE_ONLY restricts a wave to one audience. Jonathan, Sep 22: "only run
+# 50 per day and focus on medspas", for the next week -- so through Sep 29.
+# Both settings are dated on purpose: when the week is up they should be a
+# decision to renew, not a default that quietly stayed. Clear it with
+# AUDIENCE_ONLY= to go back to every audience.
+AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "medspa").strip().lower()
+FOCUS_REVIEW_DATE = "2026-09-29"
 HOURLY_CAP = int(os.environ.get("HOURLY_CAP", "10"))     # ramp: 10 per hourly wave
 FOLLOWUP_DAYS = int(os.environ.get("FOLLOWUP_DAYS", "3"))
 MAX_FOLLOWUPS = int(os.environ.get("MAX_FOLLOWUPS", "3"))
@@ -1054,7 +1061,15 @@ def initial_candidates(sent_rows):
     rest = [r for r in cands if r["email"].strip().lower() not in dids]
     vendors = [r for r in rest if r["audience"] == "vendor"]
     medspas = [r for r in rest if r["audience"] == "medspa"]
-    ordered = vendors + medspas                                   # after the drafts: vendors first, then med spas
+    if AUDIENCE_ONLY:
+        # A filter, not a reordering: anything outside the chosen audience is
+        # not eligible this week at all, so a thin med spa pool shortens the
+        # wave rather than quietly topping it up with vendors.
+        rest = [r for r in rest if r["audience"] == AUDIENCE_ONLY]
+        drafted = [r for r in drafted if r["audience"] == AUDIENCE_ONLY]
+        ordered = rest
+    else:
+        ordered = vendors + medspas                               # after the drafts: vendors first, then med spas
     pri = [r for r in ordered if r["email"].split("@", 1)[1] in PRIORITY_DOMAINS]
     ordered = drafted + pri + [r for r in ordered if r not in pri]
     out, seen, brands = [], set(), {brand_key(r["domain"]) for r in sent_rows} - {""}
@@ -1242,7 +1257,8 @@ def cmd_next(n, out_json):
                       "body": body, "draftId": did})
     Path(out_json).write_text(json.dumps(items), encoding="utf-8")
     fu = sum(1 for i in items if i["kind"] == "fu"); ini = len(items) - fu
-    print(f"BATCH {len(items)}  fu={fu} initial={ini}  (budget_left_today={budget}, cap={DAILY_CAP})")
+    focus = f", audience={AUDIENCE_ONLY} only through {FOCUS_REVIEW_DATE}" if AUDIENCE_ONLY else ""
+    print(f"BATCH {len(items)}  fu={fu} initial={ini}  (budget_left_today={budget}, cap={DAILY_CAP}{focus})")
     bad = [i["to"] for i in items if "{" in i["subject"] or "{" in i["body"]]
     if bad:
         print("!!! PLACEHOLDER LEFTOVERS:", bad)

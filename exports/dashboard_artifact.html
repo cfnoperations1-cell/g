@@ -225,7 +225,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-22 20:03 UTC</b><br>
+        UPDATED <b>2026-09-22 20:24 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -245,7 +245,7 @@
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
-    <span>10 emails per hourly wave, 100 per day. The daily cap is spent: 100 of 100 sent this Pacific day, so the next wave sends after midnight PT. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
+    <span>10 emails per hourly wave, 50 per day. The daily cap is spent: 100 of 50 sent this Pacific day, so the next wave sends after midnight PT. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
     <span class="when">cap reached &middot; next wave 07:00 UTC</span>
   </div>
 
@@ -258,7 +258,7 @@
       <div class="kpi"><div class="n mono">100</div><div class="k">Sent today</div><div class="d">100 first-touch &middot; 0 follow-ups &middot; daily cap reached</div></div>
       <div class="kpi good"><div class="n mono">54</div><div class="k">Replies</div><div class="d">5.3% of contacts &middot; plus 22 auto-replies</div></div>
       <div class="kpi bad"><div class="n mono">75</div><div class="k">Bounces</div><div class="d">7.4% &middot; removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">4,035</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi"><div class="n mono">3,482</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
     </div>
 
@@ -1330,7 +1330,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"1015 sent &middot; 10/hr &middot; 100/day"},
+    {name:"Send",       st:"run",   meta:"1015 sent &middot; 10/hr &middot; 50/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
