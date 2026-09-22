@@ -60,6 +60,12 @@ JUNK_VENDOR = re.compile(r"click here|\bpromo\b|\beligible\b|\beditor\b|\bnotes\
 
 
 FOREIGN_LOCAL = {"contato", "kontakt", "contacto", "info-de", "info-uk"}
+# Company-form suffixes that only ever sit at the END of a name, where matching
+# them loosely would be wrong: "AB" is Swedish (aktiebolag) and identifies
+# Innovagen AB of Lund, but \bab\b anywhere in a name would also hit the queue's
+# "AB Hormone", a US clinic. "Oy" is Finnish and "AS" Norwegian, both with the
+# same problem loose. Anchored, they are safe.
+FOREIGN_SUFFIX = re.compile(r"\s(ab|oy|oyj|a/?s|nv|spa|sa)\.?$", re.I)
 FOREIGN_NAME = re.compile(r"\b(uae|dubai|uk|london|centre|wuhan|shanghai|shenzhen|beijing|hangzhou|guangzhou|nanjing"
                           r"|jinan|qingdao|tianjin|chengdu|xi'?an|suzhou|ningbo|zhengzhou|changsha|hefei|kunming|dalian|chongqing"
                           r"|shijiazhuang|shandong|jiangsu|zhejiang|hubei|hunan|henan|hebei|anhui|sichuan|guangdong"
@@ -153,6 +159,10 @@ FOREIGN_DOMAINS = {"boruimei.com",      # Jinan Boruimei Trading Co., Ltd.
                                         # says us_signal = yes; it is the second follow-up in two
                                         # waves that would have sent the no-customs-risk pitch to a
                                         # company outside the US for the second time
+                   "innovagen.com",     # "LL-37 - Innovagen AB": AB is aktiebolag, the Swedish
+                                        # company form, and Innovagen is a Lund peptide synthesis
+                                        # house. Foreign and our side of the trade at once. The
+                                        # suffix is gated above as well, anchored to the end
                    "hkburson.com",      # "Hong Kong Burson PolyPeptide RD Limited", reachable at
                                         # pj91920107@icloud.com, phones (852) 667-1708 and
                                         # (861) 926-3496. Pinned as well as prefix-matched
@@ -347,6 +357,21 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     # publish about the compounds we sell. A blanket .org rule would be
                     # wrong -- 55 live queue rows are .org and most are real clinics
                     # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "ibl-america.com",      # the harvested name is a catalogue entry, "Glucagon-like
+                                            # Peptide-1 (GLP-1) Active Form ELISA - IBL-America". An
+                                            # ELISA is an assay kit: this house sells the means to
+                                            # measure peptides, not peptides
+                    "lifetein.com",         # "LifeTein: Custom Peptide Synthesis Services" -- it
+                                            # synthesises peptides to order, which is what we do. The
+                                            # genscript and cambrex case, a competitor not a buyer
+                    "bcnpeptides.com",      # the row is malformed -- the stored vendor name is a URL,
+                                            # "https://www.bcnpeptides.com/successful..." -- so nothing
+                                            # describes the business, and there is no US signal. BCN is
+                                            # Barcelona, and the company synthesises peptides: foreign
+                                            # and our side of the trade both
+                    "vitalibrary.com",      # "Ipamorelin: Uses and Benefits, Mechanism of Action" --
+                                            # a reference library, as the domain says. It explains
+                                            # compounds, it does not stock them
                     "freedomdiagnosticstesting.com",  # "Freedom Diagnostics Testing - Reliable.
                                             # Ac[curate]" -- a testing lab, the fourth of them this
                                             # week after checkpeptide, cellorigins and janoshiklab.
@@ -928,6 +953,8 @@ def skip_contact(email, audience="", domain="", name=""):
     if email in HELD_CONTACTS or d in HELD_CONTACTS:
         return True
     if FACTORY_NAME.search(name or ""):
+        return True
+    if FOREIGN_SUFFIX.search((name or "").strip()):
         return True
     if audience == "vendor" and (is_foreign(d, name) or d in FOREIGN_FREEMAIL):
         return True
