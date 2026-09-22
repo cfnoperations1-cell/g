@@ -1,0 +1,15 @@
+Jonathan, 2026-09-22 16:55 UTC: "Don't send anymore out."
+
+Outreach sending is stopped. The day's 100 had already gone out when he said
+this, so nothing was cut short mid-wave.
+
+What was done:
+  - the scheduled "Daily outreach wave" trigger (07:05Z Sep 23) was deleted
+  - this file makes `serve_send.py next` refuse, so a recreated trigger or a
+    resumed session cannot send by accident
+
+Still running and NOT stopped by this file, because neither sends email:
+  - the daily lead hunt (mines directories, adds to the queue)
+  - the morning brief triggers
+
+To resume: delete this file. Nothing else needs changing.

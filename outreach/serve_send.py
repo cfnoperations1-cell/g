@@ -1180,7 +1180,25 @@ def check_exclusions():
                  + ", ".join(bad[:8]) + ("..." if len(bad) > 8 else ""))
 
 
+STOP = OUT / "STOP_SENDING"
+
+
+def check_stopped():
+    """Refuse to build a batch while outreach/STOP_SENDING exists.
+
+    Jonathan said "Don't send anymore out" on Sep 22 after the day's 100 were
+    away. The scheduled wave was deleted, but a trigger is a thing that can be
+    recreated by accident and a session can be resumed, so the instruction also
+    lives here, in the one function every send passes through. Delete the file
+    to resume; nothing else needs changing.
+    """
+    if STOP.exists():
+        note = STOP.read_text(encoding="utf-8").strip()
+        sys.exit("SENDING IS STOPPED by outreach/STOP_SENDING\n" + note)
+
+
 def cmd_next(n, out_json):
+    check_stopped()
     check_exclusions()
     rows = load_sent(); qi = {r["email"].strip().lower(): r for r in load_queue()}
     dids = load_draft_ids(); sd = sender()
