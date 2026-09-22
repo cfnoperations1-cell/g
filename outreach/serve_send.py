@@ -361,6 +361,48 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     # publish about the compounds we sell. A blanket .org rule would be
                     # wrong -- 55 live queue rows are .org and most are real clinics
                     # (balancedhc.org, walkerwellness.org) -- so they are named here.
+                    "bioduro.com",          # the row says nothing -- the stored name is the link
+                                            # label "See Website" and there is no phone -- but
+                                            # BioDuro is a contract research and manufacturing
+                                            # organisation, the cambrex and genscript case. It is
+                                            # paid to make compounds for other people
+                    "bscg.org",             # Banned Substances Control Group, a certification and
+                                            # testing body. The page harvested is "Retailers Selling
+                                            # Unapproved Sports Peptides" -- it publishes lists of
+                                            # companies doing what a cold peptide pitch looks like.
+                                            # The worst possible recipient, and the third watchdog
+                                            # after safemedicines.org and medshadow.org
+                    "a4pc.org",             # Alliance for Pharmacy Compounding, a trade association:
+                                            # the page harvested is consumer guidance, "questions
+                                            # consumers can ask when choosing ...". The
+                                            # safemedicines.org and medshadow.org case
+                    "raybiotech.com",       # "RayBiotech: Empowering Your Proteomics Research" --
+                                            # antibody arrays and ELISA kits, the ibl-america.com
+                                            # case. It sells the means to measure, not the product
+                    "pepcalc.app",          # harvested name is the link label "Open PepCalc ->", no
+                                            # phone and no US signal. A dosing calculator, the
+                                            # peptidelibrary.app case: a tool, not a business
+                    "peptidekit.app",       # "Open PeptideKit ->", same shape and same verdict
+                    "ils-lab.com",          # "Peptide QC & Analytical Testing | ILS Lab"
+                    "optiqhealthlabs.com",  # "Peptide Testing Services in Colorado" -- with
+                                            # checkpeptide, cellorigins, freedomdiagnostics, ibl-america
+                                            # and janoshiklab, the sixth testing house declined. They
+                                            # keep surfacing because they rank for the compounds we sell
+                    "a4m.com",              # the American Academy of Anti-Aging Medicine: the harvested
+                                            # name is "Peptide therapy handbook for healthcare ...", and
+                                            # there is no US signal on the row. A teaching and
+                                            # certification body, the empiremedicaltraining.com case
+                    "myspalive.com",        # the page harvested is "Peptide Distributor Sign Up |
+                                            # Wholesale" -- it is recruiting distributors, so it is the
+                                            # supplier in that relationship. The peptidedropship.com case
+                    "pepticom.com",         # a judgement call, recorded as one: the stored name is just
+                                            # the brand twice, no country is given, and the single phone
+                                            # is "(972) 549-5549". 972 is a real Dallas area code, so
+                                            # this is not the clean 852 tell -- but it is also Israel's
+                                            # country code and 54 is an Israeli mobile prefix, and
+                                            # Pepticom is a Jerusalem company. With the US pitch resting
+                                            # on domestic manufacture, the campaign errs toward excluding
+                                            # on geography rather than loosening the gate
                     "ibl-america.com",      # the harvested name is a catalogue entry, "Glucagon-like
                                             # Peptide-1 (GLP-1) Active Form ELISA - IBL-America". An
                                             # ELISA is an assay kit: this house sells the means to
