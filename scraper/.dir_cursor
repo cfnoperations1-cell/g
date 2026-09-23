@@ -24,63 +24,64 @@
   "https://medspadirectorypro.com/sitemap.xml": 597
  },
  "verifiedantiagingclinics": {
-  "https://verifiedantiagingclinics.com/sitemap-clinics.xml": 3942,
+  "https://verifiedantiagingclinics.com/sitemap-clinics.xml": 4562,
   "https://verifiedantiagingclinics.com/sitemap-telehealth.xml": 0
  },
  "theivdirectory": {
-  "https://theivdirectory.com/sitemap.xml": 3941
+  "https://theivdirectory.com/sitemap.xml": 7369
  },
  "medspanear": {
   "https://medspanear.me/api/sitemaps/sitemap-listings-alabama.xml": 289,
   "https://medspanear.me/api/sitemaps/sitemap-listings-alaska.xml": 131,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-arizona.xml": 269,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-arkansas.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-california.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-colorado.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-connecticut.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-delaware.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-florida.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-georgia.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-hawaii.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-idaho.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-illinois.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-indiana.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-iowa.xml": 16,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-kansas.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-louisiana.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-maine.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-maryland.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-massachusetts.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-michigan.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-minnesota.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-mississippi.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-missouri.xml": 16,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-montana.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-nebraska.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-nevada.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-new-hampshire.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-new-jersey.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-new-mexico.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-new-york.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-north-carolina.xml": 24,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-north-dakota.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-ohio.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-oklahoma.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-oregon.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-pennsylvania.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-rhode-island.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-south-carolina.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-south-dakota.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-tennessee.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-texas.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-utah.xml": 18,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-vermont.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-virginia.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-washington.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-west-virginia.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-wisconsin.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-wyoming.xml": 23,
-  "https://medspanear.me/api/sitemaps/sitemap-listings-district-of-columbia.xml": 22
+  "https://medspanear.me/api/sitemaps/sitemap-listings-arizona.xml": 378,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-arkansas.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-california.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-colorado.xml": 134,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-connecticut.xml": 134,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-delaware.xml": 92,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-florida.xml": 134,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-georgia.xml": 134,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-hawaii.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-idaho.xml": 50,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-illinois.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-indiana.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-iowa.xml": 125,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-kansas.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-kentucky.xml": 109,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-louisiana.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-maine.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-maryland.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-massachusetts.xml": 133,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-michigan.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-minnesota.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-mississippi.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-missouri.xml": 124,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-montana.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-nebraska.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-nevada.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-new-hampshire.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-new-jersey.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-new-mexico.xml": 50,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-new-york.xml": 132,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-north-carolina.xml": 131,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-north-dakota.xml": 111,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-ohio.xml": 128,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-oklahoma.xml": 127,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-oregon.xml": 127,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-pennsylvania.xml": 86,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-rhode-island.xml": 10,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-south-carolina.xml": 126,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-south-dakota.xml": 126,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-tennessee.xml": 126,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-texas.xml": 46,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-utah.xml": 121,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-vermont.xml": 58,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-virginia.xml": 125,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-washington.xml": 125,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-west-virginia.xml": 125,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-wisconsin.xml": 126,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-wyoming.xml": 126,
+  "https://medspanear.me/api/sitemaps/sitemap-listings-district-of-columbia.xml": 25
  },
  "peptidesuppliermatch": {
   "https://peptidesuppliermatch.com/sitemap.xml": 1000
@@ -89,10 +90,10 @@
   "https://www.findmyhrt.com/sitemap.xml": 398
  },
  "auravenu": {
-  "https://auravenu.com/sitemap-0.xml": 890
+  "https://auravenu.com/sitemap-0.xml": 4648
  },
  "medspalistings": {
-  "https://medspalistings.com/sitemap.xml": 890
+  "https://medspalistings.com/sitemap.xml": 1405
  },
  "medspafind": {
   "https://medspafind.com/medspas-sitemap.xml": 140
@@ -104,6 +105,15 @@
   "https://glp1almanac.com/sitemap.xml": 51
  },
  "ivhealthclinics": {
-  "https://ivhealthclinics.com/sitemap.xml": 750
+  "https://ivhealthclinics.com/sitemap.xml": 3144
+ },
+ "longevityclinicfinder": {
+  "https://www.longevityclinicfinder.com/sitemap/clinics.xml": 5455
+ },
+ "trtguide": {
+  "https://trtguide.com/sitemap.xml": 2643
+ },
+ "hormonemap": {
+  "https://hormonemap.com/sitemap.xml": 1000
  }
 }

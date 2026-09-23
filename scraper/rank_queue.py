@@ -174,6 +174,36 @@ def score(row, hunts, exports, followers, ratings):
     return s, "; ".join(why)
 
 
+# A "great" lead, for runway purposes: score >= GREAT. Twenty is what a US
+# practice earns from a published location (6), an address on its own domain
+# (10) and its own pages showing a couple of peptide or GLP-1 terms (4) -- the
+# floor Jonathan's "great leads" is taken to mean. Ratings, followers and named
+# compounds all sit above it.
+GREAT = 20.0
+RUNWAY_TARGET_DAYS = 90   # Jonathan, Sep 23: "3 months of run time worth of great leads"
+
+
+def runway(scored):
+    """Days of sending the eligible great leads cover at today's daily cap.
+
+    Counts only what serve_send would actually send -- not yet contacted, past
+    every exclusion gate, inside the current AUDIENCE_ONLY focus -- so the figure
+    cannot be flattered by rows the sender would skip.
+    """
+    sys.path.insert(0, str(ROOT / "outreach"))
+    import serve_send as ss
+    eligible = {r["email"].strip().lower() for r in ss.initial_candidates(ss.load_sent())}
+    great = sum(1 for t in scored if t[3]["email"].strip().lower() in eligible and t[4] >= GREAT)
+    cap = ss.DAILY_CAP
+    days = great / cap if cap else 0
+    need = max(0, RUNWAY_TARGET_DAYS * cap - great)
+    focus = f" ({ss.AUDIENCE_ONLY} only)" if ss.AUDIENCE_ONLY else ""
+    print(f"\nRUNWAY: {great} great leads eligible{focus} = {days:.0f} days at {cap}/day; "
+          f"target {RUNWAY_TARGET_DAYS} days needs {RUNWAY_TARGET_DAYS * cap} "
+          f"-> {'MET' if not need else f'{need} short'}")
+    return great, days, need
+
+
 def main():
     apply = "--apply" in sys.argv
     rows = list(csv.DictReader(open(QUEUE, newline="", encoding="utf-8")))
@@ -198,6 +228,7 @@ def main():
     for _, _, _, r, sc, why in scored[-6:]:
         print(f"  {sc:5.1f}  {r['audience']:6s} {r['business_name'][:30]:32s} {r['email'][:36]:38s} {why}")
 
+    runway(scored)
     ms = [t for t in scored if t[0] == 0]
     print(f"\nmed spas {len(ms)} (best {-ms[0][1]:.1f}, worst {-ms[-1][1]:.1f}); "
           f"vendors {len(scored) - len(ms)} below them")
