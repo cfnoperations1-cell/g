@@ -653,6 +653,15 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                                             # The business is gone; a follow-up would only bounce
                     "pepty.app",            # "Peptide Price Comparison | Pepty" -- it ranks other
                                             # vendors' prices for shoppers and buys nothing itself
+                    "massagestrong.com",    # Massage Strong, Lexington KY: a massage studio whose
+                                            # only "peptide" hit is oxytocin, which massage copy cites
+                                            # as what a massage releases. Nothing it offers is ours
+                    "stl-psc.com",          # a shared professional-suites site: the directory listed
+                                            # it for Cabbabe Aesthetics and the only address on it is
+                                            # ahoytherapyllc@gmail.com, a third tenant's inbox
+                    "zenithbeautylab.com",  # listed as "Shaping Beauty Lounge" but the domain is Zenith
+                                            # Beauty Lab, on a single glutathione hit: a row describing
+                                            # a different business than its domain
                     "ultimapharma.com"}     # sells "AAS, HGH, PEPTIDES": its menu is Injectable
                                             # Steroids, Oral Steroids, Peptides. Anabolic steroids are
                                             # Schedule III, and this is a direct-to-consumer storefront
