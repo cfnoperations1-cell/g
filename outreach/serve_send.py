@@ -691,6 +691,25 @@ HELD_CONTACTS = {
 # .com, so neither a domain nor a TLD rule would catch both.
 FACTORY_NAME = re.compile(r"\bpeptides?\s+factory\b", re.I)
 
+# One business reached through two domains. brand_key catches look-alike
+# domains (paradigm-peptide / paradigmpeptides) but not unrelated ones, and two
+# directories can each publish a different domain for the same practice. Each
+# entry maps the alias to the domain we keep, and is here only with evidence
+# that it is the same business -- never on a name match alone.
+#
+# A general dedupe by harvested business NAME was measured on Sep 23 and
+# rejected: of 28 names found on 2+ eligible domains, most were page titles
+# shared by unrelated clinics ("IV Hydration Therapy" on seven different sites,
+# "Homepage", "About Us") or genuinely different practices with the same name in
+# different cities ("Enhanced Wellness" in Derby and in West Virginia). It would
+# have suppressed real prospects to save a handful of duplicate sends.
+DUPLICATE_OF = {
+    "ehdenaesthetics.com": "ehdenmedical.com",   # Ehden Medical Aesthetics, Latham NY.
+        # trtguide's listing "ehden-medical-aesthetics" links ehdenaesthetics.com and
+        # ivhealthclinics' "ehden-medical-latham-ny" links ehdenmedical.com: same
+        # practice, same town. Both reached one Sep 23 batch, rows 5 and 10.
+}
+
 DECLINED_CONTACTS = {"amelia.tide518@gmail.com",  # the only address for "Wingem Polypeptide
                                             # Biotech", whose two phones are both (852) Hong Kong
                                             # lines and whose row carries no US signal. On gmail,
@@ -1123,6 +1142,8 @@ def skip_contact(email, audience="", domain="", name=""):
     if d in DECLINED_DOMAINS or email in DECLINED_CONTACTS or email in third_party():
         return True
     if email in HELD_CONTACTS or d in HELD_CONTACTS:
+        return True
+    if d in DUPLICATE_OF:
         return True
     # An address the harvester mangled is a guaranteed bounce, and bounces cost
     # sending reputation on a domain that has already been throttled once. The row
