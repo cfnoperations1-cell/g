@@ -9,9 +9,19 @@ the whole mechanism -- no scoring code runs at send time and nothing about
 how a message is built changes. Re-runnable: it reads the queue, scores, and
 rewrites it in place.
 
-What "top rated" can honestly mean here. There are no star ratings anywhere in
-this data, so none are invented. What we do hold is evidence of prominence and
-of substance, and the score is built only from that:
+What "top rated" means here. Star ratings exist only where a directory
+publishes one: dir_mine.py records the listing's schema.org aggregateRating (or
+visible "4.9/5") into scraper/ratings.csv as it reads each page. Rows mined
+before Sep 23 have no rating on file, and nothing is invented for them. The
+score is built only from evidence actually held:
+
+  rating       Review-weighted, not raw. A plain average ranks a 5.0 from three
+               reviews above a 4.8 from four hundred, which is backwards, so the
+               rating is shrunk toward the directory mean in proportion to how
+               few reviews stand behind it (a Bayesian average, prior weight
+               RATING_PRIOR_N reviews at RATING_PRIOR_MEAN). Review volume also
+               earns a little on its own: a practice with a thousand reviews is
+               an established business.
 
   prominence   Instagram follower count, from the two ranked lists Jonathan
                supplied. The med spa list is itself ranked by followers, so
@@ -50,6 +60,34 @@ ROLE = re.compile(r"^(info|contact|hello|support|sales|admin|office|team|orders?
                   r"inquiries|inquiry|clientcare|customerservice|frontdesk|booking|care)\b")
 
 
+RATINGS_FILE = ROOT / "scraper" / "ratings.csv"
+RATING_PRIOR_N = 25       # a rating needs ~25 reviews before it is mostly its own
+RATING_PRIOR_MEAN = 4.6   # where med spa ratings sit before evidence says otherwise
+
+
+def load_ratings():
+    out = {}
+    if RATINGS_FILE.exists():
+        for r in csv.DictReader(open(RATINGS_FILE, encoding="utf-8")):
+            try:
+                v = float(r["rating"])
+            except (TypeError, ValueError):
+                continue
+            n = int(r["reviews"]) if (r.get("reviews") or "").isdigit() else None
+            out[r["domain"].lower()] = (v, n)
+    return out
+
+
+def rating_points(v, n):
+    """Points for a star rating, weighted by how many reviews support it."""
+    if n is None:                       # a rating with no count: weight it as a handful
+        n = 5
+    wr = (n * v + RATING_PRIOR_N * RATING_PRIOR_MEAN) / (n + RATING_PRIOR_N)
+    pts = max(0.0, (wr - 4.0) * 20.0)   # 4.0 -> 0, 5.0 -> 20
+    pts += min(9.0, 3.0 * math.log10(n)) if n >= 10 else 0.0
+    return pts, wr
+
+
 def load(pattern, key):
     """Index every row of every matching CSV by a lowercased key column."""
     idx = {}
@@ -81,12 +119,22 @@ def followers_by_email():
     return out
 
 
-def score(row, hunts, exports, followers):
+def score(row, hunts, exports, followers, ratings):
     em = row["email"].strip().lower()
     dom = em.split("@", 1)[1] if "@" in em else ""
     h = hunts.get(em) or {}
     x = exports.get(em) or {}
     s, why = 0.0, []
+
+    # The rating is keyed by the SITE's domain; for a freemail row that is only
+    # known from the hunt row, so try that first and fall back to the address.
+    for d in {(h.get("domain") or "").lower().removeprefix("www."), dom}:
+        if d and d in ratings:
+            v, n = ratings[d]
+            pts, wr = rating_points(v, n)
+            s += pts
+            why.append(f"{v:.1f} stars" + (f" / {n:,} reviews" if n else "") + f" (weighted {wr:.2f})")
+            break
 
     f = followers.get(em, 0)
     if f:
@@ -132,12 +180,13 @@ def main():
     hunts = load("scraper/hunts/*.csv", "email")
     exports = load("exports/us_peptide_vendors_*.csv", "primary_email")
     followers = followers_by_email()
+    ratings = load_ratings()
     print(f"{len(rows)} queue rows; evidence: {len(hunts)} hunt, {len(exports)} export, "
-          f"{len(followers)} follower counts")
+          f"{len(followers)} follower counts, {len(ratings)} star ratings")
 
     scored = []
     for i, r in enumerate(rows):
-        sc, why = score(r, hunts, exports, followers)
+        sc, why = score(r, hunts, exports, followers, ratings)
         # med spas first as a block, then vendors; score orders within each.
         scored.append(((0 if r["audience"] == "medspa" else 1), -sc, i, r, sc, why))
     scored.sort(key=lambda t: (t[0], t[1], t[2]))

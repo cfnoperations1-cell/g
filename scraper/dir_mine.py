@@ -428,6 +428,58 @@ def host_of(url):
     return re.sub(r"^https?://(www\.)?", "", url).split("/")[0].lower().split(":")[0]
 
 
+# Star ratings, where a directory publishes them. Jonathan asked for leads
+# "ranked by best med spa", and four directories carry a real rating on each
+# listing -- medspanear, auravenu and ivhealthclinics as schema.org
+# aggregateRating (ratingValue plus reviewCount), medspalistings only as visible
+# "4.9/5" text with no count. Kept in a sidecar keyed by domain rather than
+# threaded through the Name|domain candidate format, so lead_hunt and the
+# ingest are untouched and scraper/rank_queue.py joins it in by domain.
+RATINGS = {}
+RATINGS_FILE = Path(__file__).with_name("ratings.csv")
+RATING_RE = re.compile(r'"ratingValue"\s*:\s*"?([0-9]+(?:\.[0-9]+)?)', re.I)
+COUNT_RE = re.compile(r'"(?:reviewCount|ratingCount)"\s*:\s*"?([0-9]+)', re.I)
+VISIBLE_RE = re.compile(r'\b([0-5]\.[0-9])\s*/\s*5\b')
+
+
+def rating_of(h):
+    """(rating, reviews) from a listing page, or (None, None).
+
+    Takes the FIRST aggregateRating on the page, which is the listing's own
+    LocalBusiness block; later ones belong to "related clinics" panels. A value
+    outside 0-5 is discarded rather than clamped, since it means the regex hit
+    something other than a star rating.
+    """
+    m = RATING_RE.search(h)
+    if m:
+        v = float(m.group(1))
+        c = COUNT_RE.search(h)
+        n = int(c.group(1)) if c else None
+        return (v, n) if 0 < v <= 5 else (None, None)
+    m = VISIBLE_RE.search(h)
+    if m:
+        v = float(m.group(1))
+        return (v, None) if 0 < v <= 5 else (None, None)
+    return None, None
+
+
+def save_ratings(directory_of):
+    """Merge this run's ratings into scraper/ratings.csv. Newest reading wins."""
+    import csv as _csv
+    old = {}
+    if RATINGS_FILE.exists():
+        for r in _csv.DictReader(open(RATINGS_FILE, encoding="utf-8")):
+            old[r["domain"]] = r
+    for dom, (v, n, url) in RATINGS.items():
+        old[dom] = {"domain": dom, "rating": v, "reviews": "" if n is None else n,
+                    "directory": directory_of(url), "listing_url": url}
+    with open(RATINGS_FILE, "w", newline="", encoding="utf-8") as f:
+        w = _csv.DictWriter(f, fieldnames=["domain", "rating", "reviews", "directory", "listing_url"])
+        w.writeheader()
+        w.writerows(sorted(old.values(), key=lambda r: r["domain"]))
+    return len(RATINGS), len(old)
+
+
 def clinic_of(url):
     """(name, domain) for one listing page, or None when it names no website.
 
@@ -460,12 +512,19 @@ def clinic_of(url):
     for mm in re.finditer(r'<a[^>]+href="(https?://[^"]+)"[^>]*>(.{0,80}?)</a>', h, re.S | re.I):
         href, inner = mm.group(1), mm.group(2)
         if WEBSITE_ANCHOR.search(">" + inner + "<") and usable(host_of(href)):
-            return (name or host_of(href), host_of(href))
+            return _rated(h, url, (name or host_of(href), host_of(href)))
     for href in re.findall(r'href="(https?://[^"]+)"', h):
         d = host_of(href)
         if usable(d):
-            return (name or d, d)
+            return _rated(h, url, (name or d, d))
     return None
+
+
+def _rated(h, url, got):
+    v, n = rating_of(h)
+    if v is not None:
+        RATINGS[got[1].lower().removeprefix("www.")] = (v, n, url)
+    return got
 
 
 def cursors():
@@ -520,7 +579,14 @@ def main():
             print(f"{n:<22} {len(listing_urls(n)):>5} listings in sitemap")
         return
 
-    names = list(DIRECTORIES) if a.directory == "all" else [a.directory]
+    # "all", one name, or a comma-separated list sharing one --limit, e.g.
+    # "medspanear,auravenu" -- one process, so the cursor file has one writer.
+    # Two processes each read the cursor at start and write it at the end, and
+    # the second to finish silently discards the first one's progress.
+    names = list(DIRECTORIES) if a.directory == "all" else [x.strip() for x in a.directory.split(",")]
+    unknown = [x for x in names if x not in DIRECTORIES]
+    if unknown:
+        sys.exit(f"unknown directory: {unknown}")
     cur = cursors()
     known_bases, _ = lead_hunt.known()
     rows, opened = [], 0
@@ -572,6 +638,12 @@ def main():
         cur[n] = {sm: off[n][sm] + starts.get(sm, 0) for sm in by_sm[n]}
 
     CURSOR.write_text(json.dumps(cur, indent=1))
+    def _dir_of(u):
+        h = host_of(u)
+        return next((k for k, c in DIRECTORIES.items()
+                     if any(host_of(x) == h for x in c["sitemaps"])), h)
+    got_r, total_r = save_ratings(_dir_of)
+    print(f"ratings: {got_r} captured this run, {total_r} on file in {RATINGS_FILE.name}")
     # Re-read what the campaign holds, now that the crawl is over. known_bases was
     # read at startup, and a mine runs for the best part of an hour while the hourly
     # waves keep ingesting leads behind it -- on Sep 20 that gap let 58 clinics
