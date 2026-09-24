@@ -225,7 +225,7 @@
     </div>
     <div>
       <div class="asof">
-        UPDATED <b>2026-09-24 08:10 UTC</b><br>
+        UPDATED <b>2026-09-24 09:12 UTC</b><br>
         sending <b>10/hr · 100/day</b><br>
         follow-ups open <b>2026-09-17</b>
       </div>
@@ -245,8 +245,8 @@
   <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
     <span class="dot run"></span>
     <b style="color:var(--run)">Ramped sending</b>
-    <span>10 emails per hourly wave, 50 per day. 20 of 50 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
-    <span class="when">20 of 50 sent today</span>
+    <span>10 emails per hourly wave, 50 per day. 30 of 50 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
+    <span class="when">30 of 50 sent today</span>
   </div>
 
   <section style="margin-top:26px">
@@ -254,11 +254,11 @@
       <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
 
     <div class="kpis six" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">1085</div><div class="k">Contacts emailed</div><div class="d">915 vendors &middot; 170 med spas</div></div>
-      <div class="kpi"><div class="n mono">20</div><div class="k">Sent today</div><div class="d">20 first-touch &middot; 0 follow-ups &middot; 30 left under the daily cap</div></div>
+      <div class="kpi accent"><div class="n mono">1095</div><div class="k">Contacts emailed</div><div class="d">915 vendors &middot; 180 med spas</div></div>
+      <div class="kpi"><div class="n mono">30</div><div class="k">Sent today</div><div class="d">30 first-touch &middot; 0 follow-ups &middot; 20 left under the daily cap</div></div>
       <div class="kpi good"><div class="n mono">61</div><div class="k">Replies</div><div class="d">5.6% of contacts &middot; plus 23 auto-replies</div></div>
-      <div class="kpi bad"><div class="n mono">79</div><div class="k">Bounces</div><div class="d">7.3% &middot; removed from follow-ups</div></div>
-      <div class="kpi"><div class="n mono">5,105</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi bad"><div class="n mono">79</div><div class="k">Bounces</div><div class="d">7.2% &middot; removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">5,095</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
       <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
     </div>
 
@@ -273,10 +273,10 @@
         </div>
       </div>
       <div class="tablecard">
-        <h3>Contact status <span class="count">1085 tracked</span></h3>
+        <h3>Contact status <span class="count">1095 tracked</span></h3>
         <div class="seg" id="seg"></div>
         <ul class="status" id="statusList"></ul>
-        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>751</b> awaiting step 1, <b>164</b> at step 1, <b>647</b> due now.</div>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>761</b> awaiting step 1, <b>164</b> at step 1, <b>657</b> due now.</div>
       </div>
     </div>
 
@@ -343,7 +343,7 @@
     <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Outreach</span><h2>Catalog sent</h2>
       <span class="count">52 businesses &middot; sent by hand, one reply at a time</span></div>
     <div class="kpis" style="margin-top:0">
-      <div class="kpi accent"><div class="n mono">52</div><div class="k">Have the catalog</div><div class="d">4.8% of 1,085 contacts emailed</div></div>
+      <div class="kpi accent"><div class="n mono">52</div><div class="k">Have the catalog</div><div class="d">4.7% of 1,095 contacts emailed</div></div>
       <div class="kpi"><div class="n mono">34</div><div class="k">Full package</div><div class="d">catalog, price list, FAQ and COA examples</div></div>
       <div class="kpi"><div class="n mono">18</div><div class="k">Partial</div><div class="d">catalog only, a price sheet, or a COA</div></div>
       <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
@@ -502,7 +502,7 @@
       {
           "d": "Sep 24",
           "v": 0,
-          "m": 20
+          "m": 30
       }
   ];
   (function drawChart(){
@@ -543,7 +543,7 @@
       {
           "k": "Awaiting reply",
           "sub": "eligible for follow-ups",
-          "n": 915,
+          "n": 925,
           "c": "var(--accent)"
       },
       {
@@ -1409,7 +1409,7 @@
     {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
     {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
     {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
-    {name:"Send",       st:"run",   meta:"1085 sent &middot; 10/hr &middot; 50/day"},
+    {name:"Send",       st:"run",   meta:"1095 sent &middot; 10/hr &middot; 50/day"},
   ];
   const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
   const flow = document.getElementById("flow");
