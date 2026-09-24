@@ -39,13 +39,61 @@ _THIRD_PARTY = None
 FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "emailer" / "followup_vendor.txt"}
 
 DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/day for the next week
-# AUDIENCE_ONLY restricts a wave to one audience. Jonathan, Sep 22: "only run
-# 50 per day and focus on medspas", for the next week -- so through Sep 29.
-# Both settings are dated on purpose: when the week is up they should be a
-# decision to renew, not a default that quietly stayed. Clear it with
-# AUDIENCE_ONLY= to go back to every audience.
-AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "medspa").strip().lower()
+# AUDIENCE_ONLY restricts a wave to one audience. Jonathan, Sep 24: "swap to
+# doing RUO brands again and not do Med Spa's. These are not great leads so
+# starting tomorrow send out the rest of the RUO brands that we haven't
+# contacted." That replaces his Sep 22 med spa focus and has no end date; the
+# med spa rows stay in the queue but are not eligible. FOCUS_REVIEW_DATE now
+# dates only the 50/day cap, which he set "for the next week" on Sep 22.
+# Clear it with AUDIENCE_ONLY= to go back to every audience.
+AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "vendor").strip().lower()
 FOCUS_REVIEW_DATE = "2026-09-29"
+# RUO_ONLY: with AUDIENCE_ONLY=vendor, only research-peptide brands are eligible.
+# The "vendor" audience is not only RUO brands: the Sep 22 Instagram import filed
+# med spas and telehealth clinics with no quotable compounds under the vendor
+# template, and lead_hunt tagged some clinics from the clinic directories as
+# vendors. On Sep 24 that was 408 of the 610 uncontacted vendor rows. Jonathan's
+# ask is RUO brands and no med spas, so a vendor row is eligible only when its
+# address or domain appears on one of the RUO vendor lists below.
+RUO_ONLY = os.environ.get("RUO_ONLY", "1") != "0"
+RUO_SOURCES = ["exports/us_peptide_vendors_*.csv", "scraper/peptide_vendors_master.csv",
+               "scraper/peptidebase_resolved_*.csv"]
+_RUO = None
+
+
+def ruo_keys():
+    """Lower-cased emails and domains from every RUO vendor list."""
+    global _RUO
+    if _RUO is None:
+        import glob
+        keys = set()
+        for pat in RUO_SOURCES:
+            for f in glob.glob(str(ROOT / pat)):
+                for r in csv.DictReader(open(f, encoding="utf-8-sig", errors="replace")):
+                    r = {(k or "").strip().lower(): (v or "") for k, v in r.items()}
+                    for col in ("email", "primary_email", "all_emails"):
+                        for e in re.split(r"[;,\s]+", r.get(col, "")):
+                            e = e.strip().lower()
+                            if "@" in e:
+                                keys.add(e); keys.add(e.split("@", 1)[1])
+                    for col in ("domain", "website"):
+                        d = re.sub(r"^https?://", "", r.get(col, "").strip().lower()).split("/")[0]
+                        d = d.removeprefix("www.")
+                        if "." in d:
+                            keys.add(d)
+        # A brand's own domain identifies it; a mailbox provider does not. Without
+        # this, one gmail.com address on an RUO list let every Gmail-using clinic
+        # through (63 of them on Sep 24).
+        _RUO = keys - FREEMAIL - FOREIGN_FREEMAIL - {"icloud.com", "aol.com", "me.com", "live.com", "msn.com"}
+    return _RUO
+
+
+def is_ruo(email):
+    e = email.strip().lower()
+    k = ruo_keys()
+    return e in k or e.split("@", 1)[1] in k
+
+
 HOURLY_CAP = int(os.environ.get("HOURLY_CAP", "10"))     # ramp: 10 per hourly wave
 FOLLOWUP_DAYS = int(os.environ.get("FOLLOWUP_DAYS", "3"))
 MAX_FOLLOWUPS = int(os.environ.get("MAX_FOLLOWUPS", "3"))
@@ -653,6 +701,44 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                                             # The business is gone; a follow-up would only bounce
                     "pepty.app",            # "Peptide Price Comparison | Pepty" -- it ranks other
                                             # vendors' prices for shoppers and buys nothing itself
+                    "gyrosproteintech.com",  # Sep 24 RUO sweep: peptide synthesiser instruments (support.europe@); sells to us or buys nothing
+                    "cem.com",               # Sep 24 RUO sweep: microwave peptide synthesisers (info.fr@); sells to us or buys nothing
+                    "medigy.com",            # Sep 24 RUO sweep: health-tech directory; sells to us or buys nothing
+                    "mybiosource.com",       # Sep 24 RUO sweep: research reagent catalogue; sells to us or buys nothing
+                    "karebaybio.com",        # Sep 24 RUO sweep: custom peptide synthesis CRO; sells to us or buys nothing
+                    "p3bio.com",             # Sep 24 RUO sweep: custom peptide synthesis; sells to us or buys nothing
+                    "biorbyt.com",           # Sep 24 RUO sweep: UK reagent catalogue; sells to us or buys nothing
+                    "shipmercury.com",       # Sep 24 RUO sweep: shipping software; sells to us or buys nothing
+                    "caymanchem.com",        # Sep 24 RUO sweep: reagent manufacturer; sells to us or buys nothing
+                    "rockland.com",          # Sep 24 RUO sweep: antibody manufacturer; sells to us or buys nothing
+                    "hycultbiotech.com",     # Sep 24 RUO sweep: Dutch reagent supplier; sells to us or buys nothing
+                    "gethealthspan.com",     # Sep 24 RUO sweep: telehealth clinic, not an RUO brand; sells to us or buys nothing
+                    "bacteriostaticwaterstore.com", # Sep 24 RUO sweep: sells reconstitution supplies; sells to us or buys nothing
+                    "sportsresearch.com",    # Sep 24 RUO sweep: supplement brand; sells to us or buys nothing
+                    "bachem.com",            # Sep 24 RUO sweep: API manufacturer; the address is investor.relations@; sells to us or buys nothing
+                    "clarusanalytical.com",  # Sep 24 RUO sweep: analytical testing lab; sells to us or buys nothing
+                    "drug-dev.com",          # Sep 24 RUO sweep: trade publication; sells to us or buys nothing
+                    "scitide.com",           # Sep 24 RUO sweep: peptide synthesis; sells to us or buys nothing
+                    "stephenmccain.com",     # Sep 24 RUO sweep: a personal site harvested as "https"; sells to us or buys nothing
+                    "vectorpayments.com",    # Sep 24 RUO sweep: payment processor; sells to us or buys nothing
+                    "ohiopeptide.com",       # Sep 24 RUO sweep: custom peptide synthesis; sells to us or buys nothing
+                    "selvita.com",           # Sep 24 RUO sweep: Polish CRO; sells to us or buys nothing
+                    "csbio.com",             # Sep 24 RUO sweep: peptide synthesisers (instrument@); sells to us or buys nothing
+                    "innerbody.com",         # Sep 24 RUO sweep: review site (compliance@); sells to us or buys nothing
+                    "sydlabs.com",           # Sep 24 RUO sweep: custom peptide synthesis; sells to us or buys nothing
+                    "naturalorganicskincare.com", # Sep 24 RUO sweep: skincare shop; sells to us or buys nothing
+                    "proimmune.com",         # Sep 24 RUO sweep: UK immunology reagents; sells to us or buys nothing
+                    "tenereteam.com",        # Sep 24 RUO sweep: review blog; sells to us or buys nothing
+                    "peptracker.app",        # Sep 24 RUO sweep: peptide tracking app; sells to us or buys nothing
+                    "peptide2.com",          # Sep 24 RUO sweep: synthesis-company listing; sells to us or buys nothing
+                    "biomertech.com",        # Sep 24 RUO sweep: synthesis/reagents; sells to us or buys nothing
+                    "upgradewellnessga.com", # Sep 24 RUO sweep: wellness clinic; sells to us or buys nothing
+                    "newtropin.com",         # Sep 24 RUO sweep: hormone clinic/pharmacy; sells to us or buys nothing
+                    "lktlabs.com",           # Sep 24 RUO sweep: reagent manufacturer; sells to us or buys nothing
+                    "bloomtechz.com",       # Sep 24 RUO sweep: Shaanxi Bloom Tech, a Chinese chemical
+                                            # trader; its vendor-list row has no US signal on site
+                    "huaxiapeptides.com",   # Sep 24 RUO sweep: Huaxia Peptides, Chinese name, no US
+                                            # signal on site, harvested under the link label "Visit"
                     "massagestrong.com",    # Massage Strong, Lexington KY: a massage studio whose
                                             # only "peptide" hit is oxytocin, which massage copy cites
                                             # as what a massage releases. Nothing it offers is ours
@@ -781,9 +867,60 @@ DECLINED_CONTACTS = {"amelia.tide518@gmail.com",  # the only address for "Wingem
                                                     # "Georgia", which is where the GA came from
                      "vivpeptide@gmail.com",        # vivpeptide.com, three (852) Hong Kong numbers
                      "sulanpeptides01@gmail.com",   # sulanpeptides.com, a Hong Kong factory
-                     "thepeptideco@proton.me"}      # thepeptideco.shop, an Australian storefront --
+                     "thepeptideco@proton.me",      # thepeptideco.shop, an Australian storefront --
                                                     # proton.me is freemail, so the domain sets above
                                                     # cannot see it either
+                     "liuxianggang11@gmail.com",  # Sep 24 RUO sweep: vendor-list rows whose listed phone is a (852) Hong Kong number, the Wingem/hkburson precedent; all on freemail, so only the address reaches them
+                     "ll6855204@gmail.com",
+                     "rli974682@gmail.com",
+                     "peptidewanshun@gmail.com",
+                     "hedudu092@gmail.com",
+                     "ellasong968@gmail.com",
+                     "tansyma9@gmail.com",
+                     "ltpeptide@outlook.com",
+                     "ellapeptide13@gmail.com",
+                     "peptidejft@outlook.com",
+                     "kuanyan705@gmail.com",
+                     "baofengpeptide@gmail.com",
+                     "caihuipeptide@gmail.com",
+                     "aa168168when@gmail.com",
+                     "jitaipeptide@gmail.com",
+                     "annana0244@yahoo.com",
+                     "duoy228@gmail.com",
+                     "xabellefu@gmail.com",
+                     "anna59303431@outlook.com",
+                     "xinty60@gmail.com",
+                     "wangn3729@gmail.com",
+                     "yangwendiya@gmail.com",  # Sep 24 RUO sweep: Chinese or Vietnamese trading names (Yiwu, Grewo, ZhuoYan, Huatai, Quanyutong...) whose vendor-list row has us_signal_on_site=no; factories and traders, our side of the trade
+                     "naiya3768@gmail.com",
+                     "xuanxiao854@gmail.com",
+                     "zhuoyanlaboratorypeptide@gmail.com",
+                     "caoxuezhen99@gmail.com",
+                     "huatai2049@gmail.com",
+                     "candyma0a@gmail.com",
+                     "shipopeptide@gmail.com",
+                     "leadingpeptide@gmail.com",
+                     "fei90789@outlook.com",
+                     "le88886666@outlook.com",
+                     "luminaltp@gmail.com",
+                     "gaoleisb0716@gmail.com",
+                     "crickmore.lawbaugh855@gmail.com",
+                     "sailimu98@outlook.com",
+                     "mllegeorgesand@gmail.com",
+                     "nguyentiendung12031@gmail.com",
+                     "abc@gmail.com",  # Sep 24: placeholder addresses scraped from site templates (Bio Pepz, Luxury Amino); nobody reads them and they would bounce
+                     "lorem@gmail.com",
+                     "kalen.co.aesthetetics@gmail.com",  # Sep 24: clinics, a compounding pharmacy and a medical publication (abdominalkey.com) that sit on the RUO vendor list; Jonathan asked for RUO brands only
+                     "elitetotalhealth22@gmail.com",
+                     "nurselynn.aesthetics@gmail.com",
+                     "anapbm@gmail.com",
+                     "ilcompoundingrx@gmail.com",
+                     "clinicalpub@gmail.com",
+                     "livation2019@gmail.com",  # "Peptide Therapy | CT - LIVation" (livationct.com):
+                                            # a Connecticut peptide-therapy clinic, not an RUO brand
+                     "bamgasausa@gmail.com"}    # Alpha-Gen again: alphagen.store is the same brand as
+                                            # alphagresearch.com (alphagenanalytics@gmail.com), which
+                                            # keeps the one contact; on gmail, so brand_key cannot pair them
 
 
 FREEMAIL = {"gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "proton.me", "protonmail.com", "pm.me", "tuta.com",
@@ -1095,6 +1232,9 @@ def initial_candidates(sent_rows):
         # wave rather than quietly topping it up with vendors.
         rest = [r for r in rest if r["audience"] == AUDIENCE_ONLY]
         drafted = [r for r in drafted if r["audience"] == AUDIENCE_ONLY]
+        if AUDIENCE_ONLY == "vendor" and RUO_ONLY:
+            rest = [r for r in rest if is_ruo(r["email"])]
+            drafted = [r for r in drafted if is_ruo(r["email"])]
         ordered = rest
     else:
         ordered = vendors + medspas                               # after the drafts: vendors first, then med spas
@@ -1287,7 +1427,7 @@ def cmd_next(n, out_json):
                       "body": body, "draftId": did})
     Path(out_json).write_text(json.dumps(items), encoding="utf-8")
     fu = sum(1 for i in items if i["kind"] == "fu"); ini = len(items) - fu
-    focus = f", audience={AUDIENCE_ONLY} only through {FOCUS_REVIEW_DATE}" if AUDIENCE_ONLY else ""
+    focus = (f", audience={AUDIENCE_ONLY}{' (RUO brands)' if AUDIENCE_ONLY == 'vendor' and RUO_ONLY else ''} only" if AUDIENCE_ONLY else "") + f", cap review {FOCUS_REVIEW_DATE}"
     print(f"BATCH {len(items)}  fu={fu} initial={ini}  (budget_left_today={budget}, cap={DAILY_CAP}{focus})")
     bad = [i["to"] for i in items if "{" in i["subject"] or "{" in i["body"]]
     if bad:
