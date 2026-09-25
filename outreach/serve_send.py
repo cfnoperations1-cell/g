@@ -918,7 +918,12 @@ DECLINED_CONTACTS = {"amelia.tide518@gmail.com",  # the only address for "Wingem
                      "clinicalpub@gmail.com",
                      "livation2019@gmail.com",  # "Peptide Therapy | CT - LIVation" (livationct.com):
                                             # a Connecticut peptide-therapy clinic, not an RUO brand
-                     "bamgasausa@gmail.com"}    # Alpha-Gen again: alphagen.store is the same brand as
+                     "bamgasausa@gmail.com",
+                     "jonpinhorn.typedesign@gmail.com",  # the only address harvested for Xpeps
+                                            # (xpeps.com), but it is a type designer's inbox -- a
+                                            # font credit, not the brand's contact
+                     "flourishglobalpeptide@gmail.com"}  # Flourish Global Peptide: its phone is a
+                                            # (852) Hong Kong number, the Wingem/hkburson precedent    # Alpha-Gen again: alphagen.store is the same brand as
                                             # alphagresearch.com (alphagenanalytics@gmail.com), which
                                             # keeps the one contact; on gmail, so brand_key cannot pair them
 
