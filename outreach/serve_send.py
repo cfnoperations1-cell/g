@@ -924,7 +924,12 @@ DECLINED_CONTACTS = {"amelia.tide518@gmail.com",  # the only address for "Wingem
                      "jonpinhorn.typedesign@gmail.com",  # the only address harvested for Xpeps
                                             # (xpeps.com), but it is a type designer's inbox -- a
                                             # font credit, not the brand's contact
-                     "flourishglobalpeptide@gmail.com"}  # Flourish Global Peptide: its phone is a
+                     "flourishglobalpeptide@gmail.com",
+                     "24.stampshop@gmail.com",  # MT Meipept (mei-pept.com): its phones are (825), an
+                                            # Alberta, Canada code, and the dummy (743) 255-5555
+                     "customercare@peptideprestig.net"}  # Peptide Prestige's site is peptideprestige.net;
+                                            # this address is on peptideprestig.net, a typo domain that
+                                            # would bounce the way vantapeptides.com did on Sep 25  # Flourish Global Peptide: its phone is a
                                             # (852) Hong Kong number, the Wingem/hkburson precedent    # Alpha-Gen again: alphagen.store is the same brand as
                                             # alphagresearch.com (alphagenanalytics@gmail.com), which
                                             # keeps the one contact; on gmail, so brand_key cannot pair them
