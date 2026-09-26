@@ -932,7 +932,16 @@ DECLINED_CONTACTS = {"amelia.tide518@gmail.com",  # the only address for "Wingem
                                             # (861) 994-8169 and (994) 816-9685 are the digits of the
                                             # Chinese mobile +86 199 4816 9685 split up -- the
                                             # norcopeptide precedent; 861 and 994 are not US codes
-                     "61502702.xt@gmail.com"}   # BOC Peptide (boc-peptide.com): every address on its
+                     "61502702.xt@gmail.com",
+                     "lionmodeon@gmail.com",    # "Optimized Labs": the row's website is jeffseidman.com, a
+                                            # personal site -- a row describing a different party than
+                                            # the brand
+                     "coco19992307@gmail.com",  # Flycn Peptide: coco+digits gmail, the coco./lluna pattern
+                                            # of the Chinese sellers declined Sep 24-26
+                     "fei90757@gmail.com",      # PrimeRx: same operator as LeanRx (fei90789@outlook.com),
+                                            # declined Sep 24 as a Chinese trader with no US signal
+                     "yumingy594@gmail.com"}    # Zhiyuan Peptides: Chinese trading name on a Chinese-name
+                                            # gmail; Ptidebio, the same pattern, bounced 550 5.2.1 on Sep 26   # BOC Peptide (boc-peptide.com): every address on its
                                             # page is a QQ-style number or coco./lluna-style gmail
                                             # (61502702.xt, coco.807241, lluna45469), the pattern of
                                             # the Chinese sellers declined on Sep 24  # Peptide Prestige's site is peptideprestige.net;
