@@ -1,0 +1,45 @@
+# DISCOVERY terms: used to find prospects and to judge whether a site is
+# relevant. Brand names and category phrases live here because they are great
+# search signals, but they are NOT quoted back in an email -- see
+# BRAND_TO_GENERIC in lead_hunt.py, which maps a brand to the compound we
+# actually supply (Ozempic -> semaglutide).
+# One per line, # for comments.
+Ozempic
+Wegovy
+Rybelsus
+Mounjaro
+Zepbound
+Saxenda
+Victoza
+Trulicity
+GLP-1
+GLP1
+GLP-2
+GIP
+dual agonist
+triple agonist
+incretin
+peptide therapy
+peptide injection
+peptide injections
+peptide protocol
+weight loss injection
+weight loss injections
+weight loss shot
+medical weight loss
+compounded semaglutide
+compounded tirzepatide
+skinny shot
+lipotropic
+MIC B12
+B12 injection
+hormone optimization
+hormone replacement
+testosterone therapy
+anti-aging clinic
+regenerative medicine
+IV therapy
+NAD therapy
+growth hormone secretagogue
+research peptides
+research use only

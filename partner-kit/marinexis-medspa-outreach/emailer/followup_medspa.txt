@@ -1,0 +1,25 @@
+Subject: Re: {orig_subject}
+
+Hi there,
+
+{stage_line} I reached out recently about US-made peptide supply for
+{business_name} -- you carry {peptides}, and that's exactly what we
+manufacture.
+
+Quick recap: four US labs, a third-party COA on every batch, cold-chain
+shipping, and wholesale per-vial pricing that usually beats what practices
+pay through a middleman. One-week turnaround, even on large orders.
+
+If it's useful, reply here and I'll send our Made in USA wholesale catalog
+with pricing on the products you already offer. If the timing isn't right,
+no problem at all.
+
+Thanks,
+{sender_name}
+Marinexis Biologics
+{sender_email}
+
+--
+{sender_company}
+{sender_postal_address}
+{unsubscribe_line}

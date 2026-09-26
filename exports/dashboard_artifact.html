@@ -1,0 +1,1630 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Peptide Lead Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#eef3f2; --surface:#ffffff; --surface-2:#f4f8f7;
+    --ink:#0c1a19; --muted:#4a5b5a; --faint:#7d8f8e;
+    --border:#d3e0de; --border-strong:#b7c9c7;
+    --accent:#0b6e6d; --accent-soft:#d5e9e8; --accent-ink:#084f4e;
+    --done:#1c7a4d; --done-soft:#d6ecdf;
+    --run:#a25c00; --run-soft:#f6e6cf;
+    --block:#a83535; --block-soft:#f3d9d9;
+    --queue:#5a6b6a; --queue-soft:#e2e9e8;
+    --s1:#00968f; --s2:#c5620f;
+    --shadow:0 1px 2px rgba(12,26,25,.05), 0 6px 20px -12px rgba(12,26,25,.18);
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --disp:"Archivo","IBM Plex Sans",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#0a1413; --surface:#0f1c1b; --surface-2:#12211f;
+    --ink:#e8f1f0; --muted:#9db1af; --faint:#6f8280;
+    --border:#213230; --border-strong:#2d423f;
+    --accent:#3fb9b4; --accent-soft:#123230; --accent-ink:#7fd6d1;
+    --done:#4fc487; --done-soft:#0f2a1f;
+    --run:#e0a44b; --run-soft:#2c2210;
+    --block:#e07070; --block-soft:#2e1616;
+    --queue:#93a5a3; --queue-soft:#1a2725;
+    --s1:#1fa39c; --s2:#bd7628;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -14px rgba(0,0,0,.6);
+  }}
+  :root[data-theme="dark"]{
+    --ground:#0a1413; --surface:#0f1c1b; --surface-2:#12211f;
+    --ink:#e8f1f0; --muted:#9db1af; --faint:#6f8280;
+    --border:#213230; --border-strong:#2d423f;
+    --accent:#3fb9b4; --accent-soft:#123230; --accent-ink:#7fd6d1;
+    --done:#4fc487; --done-soft:#0f2a1f;
+    --run:#e0a44b; --run-soft:#2c2210;
+    --block:#e07070; --block-soft:#2e1616;
+    --queue:#93a5a3; --queue-soft:#1a2725;
+    --s1:#1fa39c; --s2:#bd7628;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -14px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;font-size:15px}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;padding-block:34px}
+  a{color:var(--accent-ink)}
+  h1,h2,h3{margin:0;font-family:var(--disp);text-wrap:balance;letter-spacing:-.01em}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* header */
+  header{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;
+    border-bottom:2px solid var(--border-strong);padding-bottom:22px}
+  header h1{font-size:clamp(28px,5vw,40px);font-weight:800;line-height:1.02}
+  .sub{color:var(--muted);margin-top:8px;max-width:52ch}
+  .asof{text-align:right;font-family:var(--mono);font-size:12px;color:var(--faint);line-height:1.7}
+  .asof b{color:var(--ink);font-weight:600}
+  .asof b.warn{color:var(--block)}
+  .theme-btn{margin-top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:999px;
+    padding:5px 12px;cursor:pointer}
+  .theme-btn:hover{border-color:var(--border-strong);color:var(--ink)}
+  .theme-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* paused banner */
+  .banner{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:22px;padding:12px 16px;
+    border-radius:10px;background:var(--block-soft);border:1px solid color-mix(in srgb,var(--block) 35%,transparent)}
+  .banner .dot{width:9px;height:9px}
+  .banner b{font-family:var(--disp);font-weight:700;color:var(--block)}
+  .banner span{color:var(--muted);font-size:13.5px}
+  .banner .when{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+
+  /* kpi */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+  .kpis.six{grid-template-columns:repeat(6,1fr)}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 16px 15px;box-shadow:var(--shadow)}
+  .kpi .n{font-family:var(--disp);font-weight:800;font-size:34px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .kpis.six .kpi .n{font-size:28px}
+  .kpi .k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:9px}
+  .kpi .d{color:var(--muted);font-size:12.5px;margin-top:5px}
+  .kpi.accent{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset, var(--shadow)}
+  .kpi.accent .n{color:var(--accent)}
+  .kpi.good .n{color:var(--done)}
+  .kpi.bad .n{color:var(--block)}
+
+  section{margin-top:38px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+  .sec-head h2{font-size:19px;font-weight:700}
+  .sec-head .count{font-family:var(--mono);font-size:12px;color:var(--faint)}
+
+  /* pipeline stages */
+  .flow{display:flex;flex-wrap:wrap;gap:8px}
+  .stage{flex:1 1 130px;min-width:120px;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:12px 13px;position:relative}
+  .stage .s-top{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--faint)}
+  .stage .s-name{font-weight:600;margin-top:6px;font-size:14px}
+  .stage .s-meta{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .dot.done{background:var(--done)} .dot.run{background:var(--run);box-shadow:0 0 0 0 var(--run);animation:pulse 1.8s infinite}
+  .dot.queue{background:var(--queue)} .dot.block{background:var(--block)}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--run) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+  @media (prefers-reduced-motion:reduce){.dot.run{animation:none}}
+
+  /* phase groups */
+  .phase{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);
+    overflow:hidden;margin-bottom:16px}
+  .phase-hd{display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid var(--border);
+    background:var(--surface-2)}
+  .phase-hd .pn{font-family:var(--disp);font-weight:700;font-size:16px}
+  .phase-hd .pmeta{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .bar{height:6px;border-radius:999px;background:var(--queue-soft);overflow:hidden;width:120px;margin-left:14px}
+  .bar > i{display:block;height:100%;background:var(--accent);border-radius:999px}
+  .status-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
+    padding:4px 9px;border-radius:999px}
+  .t-done{color:var(--done);background:var(--done-soft)}
+  .t-run{color:var(--run);background:var(--run-soft)}
+  .t-queue{color:var(--queue);background:var(--queue-soft)}
+  .t-block{color:var(--block);background:var(--block-soft)}
+
+  ul.tasks{list-style:none;margin:0;padding:6px 0}
+  ul.tasks li{display:flex;align-items:center;gap:13px;padding:10px 18px}
+  ul.tasks li + li{border-top:1px solid var(--border)}
+  .check{width:19px;height:19px;border-radius:6px;flex:none;display:grid;place-items:center;border:1.5px solid var(--border-strong)}
+  .check.done{background:var(--done);border-color:var(--done)}
+  .check.run{border-color:var(--run)}
+  .check.block{border-color:var(--block);background:var(--block-soft)}
+  .check svg{width:12px;height:12px}
+  .task-name{font-weight:500}
+  .task-name.dn{color:var(--muted)}
+  .task-meta{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+  .stripe{width:3px;align-self:stretch;border-radius:3px;flex:none;margin:-10px 0;margin-right:-4px}
+
+  /* cards, tables */
+  .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+  .grid2 + .grid2{margin-top:16px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tablecard{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .tablecard h3{font-size:14px;padding:14px 16px 12px;border-bottom:1px solid var(--border);font-family:var(--disp);
+    display:flex;align-items:baseline;gap:10px}
+  .tablecard h3 .count{font-family:var(--mono);font-size:11.5px;color:var(--faint);font-weight:500}
+  th,td{text-align:left;padding:9px 16px}
+  th{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:600}
+  tbody tr + tr td{border-top:1px solid var(--border)}
+  td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+  td.mono{font-family:var(--mono);font-size:12.5px}
+  .src-name{font-weight:500}
+  .aud{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .gap{display:flex;gap:11px;padding:12px 16px;align-items:flex-start}
+  .gap + .gap{border-top:1px solid var(--border)}
+  .gap .g-n{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--block);font-variant-numeric:tabular-nums;min-width:34px}
+  .gap .g-t{font-size:13px;color:var(--muted)}
+  .gap .g-t b{color:var(--ink);font-weight:600;display:block;font-size:13.5px;margin-bottom:1px}
+
+  /* chart */
+  .chart-wrap{padding:12px 14px 8px;position:relative}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;padding:0 4px 6px;font-size:12.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+  .chart-wrap svg{width:100%;height:auto;display:block}
+  .chart-wrap .grid{stroke:var(--border);stroke-width:1}
+  .chart-wrap .axis{stroke:var(--border-strong);stroke-width:1}
+  .chart-wrap .tick{fill:var(--faint);font-family:var(--mono);font-size:10.5px}
+  .chart-wrap .val{fill:var(--muted);font-family:var(--mono);font-size:11px;font-weight:600}
+  .chart-wrap .s1{fill:var(--s1)} .chart-wrap .s2{fill:var(--s2)}
+  .chart-wrap .hit{cursor:crosshair}
+  .chart-wrap .hit:hover{fill:color-mix(in srgb,var(--ink) 5%,transparent)}
+  .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--ground);font-family:var(--mono);font-size:11.5px;
+    padding:7px 10px;border-radius:7px;white-space:nowrap;box-shadow:var(--shadow);display:none;line-height:1.55;z-index:2}
+  .chart-note{font-family:var(--mono);font-size:11px;color:var(--faint);padding:4px 4px 8px}
+
+  /* status breakdown */
+  .seg{display:flex;height:14px;border-radius:999px;overflow:hidden;gap:2px;margin:14px 16px 6px;background:var(--surface)}
+  .seg i{display:block;height:100%}
+  ul.status{list-style:none;margin:0;padding:4px 0 8px}
+  ul.status li{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:13.5px}
+  ul.status li + li{border-top:1px solid var(--border)}
+  ul.status .sw{width:10px;height:10px;border-radius:2px;flex:none}
+  ul.status .lbl{font-weight:500}
+  ul.status .sub{color:var(--faint);font-size:12px}
+  ul.status .n{margin-left:auto;font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600}
+  .status-foot{padding:10px 16px 14px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
+  .status-foot b{color:var(--ink);font-weight:600}
+
+  /* tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;border-bottom:1px solid var(--border);padding-bottom:12px}
+  .tab{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+    background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:999px;
+    padding:7px 15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .tab:hover{border-color:var(--border-strong);color:var(--ink)}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+  .tab .n{font-variant-numeric:tabular-nums;font-weight:700}
+  .pkg{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;
+    padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .pkg.full{color:var(--accent-ink);background:var(--accent-soft)}
+  .pkg.partial{color:var(--queue);background:var(--queue-soft)}
+  td.note{color:var(--muted);font-size:12.5px}
+  td.note b{color:var(--done);font-weight:600}
+  td.note i{color:var(--block);font-style:normal;font-weight:600}
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);
+    font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
+
+  @media (max-width:860px){ .kpis.six{grid-template-columns:repeat(3,1fr)} }
+  @media (max-width:720px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .kpis.six{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}
+    .asof{text-align:left}
+    header{align-items:flex-start}
+    .banner .when{margin-left:0}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Lead-gen operations</div>
+      <h1>Peptide Lead Pipeline</h1>
+      <p class="sub">Discovery, enrichment and outreach across US peptide vendors, med spas and clinics. Every send is logged in the repo so no business is emailed twice.</p>
+    </div>
+    <div>
+      <div class="asof">
+        UPDATED <b>2026-09-26 08:11 UTC</b><br>
+        sending <b>10/hr · 100/day</b><br>
+        follow-ups open <b>2026-09-17</b>
+      </div>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">◐ Theme</button>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Dashboard views">
+    <button class="tab" id="tab-btn-pipeline" role="tab" aria-selected="true"
+            aria-controls="panel-pipeline">Pipeline</button>
+    <button class="tab" id="tab-btn-catalog" role="tab" aria-selected="false"
+            aria-controls="panel-catalog">Catalog sent <span class="n">52</span></button>
+  </div>
+
+  <div id="panel-pipeline" role="tabpanel" aria-labelledby="tab-btn-pipeline">
+
+  <div class="banner" role="status" style="background:var(--run-soft);border-color:color-mix(in srgb,var(--run) 35%,transparent)">
+    <span class="dot run"></span>
+    <b style="color:var(--run)">Ramped sending</b>
+    <span>10 emails per hourly wave, 50 per day. 20 of 50 sent so far today. Follow-ups run 3 days apart, 3 steps at most, only to contacts who never replied.</span>
+    <span class="when">20 of 50 sent today</span>
+  </div>
+
+  <section style="margin-top:26px">
+    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Outreach</span><h2>Campaign</h2>
+      <span class="count">jonathan@marinexisbiologics.com · vendors first, then med spas</span></div>
+
+    <div class="kpis six" style="margin-top:0">
+      <div class="kpi accent"><div class="n mono">1185</div><div class="k">Contacts emailed</div><div class="d">985 vendors &middot; 200 med spas</div></div>
+      <div class="kpi"><div class="n mono">20</div><div class="k">Sent today</div><div class="d">20 first-touch &middot; 0 follow-ups &middot; 30 left under the daily cap</div></div>
+      <div class="kpi good"><div class="n mono">63</div><div class="k">Replies</div><div class="d">5.3% of contacts &middot; plus 23 auto-replies</div></div>
+      <div class="kpi bad"><div class="n mono">89</div><div class="k">Bounces</div><div class="d">7.5% &middot; removed from follow-ups</div></div>
+      <div class="kpi"><div class="n mono">35</div><div class="k">Still to send</div><div class="d">one contact per business</div></div>
+      <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="tablecard">
+        <h3>First-touch emails per day <span class="count">Sep 1 – Sep 26</span></h3>
+        <div class="chart-wrap">
+          <div class="legend"><span><i style="background:var(--s1)"></i>Vendors</span><span><i style="background:var(--s2)"></i>Med spas</span></div>
+          <div id="chart"></div>
+          <div class="tip" id="tip"></div>
+          <div class="chart-note">Follow-ups (22 on Sep 14) are not stacked here. Sep 10–11 sends were recovered from the Gmail Sent folder during reconciliation.</div>
+        </div>
+      </div>
+      <div class="tablecard">
+        <h3>Contact status <span class="count">1185 tracked</span></h3>
+        <div class="seg" id="seg"></div>
+        <ul class="status" id="statusList"></ul>
+        <div class="status-foot">Follow-up sequence: 3 steps, 3 days apart, only to contacts with no reply or bounce. <b>839</b> awaiting step 1, <b>164</b> at step 1, <b>822</b> due now.</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="tablecard">
+        <h3>Replies <span class="count">60 warm leads &middot; 3 declined &middot; <b style="color:var(--done)">4 ready to buy</b> &middot; catalog sent to 35 &middot; follow-ups stopped</span></h3>
+        <table>
+          <thead><tr><th>Company</th><th>Type</th><th>First emailed</th><th>Contact</th></tr></thead>
+          <tbody id="replyBody"></tbody>
+        </table>
+      </div>
+      <div class="tablecard">
+        <h3>Bounces <span class="count">bad addresses</span></h3>
+        <table>
+          <thead><tr><th>Address</th><th>Type</th></tr></thead>
+          <tbody id="bounceBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Discovery</span><h2>Lead base</h2>
+      <span class="count">21 clinic directories &middot; search &middot; intake forms</span></div>
+    <div class="kpis" style="margin-top:0">
+      <div class="kpi"><div class="n mono">6,818</div><div class="k">Verified send queue</div><div class="d">one contact per business &middot; CAN-SPAM footer rendered</div></div>
+      <div class="kpi"><div class="n mono">1,573</div><div class="k">US RUO vendors</div><div class="d">email published on the vendor's own pages</div></div>
+      <div class="kpi"><div class="n mono">5,245</div><div class="k">Med spas &amp; clinics</div><div class="d">site confirms they run peptides</div></div>
+      <div class="kpi"><div class="n mono">57,800</div><div class="k">Directory listings mined</div><div class="d">of 14,023 published across the directories</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Flow</span><h2>Pipeline</h2>
+      <span class="count">discover → crawl → render → deep → compile → send</span></div>
+    <div class="flow" id="flow"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Task board</h2><span class="count" id="taskCount"></span></div>
+    <div id="phases"></div>
+  </section>
+
+  <section>
+    <div class="grid2">
+      <div class="tablecard">
+        <h3>Vendors by source</h3>
+        <table>
+          <thead><tr><th>Source</th><th style="text-align:right">Vendors</th><th style="text-align:right">With email</th></tr></thead>
+          <tbody id="srcBody"></tbody>
+        </table>
+      </div>
+      <div class="tablecard">
+        <h3>Known gaps &amp; manual follow-up</h3>
+        <div id="gaps"></div>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /panel-pipeline -->
+
+  <div id="panel-catalog" role="tabpanel" aria-labelledby="tab-btn-catalog" hidden>
+  <section style="margin-top:26px">
+    <div class="sec-head"><span class="eyebrow" style="color:var(--muted)">Outreach</span><h2>Catalog sent</h2>
+      <span class="count">52 businesses &middot; sent by hand, one reply at a time</span></div>
+    <div class="kpis" style="margin-top:0">
+      <div class="kpi accent"><div class="n mono">52</div><div class="k">Have the catalog</div><div class="d">4.4% of 1,185 contacts emailed</div></div>
+      <div class="kpi"><div class="n mono">34</div><div class="k">Full package</div><div class="d">catalog, price list, FAQ and COA examples</div></div>
+      <div class="kpi"><div class="n mono">18</div><div class="k">Partial</div><div class="d">catalog only, a price sheet, or a COA</div></div>
+      <div class="kpi good"><div class="n mono">4</div><div class="k">Ready to buy</div><div class="d">AminoForge &middot; BioLongevity Labs &middot; Martin Shorey &middot; Phil Moody</div></div>
+    </div>
+    <div class="tablecard" style="margin-top:16px">
+      <h3>Every business that has our pricing <span class="count">newest first &middot; none of this went out automatically</span></h3>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Business</th><th>Sent to</th><th>Date</th><th>Package</th><th>Where it stands</th></tr></thead>
+        <tbody>
+          <tr><td class="src-name">Light Peptide</td><td class="mono">info@lightpeptide.com</td><td class="mono">2026-09-23</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Max: reviewing supply chain options</td></tr>
+          <tr><td class="src-name">Amino Wholesale</td><td class="mono">sales@amino-wholesale.com</td><td class="mono">2026-09-23</td><td><span class="pkg full (inferred: 22.8 MB reply)">part</span></td><td class="note">Asked for a phone call; JC said he would call</td></tr>
+          <tr><td class="src-name">Revive Amino</td><td class="mono">support@reviveamino.com</td><td class="mono">2026-09-22</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Rob: &quot;Send list please&quot;</td></tr>
+          <tr><td class="src-name">Midwest Peps</td><td class="mono">support@midwestpeps.net</td><td class="mono">2026-09-22</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for the list outright; research-use-only wording in their signature</td></tr>
+          <tr><td class="src-name">Lost Coast Aminos</td><td class="mono">support@lostcoastaminos.com</td><td class="mono">2026-09-22</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Bill asked to see the pricing; catalog sent within the hour</td></tr>
+          <tr><td class="src-name">Impact Aminos</td><td class="mono">info@impactaminos.us</td><td class="mono">2026-09-22</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Rav: asked for COAs in his company&#x27;s name; JC said yes</td></tr>
+          <tr><td class="src-name">Global Aminos</td><td class="mono">info@globalaminos.com</td><td class="mono">2026-09-22</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for the whole catalogue</td></tr>
+          <tr><td class="src-name">Affordable Peptides</td><td class="mono">affordablepeptidesorders@gmail.com</td><td class="mono">2026-09-22</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Chased us for the catalog, then rejected on price at roughly double their current cost and said US-made does not matter to them</td></tr>
+          <tr><td class="src-name">Scantifix</td><td class="mono">contact@scantifix.com</td><td class="mono">2026-09-21</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Thom K Jensen asked to see what we can do; Norwegian sign-off, Wyoming phone and address on the harvested row</td></tr>
+          <tr><td class="src-name">Precisely Peptides</td><td class="mono">support@preciselypeptides.com</td><td class="mono">2026-09-21</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Vaughn asked for pricing and whether facilities are cGMP; replied 83% above their current USA cGMP pricing</td></tr>
+          <tr><td class="src-name">Odic Labs</td><td class="mono">support@odiclabs.com</td><td class="mono">2026-09-21</td><td><span class="pkg partial">part</span></td><td class="note">Scaling from private clients into volume and asked to discuss further; first send was refused by Gmail as an archive, resent smaller</td></tr>
+          <tr><td class="src-name">Evo Peptides US</td><td class="mono">info@evopeptidesus.com</td><td class="mono">2026-09-21</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for the inventory; catalog sent the next minute</td></tr>
+          <tr><td class="src-name">BetterLife Bioscience</td><td class="mono">support@betterlifebioscience.com</td><td class="mono">2026-09-21</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">John: asked for the catalog after the first contact</td></tr>
+          <tr><td class="src-name">Research Peptide Market</td><td class="mono">Kevin@peptribe.us</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Kevin Castello: &quot;Glad to take a look&quot;</td></tr>
+          <tr><td class="src-name">Research Chem Co</td><td class="mono">info@researchchem.co</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">URGENT: sent back a 10-point vendor audit and found two pricing sheets disagreeing on the same products</td></tr>
+          <tr><td class="src-name">Novaglo Research</td><td class="mono">novaglo@novagloresearch.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for bulk discounts, payment methods and testing policy; discount tiers still unanswered</td></tr>
+          <tr><td class="src-name">Molecular Solutions Peptides</td><td class="mono">chris@mspeptides.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Chris, the owner. Asked how long we have been in business and where we source API - only the API part was answered</td></tr>
+          <tr><td class="src-name">Elyria Bio</td><td class="mono">support@elyriabio.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Charles Enderle asked for the catalogue</td></tr>
+          <tr><td class="src-name">Daavy Research</td><td class="mono">daavyresearchpeptides@gmail.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note"><i>Walking away</i> over the 3000 MOQ: &quot;Thats $44400! Seriously?&quot;</td></tr>
+          <tr><td class="src-name">Canlab International</td><td class="mono">support@canlabintl.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Replied 9 min after first contact asking for the complete price list</td></tr>
+          <tr><td class="src-name">Boss Peptides</td><td class="mono">info@bosspeptide.com</td><td class="mono">2026-09-20</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Martin Shorey. Asked &quot;You have to order 3000?&quot;, corrected to 100; now negotiating box sizes</td></tr>
+          <tr><td class="src-name">Treasure Coast Peptides</td><td class="mono">patrick@treasurecoastpeptides.com</td><td class="mono">2026-09-19</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for catalogue and pricing</td></tr>
+          <tr><td class="src-name">Platinum Lion Peptides</td><td class="mono">platinumlionpeptides@gmail.com</td><td class="mono">2026-09-19</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Sent as a standalone &quot;Catalog and info&quot; mail</td></tr>
+          <tr><td class="src-name">Longevity Pros</td><td class="mono">support@longevityprolabs.com</td><td class="mono">2026-09-19</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Phil Moody. <b>READY TO BUY</b> - orders 100 at a time; call still to happen</td></tr>
+          <tr><td class="src-name">Gel Labs</td><td class="mono">info@gel-labs.com</td><td class="mono">2026-09-19</td><td><span class="pkg partial">part</span></td><td class="note">Gregg Snyder. Catalog and price list, plus WhatsApp number</td></tr>
+          <tr><td class="src-name">Simon&#x27;s Compounding</td><td class="mono">contact@simonsrx.com</td><td class="mono">2026-09-18</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked about SLU-PP-332 caps or tabs; we do not offer orals</td></tr>
+          <tr><td class="src-name">PPP Peptides</td><td class="mono">ppppeptides@gmail.com</td><td class="mono">2026-09-18</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Matt. Open to discussing a partnership if pricing works</td></tr>
+          <tr><td class="src-name">Next Level Pharm</td><td class="mono">jim@nextlevelpharm.com</td><td class="mono">2026-09-18</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Jim asked for the price list outright</td></tr>
+          <tr><td class="src-name">Great Lakes Peptides</td><td class="mono">lawrence@greatlakespeptides.com</td><td class="mono">2026-09-18</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Lawrence asked to see all products with prices</td></tr>
+          <tr><td class="src-name">BioLongevity Labs</td><td class="mono">josh@biolongevitylabs.com</td><td class="mono">2026-09-18</td><td><span class="pkg partial">part</span></td><td class="note">COA example only. <b>READY TO BUY</b> - already buys US from 3 labs</td></tr>
+          <tr><td class="src-name">Vantix Bio</td><td class="mono">support@vantixbio.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note"><i>DECLINED</i>: &quot;pricing and MOQ far above where we are at right now&quot;</td></tr>
+          <tr><td class="src-name">Sigma Peptides</td><td class="mono">support@sigmapeptides.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Interested; asked how we prove US manufacture and about bac water pricing</td></tr>
+          <tr><td class="src-name">Peptiva Research Labs</td><td class="mono">info@peptivaresearchlabs.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for custom COAs with their company name</td></tr>
+          <tr><td class="src-name">Peptide Bureau</td><td class="mono">johanlarsen2001@gmail.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Told MOQ 100 and 2-week lead time; later asked about dropship - unanswered</td></tr>
+          <tr><td class="src-name">Omnio Peptides</td><td class="mono">Chad@omniopeptides.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Chad wants backup sourcing and small custom runs</td></tr>
+          <tr><td class="src-name">Calm Peptides</td><td class="mono">support@calmpeptides.com</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for a call, gave 631-848-1055</td></tr>
+          <tr><td class="src-name">AminoForge</td><td class="mono">support@aminoforge.vegas</td><td class="mono">2026-09-17</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note"><b>READY TO BUY</b>. Las Vegas, currently sourcing from Texas</td></tr>
+          <tr><td class="src-name">Puritide Research</td><td class="mono">brian@puritideresearch.com</td><td class="mono">2026-09-16</td><td><span class="pkg partial">part</span></td><td class="note">Brian: &quot;Send the catalog my way please&quot;</td></tr>
+          <tr><td class="src-name">Peptide Group Buy</td><td class="mono">info@peptidegroupbuy.com</td><td class="mono">2026-09-16</td><td><span class="pkg full">catalog + pricing + FAQ + COA</span></td><td class="note">Asked for legal entity and state of formation in writing; chased once, silent since</td></tr>
+          <tr><td class="src-name">PeRx Peptides</td><td class="mono">support@perxpeptides.com</td><td class="mono">2026-09-16</td><td><span class="pkg partial">part</span></td><td class="note">Philadelphia Peptide Therapy. Catalog and FAQ</td></tr>
+          <tr><td class="src-name">Pretty Peptide Collective</td><td class="mono">summer@prettypeptidecollective.com</td><td class="mono">2026-09-15</td><td><span class="pkg partial">part</span></td><td class="note">Summer: &quot;Definitely interested&quot;</td></tr>
+          <tr><td class="src-name">Oneday Compounds</td><td class="mono">support@onedaycompounds.com</td><td class="mono">2026-09-15</td><td><span class="pkg partial">part</span></td><td class="note">Will asked for a price list</td></tr>
+          <tr><td class="src-name">Zero Variance Labs</td><td class="mono">mdauphinee@zerovariancelabs.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Quoted MOQ &quot;100 to 1000 units&quot; - a third figure</td></tr>
+          <tr><td class="src-name">Vantage Aminos</td><td class="mono">support@vantageaminos.co</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Asked for catalog and pricing sheet</td></tr>
+          <tr><td class="src-name">Suaway Lab Research</td><td class="mono">info@suaway.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Challenged the US-manufacturing claim; answered with sourcing detail</td></tr>
+          <tr><td class="src-name">Solyn</td><td class="mono">support@solyn.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Replied: &quot;about 3-4x what I currently pay&quot;</td></tr>
+          <tr><td class="src-name">Restore Peptides</td><td class="mono">support@restorepeptides.io</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Their GM said some of the prices seemed high</td></tr>
+          <tr><td class="src-name">Oasis Labs</td><td class="mono">support@myoasislabs.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Wanted a side-by-side comparison</td></tr>
+          <tr><td class="src-name">Mindful Research</td><td class="mono">support@happypeptides.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Asked for pricing</td></tr>
+          <tr><td class="src-name">Flatirons Research</td><td class="mono">support@flatironsrc.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Tom. Reported our mail was not reaching them - unresolved</td></tr>
+          <tr><td class="src-name">Amino Amigos</td><td class="mono">info@aminoamigos.com</td><td class="mono">2026-09-14</td><td><span class="pkg partial">part</span></td><td class="note">Asked where we are based; told South Carolina and California</td></tr>
+          <tr><td class="src-name">The Peptide Plug</td><td class="mono">Hello@thepeptideplug.ai</td><td class="mono">2026-09-01</td><td><span class="pkg partial">part</span></td><td class="note">Catalogs for 100, 2000+ and 503a, after a phone call</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+  </div><!-- /panel-catalog -->
+
+  <footer>
+    <span>Peptide Lead Pipeline · outreach/serve_send.py · outreach/sent_log.csv</span>
+    <span>Emails harvested from published pages only · robots.txt honoured · every send logged with date, step and status</span>
+  </footer>
+</div>
+
+<script>
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+
+  /* ---------- outreach: sends per day (first-touch only) ---------- */
+  const days = [
+      {
+          "d": "Sep 1",
+          "v": 1,
+          "m": 0
+      },
+      {
+          "d": "Sep 2",
+          "v": 12,
+          "m": 9
+      },
+      {
+          "d": "Sep 8",
+          "v": 6,
+          "m": 11
+      },
+      {
+          "d": "Sep 10",
+          "v": 84,
+          "m": 0
+      },
+      {
+          "d": "Sep 11",
+          "v": 55,
+          "m": 0
+      },
+      {
+          "d": "Sep 14",
+          "v": 166,
+          "m": 31
+      },
+      {
+          "d": "Sep 15",
+          "v": 51,
+          "m": 49
+      },
+      {
+          "d": "Sep 16",
+          "v": 100,
+          "m": 0
+      },
+      {
+          "d": "Sep 17",
+          "v": 100,
+          "m": 0
+      },
+      {
+          "d": "Sep 18",
+          "v": 50,
+          "m": 0
+      },
+      {
+          "d": "Sep 19",
+          "v": 50,
+          "m": 0
+      },
+      {
+          "d": "Sep 20",
+          "v": 50,
+          "m": 0
+      },
+      {
+          "d": "Sep 21",
+          "v": 90,
+          "m": 0
+      },
+      {
+          "d": "Sep 22",
+          "v": 100,
+          "m": 0
+      },
+      {
+          "d": "Sep 23",
+          "v": 0,
+          "m": 50
+      },
+      {
+          "d": "Sep 24",
+          "v": 0,
+          "m": 50
+      },
+      {
+          "d": "Sep 25",
+          "v": 50,
+          "m": 0
+      },
+      {
+          "d": "Sep 26",
+          "v": 20,
+          "m": 0
+      }
+  ];
+  (function drawChart(){
+    const W=560,H=250,L=40,R=12,T=20,B=32,ymax=200;
+    const iw=W-L-R, ih=H-T-B, n=days.length, slot=iw/n, bw=Math.min(48, slot*0.6);
+    const y=v=>T+ih-(v/ymax)*ih;
+    const roundTop=(x,yy,w,h,r,cls)=>{ r=Math.min(r,h/2,w/2); if(h<=0) return "";
+      return `<path class="${cls}" d="M${x},${yy+r} a${r},${r} 0 0 1 ${r},-${r} h${w-2*r} a${r},${r} 0 0 1 ${r},${r} v${h-r} h-${w} z"/>`; };
+    let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="First-touch emails per day, vendors stacked under med spas">`;
+    [0,50,100,150,200].forEach(t=>{
+      s+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}"/><text class="tick" x="${L-7}" y="${y(t)+3.5}" text-anchor="end">${t}</text>`;
+    });
+    days.forEach((k,i)=>{
+      const cx=L+slot*i+slot/2, x=cx-bw/2, tot=k.v+k.m;
+      if(k.v){ const h=y(0)-y(k.v);
+        s+= k.m ? `<rect class="s1" x="${x}" y="${y(k.v)}" width="${bw}" height="${h}"/>` : roundTop(x,y(k.v),bw,h,4,"s1"); }
+      if(k.m){ const top=y(tot), h=(k.v? y(k.v)-2 : y(0))-top; s+=roundTop(x,top,bw,h,4,"s2"); }
+      s+=`<text class="val" x="${cx}" y="${y(tot)-6}" text-anchor="middle">${tot}</text>`;
+      s+=`<text class="tick" x="${cx}" y="${H-10}" text-anchor="middle">${k.d}</text>`;
+    });
+    s+=`<line class="axis" x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}"/>`;
+    days.forEach((k,i)=>{ s+=`<rect class="hit" data-i="${i}" x="${L+slot*i}" y="${T}" width="${slot}" height="${ih}" fill="transparent"/>`; });
+    s+=`</svg>`;
+    const host=document.getElementById("chart"); host.innerHTML=s;
+    const tip=document.getElementById("tip"), wrap=host.parentElement;
+    host.querySelectorAll(".hit").forEach(r=>{
+      r.addEventListener("mousemove",e=>{ const k=days[+r.dataset.i];
+        tip.innerHTML=`<b>${k.d}</b><br>Vendors ${k.v} · Med spas ${k.m}<br>Total ${k.v+k.m}`;
+        const b=wrap.getBoundingClientRect(); let lx=e.clientX-b.left+14, ty=e.clientY-b.top-10;
+        tip.style.display="block"; if(lx+tip.offsetWidth>b.width-8) lx=e.clientX-b.left-tip.offsetWidth-14;
+        tip.style.left=lx+"px"; tip.style.top=ty+"px"; });
+      r.addEventListener("mouseleave",()=>{ tip.style.display="none"; });
+    });
+  })();
+
+  /* ---------- outreach: contact status ---------- */
+  const statuses = [
+      {
+          "k": "Awaiting reply",
+          "sub": "eligible for follow-ups",
+          "n": 1003,
+          "c": "var(--accent)"
+      },
+      {
+          "k": "Replied",
+          "sub": "63 real replies + 23 auto-replies · no more automated mail",
+          "n": 86,
+          "c": "var(--done)"
+      },
+      {
+          "k": "Bounced",
+          "sub": "address rejected · excluded",
+          "n": 89,
+          "c": "var(--block)"
+      },
+      {
+          "k": "Manual sends",
+          "sub": "handled by hand · excluded from sequence",
+          "n": 7,
+          "c": "var(--queue)"
+      }
+  ];
+  const segEl=document.getElementById("seg"), statusTotal=statuses.reduce((a,b)=>a+b.n,0);
+  statuses.forEach(s=>{ const i=document.createElement("i"); i.style.width=(s.n/statusTotal*100)+"%"; i.style.background=s.c; i.title=`${s.k}: ${s.n}`; segEl.appendChild(i); });
+  const sl=document.getElementById("statusList");
+  statuses.forEach(s=>{ const li=document.createElement("li");
+    li.innerHTML=`<span class="sw" style="background:${s.c}"></span><span><span class="lbl">${s.k}</span><br><span class="sub">${s.sub}</span></span><span class="n">${s.n}</span>`; sl.appendChild(li); });
+
+  const replies = [
+      {
+          "c": "bosspeptide.com",
+          "t": "vendor &middot; READY TO BUY",
+          "d": "Sep 19",
+          "e": "info@"
+      },
+      {
+          "c": "longevityprolabs.com",
+          "t": "vendor &middot; READY TO BUY",
+          "d": "Sep 19",
+          "e": "support@"
+      },
+      {
+          "c": "biolongevitylabs.com",
+          "t": "vendor &middot; READY TO BUY",
+          "d": "Sep 10",
+          "e": "wholesale@"
+      },
+      {
+          "c": "aminoforge.vegas",
+          "t": "vendor &middot; READY TO BUY",
+          "d": "Sep 17",
+          "e": "support@"
+      },
+      {
+          "c": "pxpeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 25",
+          "e": "support@"
+      },
+      {
+          "c": "protonmail.com",
+          "t": "vendor · INTERESTED. BioPep Store, Sep 25 14:05: \"I'm alw...",
+          "d": "Sep 25",
+          "e": "biopepcs@"
+      },
+      {
+          "c": "alchemy43.com",
+          "t": "auto-reply",
+          "d": "Sep 23",
+          "e": "info@"
+      },
+      {
+          "c": "reviveamino.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 22",
+          "e": "support@"
+      },
+      {
+          "c": "aminovitality.com",
+          "t": "vendor · INTERESTED - AWAITING JONATHAN. Sep 23 06:35: \"P...",
+          "d": "Sep 22",
+          "e": "support@"
+      },
+      {
+          "c": "peptira.com",
+          "t": "vendor · DEAD ADDRESS, not a bounce. Auto-reply: \"this in...",
+          "d": "Sep 22",
+          "e": "support@"
+      },
+      {
+          "c": "midwestpeps.net",
+          "t": "auto-reply",
+          "d": "Sep 22",
+          "e": "support@"
+      },
+      {
+          "c": "accumarklabs.com",
+          "t": "vendor · REPLIED BY SELLING TO US. \"We invite you for a t...",
+          "d": "Sep 22",
+          "e": "info@"
+      },
+      {
+          "c": "impactaminos.us",
+          "t": "vendor · catalog sent",
+          "d": "Sep 22",
+          "e": "info@"
+      },
+      {
+          "c": "lightpeptide.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 22",
+          "e": "info@"
+      },
+      {
+          "c": "lostcoastaminos.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 22",
+          "e": "support@"
+      },
+      {
+          "c": "gogeviti.com",
+          "t": "vendor · ROUTED. Sep 22 18:11: \"I'm routing your message ...",
+          "d": "Sep 22",
+          "e": "info@"
+      },
+      {
+          "c": "amino-wholesale.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 21",
+          "e": "sales@"
+      },
+      {
+          "c": "odiclabs.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 21",
+          "e": "support@"
+      },
+      {
+          "c": "offlinepeptides.com",
+          "t": "auto-reply",
+          "d": "Sep 21",
+          "e": "support@"
+      },
+      {
+          "c": "globalaminos.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 21",
+          "e": "info@"
+      },
+      {
+          "c": "scantifix.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 21",
+          "e": "contact@"
+      },
+      {
+          "c": "preciselypeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 21",
+          "e": "support@"
+      },
+      {
+          "c": "elliemd.com",
+          "t": "auto-reply",
+          "d": "Sep 21",
+          "e": "support@"
+      },
+      {
+          "c": "cosmicnootropic.com",
+          "t": "auto-reply",
+          "d": "Sep 21",
+          "e": "support@"
+      },
+      {
+          "c": "evopeptidesus.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 21",
+          "e": "info@"
+      },
+      {
+          "c": "betterlifebioscience.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 21",
+          "e": "support@"
+      },
+      {
+          "c": "zenaminos.com",
+          "t": "auto-reply",
+          "d": "Sep 14",
+          "e": "sales@"
+      },
+      {
+          "c": "elyriabio.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "nicerx.com",
+          "t": "auto-reply",
+          "d": "Sep 20",
+          "e": "help@"
+      },
+      {
+          "c": "mspeptides.com",
+          "t": "vendor · CATALOG SENT Sep 20 23:58 - GOOD QUESTIONS, PART...",
+          "d": "Sep 20",
+          "e": "support@"
+      },
+      {
+          "c": "novagloresearch.com",
+          "t": "vendor · CATALOG SENT Sep 20 23:59. \"We are open to somet...",
+          "d": "Sep 20",
+          "e": "support@"
+      },
+      {
+          "c": "canlabintl.com",
+          "t": "vendor · NEEDS JONATHAN - replied Sep 20, nine minutes af...",
+          "d": "Sep 20",
+          "e": "info@"
+      },
+      {
+          "c": "researchchem.co",
+          "t": "vendor · JC answered the 10-point vendor audit on Sep 24 ...",
+          "d": "Sep 20",
+          "e": "info@"
+      },
+      {
+          "c": "tuta.com",
+          "t": "auto-reply",
+          "d": "Sep 11",
+          "e": "thelobster@"
+      },
+      {
+          "c": "pekcuralabs.com",
+          "t": "auto-reply",
+          "d": "Sep 19",
+          "e": "support@"
+      },
+      {
+          "c": "bmimd.com",
+          "t": "auto-reply",
+          "d": "Sep 19",
+          "e": "orders@"
+      },
+      {
+          "c": "gmail.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 11",
+          "e": "affordablepeptidesorders@"
+      },
+      {
+          "c": "gel-labs.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 19",
+          "e": "info@"
+      },
+      {
+          "c": "platinumlionpeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 10",
+          "e": "support@"
+      },
+      {
+          "c": "eden.health",
+          "t": "auto-reply",
+          "d": "Sep 19",
+          "e": "care@"
+      },
+      {
+          "c": "daavyresearch.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 19",
+          "e": "orders@"
+      },
+      {
+          "c": "cosmicpeptides.com",
+          "t": "auto-reply",
+          "d": "Sep 19",
+          "e": "customercare@"
+      },
+      {
+          "c": "fountainofyouth.bio",
+          "t": "auto-reply",
+          "d": "Sep 19",
+          "e": "support@"
+      },
+      {
+          "c": "treasurecoastpeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 10",
+          "e": "support@"
+      },
+      {
+          "c": "researchpeptidemarket.com",
+          "t": "vendor · CATALOG SENT Sep 20 23:58. Kevin Castello replie...",
+          "d": "Sep 19",
+          "e": "contact@"
+      },
+      {
+          "c": "limitlesslifenootropics.com",
+          "t": "auto-reply",
+          "d": "Sep 10",
+          "e": "support@"
+      },
+      {
+          "c": "simplepeptide.com",
+          "t": "auto-reply",
+          "d": "Sep 10",
+          "e": "support@"
+      },
+      {
+          "c": "reinventioncompounds.com",
+          "t": "auto-reply",
+          "d": "Sep 18",
+          "e": "cs@"
+      },
+      {
+          "c": "greatlakespeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 18",
+          "e": "support@"
+      },
+      {
+          "c": "nextlevelpharm.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 18",
+          "e": "hello@"
+      },
+      {
+          "c": "simonsrx.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 10",
+          "e": "contact@"
+      },
+      {
+          "c": "strivepharmacy.com",
+          "t": "auto-reply",
+          "d": "Sep 18",
+          "e": "info@"
+      },
+      {
+          "c": "agelessrx.com",
+          "t": "auto-reply",
+          "d": "Sep 18",
+          "e": "info@"
+      },
+      {
+          "c": "novaprimelabs.com",
+          "t": "auto-reply",
+          "d": "Sep 18",
+          "e": "cs@"
+      },
+      {
+          "c": "ppppeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 18",
+          "e": "contact@"
+      },
+      {
+          "c": "gmail.com",
+          "t": "vendor · needs answer",
+          "d": "Sep 18",
+          "e": "regeneratepeptides@"
+      },
+      {
+          "c": "sigmapeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 17",
+          "e": "support@"
+      },
+      {
+          "c": "calmpeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 17",
+          "e": "support@"
+      },
+      {
+          "c": "omniopeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 17",
+          "e": "sales@"
+      },
+      {
+          "c": "protidehealth.com",
+          "t": "auto-reply",
+          "d": "Sep 17",
+          "e": "support@"
+      },
+      {
+          "c": "vantixbio.com",
+          "t": "vendor &middot; declined",
+          "d": "Sep 17",
+          "e": "support@"
+      },
+      {
+          "c": "peptivaresearchlabs.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 17",
+          "e": "info@"
+      },
+      {
+          "c": "peptidebureau.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 16",
+          "e": "bureau@"
+      },
+      {
+          "c": "peptideclub.com",
+          "t": "auto-reply",
+          "d": "Sep 16",
+          "e": "info@"
+      },
+      {
+          "c": "puritideresearch.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 16",
+          "e": "support@"
+      },
+      {
+          "c": "koipeptides.com",
+          "t": "vendor &middot; declined",
+          "d": "Sep 16",
+          "e": "support@"
+      },
+      {
+          "c": "basepeps.com",
+          "t": "vendor · Auto-reply only: \"Our Team is Researching a Resp...",
+          "d": "Sep 16",
+          "e": "support@"
+      },
+      {
+          "c": "perxpeptides.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 16",
+          "e": "support@"
+      },
+      {
+          "c": "wooshlabs.com",
+          "t": "vendor · Marked replied in sent_log but no thread survive...",
+          "d": "Sep 15",
+          "e": "info@"
+      },
+      {
+          "c": "10bottlevalue.co",
+          "t": "vendor · MOQ INCONSISTENCY, AND THEY ARE IN EUROPE. Drops...",
+          "d": "Sep 15",
+          "e": "support@"
+      },
+      {
+          "c": "restorepeptides.io",
+          "t": "vendor · PRICE CONCERN. Sep 14: \"Yes, send over the whole...",
+          "d": "Sep 2",
+          "e": "support@"
+      },
+      {
+          "c": "solyn.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "peptidegroupbuy.com",
+          "t": "vendor · DUE DILIGENCE, THEN SILENCE. Sep 15 they asked f...",
+          "d": "Sep 14",
+          "e": "info@"
+      },
+      {
+          "c": "myoasislabs.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "ironwithin.io",
+          "t": "auto-reply",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "vantageaminos.co",
+          "t": "vendor · catalog sent",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "eliteedgebiotech.com",
+          "t": "auto-reply",
+          "d": "Sep 14",
+          "e": "info@"
+      },
+      {
+          "c": "suaway.com",
+          "t": "vendor · Sep 14: challenged the US-manufacturing claim di...",
+          "d": "Sep 14",
+          "e": "info@"
+      },
+      {
+          "c": "happypeptides.com",
+          "t": "vendor · Mindful Research. Sep 14: \"Please send pricing.\"...",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "onedaycompounds.com",
+          "t": "vendor · Sep 15, Will: \"We are interested in a price list...",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "zerovariancelabs.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 14",
+          "e": "support@"
+      },
+      {
+          "c": "thepeplair.com",
+          "t": "vendor &middot; declined",
+          "d": "Sep 14",
+          "e": "javik@"
+      },
+      {
+          "c": "flatironsrc.com",
+          "t": "vendor · catalog sent",
+          "d": "Sep 11",
+          "e": "support@"
+      },
+      {
+          "c": "prettypeptidecollective.com",
+          "t": "vendor · Sep 15, Summer: \"Definitely interested. Can you ...",
+          "d": "Sep 11",
+          "e": "support@"
+      },
+      {
+          "c": "nurevpeptides.com",
+          "t": "vendor · needs answer",
+          "d": "Sep 10",
+          "e": "support@"
+      },
+      {
+          "c": "aminoamigos.com",
+          "t": "vendor · Sep 10: \"Where are you located?\" JC answered Sep...",
+          "d": "Sep 10",
+          "e": "info@"
+      }
+  ];
+  const rb=document.getElementById("replyBody");
+  replies.forEach(r=>{ const tr=document.createElement("tr");
+    tr.innerHTML=`<td class="src-name">${r.c}</td><td class="aud">${r.t}</td><td class="mono">${r.d}</td><td class="mono">${r.e}${r.c}</td>`; rb.appendChild(tr); });
+
+  const bounces = [
+      {
+          "a": "yuny79338@gmail.com",
+          "t": "vendor"
+      },
+      {
+          "a": "research@utahbiolabs.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@vitalcoreresearch.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@biolongevitysupplements.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@vantapeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@srqmedspa.com",
+          "t": "med spa"
+      },
+      {
+          "a": "info@miamielegance.com",
+          "t": "med spa"
+      },
+      {
+          "a": "contact@aspirerejuvenation.com",
+          "t": "med spa"
+      },
+      {
+          "a": "info@goodivpdx.com",
+          "t": "med spa"
+      },
+      {
+          "a": "info@elitemedicalspaofparrish.com",
+          "t": "med spa"
+      },
+      {
+          "a": "info@melnp.com",
+          "t": "med spa"
+      },
+      {
+          "a": "orders@melanotan2usa.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@synexlabs.org",
+          "t": "vendor"
+      },
+      {
+          "a": "contact@optiveralabs.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@abbexa.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@imfabulouscosmetics.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@apexbt.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@moesgroup.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@utahlabresearch.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@swiftpeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@velocitybiolabs.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@arkpeps.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@riptidewellness.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@borderfreehealth.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@riptidez.net",
+          "t": "vendor"
+      },
+      {
+          "a": "support@somapeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "contact@celtek-peptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@reviveandthrive.io",
+          "t": "vendor"
+      },
+      {
+          "a": "support@absolutepep.com",
+          "t": "vendor"
+      },
+      {
+          "a": "desk@peptidewholesalers.com",
+          "t": "vendor"
+      },
+      {
+          "a": "help@telepeptide.org",
+          "t": "vendor"
+      },
+      {
+          "a": "support@synthrolab.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@onprl.com",
+          "t": "vendor"
+      },
+      {
+          "a": "contact@novaxpeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@creative-peptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@uspeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@delphiwellness.clinic",
+          "t": "med spa"
+      },
+      {
+          "a": "support@aminobros.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@pepnationlab.com",
+          "t": "vendor"
+      },
+      {
+          "a": "admin@peptidespalace.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@rarevbiolabs.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@titanpeptidelab.com",
+          "t": "vendor"
+      },
+      {
+          "a": "contact@regentide.com",
+          "t": "vendor"
+      },
+      {
+          "a": "contact@peptideinsider.org",
+          "t": "vendor"
+      },
+      {
+          "a": "info@peptidesfactorydirect.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@chemdope.com",
+          "t": "vendor"
+      },
+      {
+          "a": "contact@peptideprotocolwiki.com",
+          "t": "vendor"
+      },
+      {
+          "a": "hello@peptideiq.io",
+          "t": "vendor"
+      },
+      {
+          "a": "george@tennesseepeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "admin@youmepeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@polybiotech.us",
+          "t": "vendor"
+      },
+      {
+          "a": "support@pinnaclepeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "hello@peptides.nyc",
+          "t": "vendor"
+      },
+      {
+          "a": "sales@purepeptidepharma.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@spartanpeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "customercare@true-peptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@elementsarms.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@lifestylepeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@rttpeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "hello@peptidex.app",
+          "t": "vendor"
+      },
+      {
+          "a": "orders@genoscience.net",
+          "t": "vendor"
+      },
+      {
+          "a": "support@prolabs.bio",
+          "t": "vendor"
+      },
+      {
+          "a": "service@peptideorders.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@celvive.com",
+          "t": "vendor"
+      },
+      {
+          "a": "contact@knowyourpeptide.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@agerejuvenation.com",
+          "t": "med spa"
+      },
+      {
+          "a": "support@mdpep.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@peptides.org",
+          "t": "vendor"
+      },
+      {
+          "a": "sales@westcoastpeptidesupply.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@usapeptidescience.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@kjbm.thepreptide.com",
+          "t": "vendor"
+      },
+      {
+          "a": "contact@navarahealthtx.com",
+          "t": "med spa"
+      },
+      {
+          "a": "hello@thegoodlifeiv.com",
+          "t": "med spa"
+      },
+      {
+          "a": "support@aminocoreresearch.com",
+          "t": "vendor"
+      },
+      {
+          "a": "sales@geopeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@reliablepeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "research@peptidecraft.co",
+          "t": "vendor"
+      },
+      {
+          "a": "sales@innmi.com",
+          "t": "vendor"
+      },
+      {
+          "a": "nexbiopeptix@gmail.com",
+          "t": "vendor"
+      },
+      {
+          "a": "hello@proxivalabs.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@masterspeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@peptidedirect.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@crestbiolabs.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@sqspeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@pepperlicious.com",
+          "t": "vendor"
+      },
+      {
+          "a": "info@excaliburpeptides.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@synergybiopeps.com",
+          "t": "vendor"
+      },
+      {
+          "a": "support@trustedpeptide.net",
+          "t": "vendor"
+      },
+      {
+          "a": "support@foreveryoungpharmacy.com",
+          "t": "vendor"
+      }
+  ];
+  const bb=document.getElementById("bounceBody");
+  bounces.forEach(b=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td class="mono">${b.a}</td><td class="aud">${b.t}</td>`; bb.appendChild(tr); });
+
+  /* ---------- pipeline flow ---------- */
+  const stages = [
+    {name:"Discover",   st:"run",   meta:"7 directories &middot; 3,156 read"},
+    {name:"Crawl",      st:"done",  meta:"~2,400 sites"},
+    {name:"Render",     st:"done",  meta:"Chromium · CF sites"},
+    {name:"Deep pass",  st:"done",  meta:"contact + policy pages"},
+    {name:"Compile",    st:"done",  meta:"1,689-contact queue"},
+    {name:"Send",       st:"run",   meta:"1185 sent &middot; 10/hr &middot; 50/day"},
+  ];
+  const stLabel = st => st==="run"?"Running":st==="done"?"Done":st==="block"?"Paused":"Queued";
+  const flow = document.getElementById("flow");
+  stages.forEach(s=>{
+    const el=document.createElement("div"); el.className="stage";
+    el.innerHTML=`<div class="s-top"><span class="dot ${s.st}"></span>${stLabel(s.st)}</div>
+      <div class="s-name">${s.name}</div><div class="s-meta">${s.meta}</div>`;
+    flow.appendChild(el);
+  });
+
+  /* ---------- task board ---------- */
+  const phases = [
+    {name:"Phase 1 — Vendor discovery & enrichment", status:"done", pct:100,
+     tasks:[
+      {t:"Ingest master roster (PeptideBase + Finnrick)", s:"done", m:"367 rows"},
+      {t:"Pull Finnrick public vendor index", s:"done", m:"1,796 → 1,113 US/unknown"},
+      {t:"Crawl repo seed & roster lists", s:"done", m:"183 domains"},
+      {t:"Resolve vendor name → website", s:"done", m:"70 verified"},
+      {t:"Search discovery (research-only, coupon, wholesale)", s:"done", m:"516 queries"},
+      {t:"Crawl + email/phone/IG extraction", s:"done", m:"resumable, robots-aware"},
+      {t:"Chromium render pass (Cloudflare / JS sites)", s:"done", m:"356 retried"},
+      {t:"Deep contact & policy-page pass", s:"done", m:"+69 emails"},
+      {t:"Second discovery run via Startpage (547 queries)", s:"done", m:"+462 vendors"},
+      {t:"Round 3: state + storefront queries, deep list-page harvest", s:"done", m:"+336 vendors"},
+     ]},
+    {name:"Phase 2 — Med spas & clinics offering peptides", status:"done", pct:100,
+     tasks:[
+      {t:"Build city × treatment query set", s:"done", m:"300 queries · 50 cities"},
+      {t:"Startpage search in Chromium (Bing was geo-blind)", s:"done", m:"1,244 business sites"},
+      {t:"Med-spa-mode crawl (service & treatment pages)", s:"done", m:"930 confirm peptides"},
+      {t:"Chromium pass on blocked sites", s:"done", m:"265 retried"},
+      {t:"Parse Drive peptide-intake forms", s:"done", m:"232 leads / 40 states"},
+      {t:"Merge, dedupe, split per state", s:"done", m:"exports/medspa_by_state"},
+      {t:"Mine clinic directories via their sitemaps", s:"run", m:"7 directories · 14,023 listings"},
+      {t:"Crawl each clinic's own site for a published address", s:"run", m:"~35% publish one"},
+      {t:"Gate into the queue: US, peptide-confirmed, address on the site", s:"done", m:"outreach/ingest_resolved.py"},
+     ]},
+    {name:"Phase 3 — Outreach campaign", status:"run", pct:70,
+     tasks:[
+      {t:"Per-audience copy with CAN-SPAM footer (postal address + unsubscribe)", s:"done", m:"2 templates"},
+      {t:"30-email med-spa test batch", s:"done", m:"Sep 14 · approved"},
+      {t:"Gmail drafts created and verified", s:"done", m:"86 drafts"},
+      {t:"Send engine with per-contact tracking (date, step, status)", s:"done", m:"outreach/serve_send.py"},
+      {t:"Reconcile log against Gmail Sent (Sep 1–14)", s:"done", m:"375 contacts"},
+      {t:"Reply & bounce detection; contacted / replied / bounced lists in outreach/", s:"done", m:"rescanned every wave"},
+      {t:"Follow-up copy: 3 steps, 3 days apart", s:"done", m:"opens Sep 17"},
+      {t:"Ramped sending: 10 per hour, 100 per day, drafts first", s:"run", m:"100 sent Sep 16 · waves hourly"},
+      {t:"100 per hour target", s:"block", m:"shelved · Gmail throttling"},
+      {t:"Follow-up wave 1 (contacts with no reply)", s:"queue", m:"not before Sep 17"},
+      {t:"Delete 14 stale Sep 10–11 drafts (old copy)", s:"queue", m:"awaiting go-ahead"},
+     ]},
+    {name:"Phase 4 — Next verticals", status:"queue", pct:0,
+     tasks:[
+      {t:"Telehealth companies needing 503A", s:"queue", m:"planned"},
+      {t:"503A / 503B compounding pharmacies", s:"queue", m:"classifier ready"},
+      {t:"Affiliate & discount-code networks (deep)", s:"queue", m:"planned"},
+     ]},
+  ];
+
+  const sources = [
+    {n:"Finnrick public index", v:"1,039", e:"617"},
+    {n:"Repo seed & roster lists", v:"141", e:"348"},
+    {n:"Master roster (PeptideBase)", v:"149", e:"112"},
+    {n:"Search discovery", v:"70", e:"37"},
+  ];
+
+  const gaps = [
+    {n:"~55%", t:"Clinics that publish no address", d:"Of 658 clinics crawled in one directory batch, 332 offer only a contact form. They are recorded but never queued: a guessed address costs sending reputation, and this domain has been throttled once already."},
+    {n:"14",  t:"Stale drafts in Gmail", d:"Sep 10–11 drafts carry the old copy. Don't send them by hand; the queue re-sends those contacts with the current template."},
+    {n:"17",  t:"Non-US vendors skipped", d:"Foreign domains and names are excluded from the US-made, no-customs pitch. Jinan Boruimei Trading Co., Ltd. was caught by reading the site: the stored name was just \"Boruimei\"."},
+    {n:"141", t:"Cloudflare-hard sites", d:"Block even a real browser — flagged in the CSV for a manual contact-page check."},
+    {n:"25",  t:"No findable website", d:"Roster vendors with a name but no site; need a manual or directory lookup."},
+    {n:"22",  t:"PeptideBase vendors still unreachable", d:"Of 35 US vendors from that directory never contacted, 13 are now queued. Six sites block every client, six publish no address, three could not be identified, and two are held back: one an unverified successor to an FDA-closed brand, one an address whose source page now 404s."},
+    {n:"10.9k", t:"Directory listings still unmined", d:"Seven directories publish 14,023 clinic listings between them and 3,156 have been read. The rest are the pipeline for the coming days, at roughly 900 listings a mine."},
+    {n:"4", t:"Directories checked and rejected", d:"usmedspadirectory.com gives all 611 of its spas a .example.com website, so the listings are invented. medspafind.com renders US listings in JavaScript. medicalspalocator.com answers 429 to everything. klinic.com covers wegovy, zepbound and TRT in every state but links to no clinic but its own."},
+  ];
+
+  const tagFor = st => st==="done"?'<span class="status-tag t-done">Complete</span>'
+    : st==="run"?'<span class="status-tag t-run">Running</span>'
+    : st==="block"?'<span class="status-tag t-block">Paused</span>'
+    : '<span class="status-tag t-queue">Queued</span>';
+
+  const phasesEl=document.getElementById("phases");
+  let totalDone=0,total=0;
+  phases.forEach(p=>{
+    const card=document.createElement("div"); card.className="phase";
+    let lis="";
+    p.tasks.forEach(tk=>{
+      total++; if(tk.s==="done")totalDone++;
+      const stripe = tk.s==="block"?'<span class="stripe" style="background:var(--block)"></span>':
+                     tk.s==="run"?'<span class="stripe" style="background:var(--run)"></span>':'';
+      const check = tk.s==="done"?`<span class="check done">${ICON_CHECK}</span>`
+        : tk.s==="run"?'<span class="check run"><span class="dot run" style="width:9px;height:9px"></span></span>'
+        : tk.s==="block"?'<span class="check block"><span class="dot block" style="width:9px;height:9px"></span></span>'
+        : '<span class="check"></span>';
+      lis+=`<li>${stripe}${check}<span class="task-name ${tk.s==='done'?'dn':''}">${tk.t}</span><span class="task-meta">${tk.m}</span></li>`;
+    });
+    const barColor = p.status==='run'?'var(--run)':p.status==='block'?'var(--block)':p.status==='queue'?'var(--queue)':'var(--done)';
+    card.innerHTML=`<div class="phase-hd"><span class="pn">${p.name}</span>${tagFor(p.status)}
+        <span class="pmeta">${p.pct}%</span><span class="bar"><i style="width:${p.pct}%;background:${barColor}"></i></span></div>
+      <ul class="tasks">${lis}</ul>`;
+    phasesEl.appendChild(card);
+  });
+  document.getElementById("taskCount").textContent = `${totalDone} of ${total} tasks complete`;
+
+  const sb=document.getElementById("srcBody");
+  sources.forEach(s=>{ const tr=document.createElement("tr");
+    tr.innerHTML=`<td class="src-name">${s.n}</td><td class="num">${s.v}</td><td class="num">${s.e}</td>`; sb.appendChild(tr); });
+
+  const g=document.getElementById("gaps");
+  gaps.forEach(x=>{ const d=document.createElement("div"); d.className="gap";
+    d.innerHTML=`<span class="g-n">${x.n}</span><span class="g-t"><b>${x.t}</b>${x.d}</span>`; g.appendChild(d); });
+
+  // tabs. The pipeline panel is the one rendered visible in the HTML, so the
+  // page reads correctly before this runs at all; the remembered choice is a
+  // per-viewer convenience and never the source of truth.
+  (function tabs(){
+    const defs=[["pipeline",document.getElementById("tab-btn-pipeline")],
+                ["catalog",document.getElementById("tab-btn-catalog")]];
+    function show(name){
+      defs.forEach(([n,btn])=>{
+        const panel=document.getElementById("panel-"+n);
+        const on = n===name;
+        btn.setAttribute("aria-selected", on?"true":"false");
+        panel.hidden=!on;
+      });
+      try{ localStorage.setItem("plt-tab",name); }catch(e){}
+    }
+    defs.forEach(([n,btn])=>{
+      btn.addEventListener("click",()=>show(n));
+      btn.addEventListener("keydown",e=>{
+        if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return;
+        e.preventDefault();
+        const i=defs.findIndex(d=>d[0]===n);
+        const next=defs[(i+(e.key==="ArrowRight"?1:defs.length-1))%defs.length];
+        next[1].focus(); show(next[0]);
+      });
+    });
+    let saved=null;
+    try{ saved=localStorage.getItem("plt-tab"); }catch(e){}
+    if(saved && defs.some(d=>d[0]===saved)) show(saved);
+  })();
+
+  // theme toggle: cycles system → light → dark
+  const root=document.documentElement, btn=document.getElementById("themeBtn");
+  let mode = null;
+  try{ mode = localStorage.getItem("plt-theme"); }catch(e){}
+  if(mode) root.setAttribute("data-theme",mode);
+  btn.addEventListener("click",()=>{
+    mode = mode==="dark" ? "light" : "dark";
+    root.setAttribute("data-theme",mode);
+    try{ localStorage.setItem("plt-theme",mode); }catch(e){}
+  });
+</script>
+
+</body></html>
