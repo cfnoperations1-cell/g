@@ -927,7 +927,15 @@ DECLINED_CONTACTS = {"amelia.tide518@gmail.com",  # the only address for "Wingem
                      "flourishglobalpeptide@gmail.com",
                      "24.stampshop@gmail.com",  # MT Meipept (mei-pept.com): its phones are (825), an
                                             # Alberta, Canada code, and the dummy (743) 255-5555
-                     "customercare@peptideprestig.net"}  # Peptide Prestige's site is peptideprestige.net;
+                     "customercare@peptideprestig.net",
+                     "healthymorphllc@gmail.com",  # Healthy Morph (chemicalpeptide.com): its "US" phones
+                                            # (861) 994-8169 and (994) 816-9685 are the digits of the
+                                            # Chinese mobile +86 199 4816 9685 split up -- the
+                                            # norcopeptide precedent; 861 and 994 are not US codes
+                     "61502702.xt@gmail.com"}   # BOC Peptide (boc-peptide.com): every address on its
+                                            # page is a QQ-style number or coco./lluna-style gmail
+                                            # (61502702.xt, coco.807241, lluna45469), the pattern of
+                                            # the Chinese sellers declined on Sep 24  # Peptide Prestige's site is peptideprestige.net;
                                             # this address is on peptideprestig.net, a typo domain that
                                             # would bounce the way vantapeptides.com did on Sep 25  # Flourish Global Peptide: its phone is a
                                             # (852) Hong Kong number, the Wingem/hkburson precedent    # Alpha-Gen again: alphagen.store is the same brand as
