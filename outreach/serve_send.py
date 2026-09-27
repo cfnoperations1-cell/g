@@ -737,6 +737,9 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "lktlabs.com",           # Sep 24 RUO sweep: reagent manufacturer; sells to us or buys nothing
                     "curo.you",             # Sep 25: "Best Peptide Companies (...)" -- a ranking and
                                             # comparison site that rates other vendors, buys nothing
+                    "precisionpeptidecompany.com",  # The Precision Peptide Company Inc.: its only phone is
+                                            # (604), Vancouver, Canada, and the vendor list classes it
+                                            # as a compounding pharmacy -- two standing tells
                     "bloomtechz.com",       # Sep 24 RUO sweep: Shaanxi Bloom Tech, a Chinese chemical
                                             # trader; its vendor-list row has no US signal on site
                     "huaxiapeptides.com",   # Sep 24 RUO sweep: Huaxia Peptides, Chinese name, no US
