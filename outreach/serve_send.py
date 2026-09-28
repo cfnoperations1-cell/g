@@ -39,14 +39,14 @@ _THIRD_PARTY = None
 FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "emailer" / "followup_vendor.txt"}
 
 DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/day for the next week
-# AUDIENCE_ONLY restricts a wave to one audience. Jonathan, Sep 24: "swap to
-# doing RUO brands again and not do Med Spa's. These are not great leads so
-# starting tomorrow send out the rest of the RUO brands that we haven't
-# contacted." That replaces his Sep 22 med spa focus and has no end date; the
-# med spa rows stay in the queue but are not eligible. FOCUS_REVIEW_DATE now
-# dates only the 50/day cap, which he set "for the next week" on Sep 22.
+# AUDIENCE_ONLY restricts a wave to one audience. Jonathan, Sep 28, once the RUO
+# list was finished: "Continue with verified med spa leads." That brings back
+# the med spa focus he first set on Sep 22 (and paused Sep 24 for the RUO
+# brands). The queue is ranked best-first by scraper/rank_queue.py, so waves
+# take the highest-scoring verified med spas first. FOCUS_REVIEW_DATE dates
+# the 50/day cap, which he set "for the next week" on Sep 22.
 # Clear it with AUDIENCE_ONLY= to go back to every audience.
-AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "vendor").strip().lower()
+AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "medspa").strip().lower()
 FOCUS_REVIEW_DATE = "2026-09-29"
 # RUO_ONLY: with AUDIENCE_ONLY=vendor, only research-peptide brands are eligible.
 # The "vendor" audience is not only RUO brands: the Sep 22 Instagram import filed
