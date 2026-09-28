@@ -39,14 +39,12 @@ _THIRD_PARTY = None
 FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "emailer" / "followup_vendor.txt"}
 
 DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/day for the next week
-# AUDIENCE_ONLY restricts a wave to one audience. Jonathan, Sep 28, once the RUO
-# list was finished: "Continue with verified med spa leads." That brings back
-# the med spa focus he first set on Sep 22 (and paused Sep 24 for the RUO
-# brands). The queue is ranked best-first by scraper/rank_queue.py, so waves
-# take the highest-scoring verified med spas first. FOCUS_REVIEW_DATE dates
-# the 50/day cap, which he set "for the next week" on Sep 22.
-# Clear it with AUDIENCE_ONLY= to go back to every audience.
-AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "medspa").strip().lower()
+# AUDIENCE_ONLY restricts a wave to one audience. Jonathan, Sep 28 afternoon,
+# after one more med spa wave: "MedSpa is truly don't work." Med spa sends are
+# stopped. "paused" matches no audience, so `next` builds an empty wave until he
+# approves the telehealth copy (or names another audience). Set AUDIENCE_ONLY=
+# vendor / telehealth / medspa on the command line to send one deliberately.
+AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "paused").strip().lower()
 FOCUS_REVIEW_DATE = "2026-09-29"
 # RUO_ONLY: with AUDIENCE_ONLY=vendor, only research-peptide brands are eligible.
 # The "vendor" audience is not only RUO brands: the Sep 22 Instagram import filed
