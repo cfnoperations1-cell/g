@@ -781,6 +781,9 @@ DECLINED_DOMAINS = {"aminoasylumofficial.com",
                     "zenithbeautylab.com",  # listed as "Shaping Beauty Lounge" but the domain is Zenith
                                             # Beauty Lab, on a single glutathione hit: a row describing
                                             # a different business than its domain
+                    "peptidesciencessupplies.com",  # Sep 29: same Henderson NV 89052 zip as Peptide
+                                            # Sciences, already emailed at peptidesciencesmail.com --
+                                            # a second domain for that business or a copycat
                     "ultimapharma.com"}     # sells "AAS, HGH, PEPTIDES": its menu is Injectable
                                             # Steroids, Oral Steroids, Peptides. Anabolic steroids are
                                             # Schedule III, and this is a direct-to-consumer storefront
