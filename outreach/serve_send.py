@@ -38,14 +38,16 @@ EXPECTED = OUT / "exclusions_expected.txt"
 _THIRD_PARTY = None
 FU_TPL = {"medspa": ROOT / "emailer" / "followup_medspa.txt", "vendor": ROOT / "emailer" / "followup_vendor.txt"}
 
-DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/day for the next week
-# AUDIENCE_ONLY restricts a wave to one audience. Jonathan, Sep 28 afternoon,
-# after one more med spa wave: "MedSpa is truly don't work." Med spa sends are
-# stopped. "paused" matches no audience, so `next` builds an empty wave until he
-# approves the telehealth copy (or names another audience). Set AUDIENCE_ONLY=
-# vendor / telehealth / medspa on the command line to send one deliberately.
-AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "paused").strip().lower()
-FOCUS_REVIEW_DATE = "2026-09-29"
+DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/day; confirmed Sep 29 ("yes 50 per day")
+# AUDIENCE_ONLY restricts a wave to one audience. Med spas stopped Sep 28 ("MedSpa
+# is truly don't work"). Sep 29 Jonathan approved starting the new RUO vendors
+# (scraper/hunts/ruo_vendors_*.csv) "tomorrow", and the personal emails to named
+# decision-makers, which go first (see personal_rank). Telehealth is held: he
+# says telehealth buyers need a 503A pharmacy, and neither the standard nor the
+# personal telehealth copy speaks to that yet. Set AUDIENCE_ONLY=paused to stop
+# every send, or telehealth / medspa / personal to send one deliberately.
+AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "vendor").strip().lower()
+FOCUS_REVIEW_DATE = "none (50/day confirmed 2026-09-29)"
 # RUO_ONLY: with AUDIENCE_ONLY=vendor, only research-peptide brands are eligible.
 # The "vendor" audience is not only RUO brands: the Sep 22 Instagram import filed
 # med spas and telehealth clinics with no quotable compounds under the vendor
@@ -55,7 +57,7 @@ FOCUS_REVIEW_DATE = "2026-09-29"
 # address or domain appears on one of the RUO vendor lists below.
 RUO_ONLY = os.environ.get("RUO_ONLY", "1") != "0"
 RUO_SOURCES = ["exports/us_peptide_vendors_*.csv", "scraper/peptide_vendors_master.csv",
-               "scraper/peptidebase_resolved_*.csv"]
+               "scraper/peptidebase_resolved_*.csv", "scraper/hunts/ruo_vendors_*.csv"]
 _RUO = None
 
 
@@ -84,6 +86,34 @@ def ruo_keys():
         # through (63 of them on Sep 24).
         _RUO = keys - FREEMAIL - FOREIGN_FREEMAIL - {"icloud.com", "aol.com", "me.com", "live.com", "msn.com"}
     return _RUO
+
+
+# PERSONAL LEADS. Jonathan, Sep 28: "find who the best customers are ... and write
+# emails to them and add them to the list." outreach/personal_leads_*.csv holds one
+# hand-written email per business, addressed to a named decision-maker at an
+# address the business or the person published (never a guessed one). Their queue
+# rows carry that copy, so a wave sends them first, in the file's rank order, and
+# never rewrites their name or subject: the standard subject line carries claims
+# the personal copy deliberately leaves out. AUDIENCE_ONLY=personal sends only
+# these, whatever their audience.
+_PERSONAL = None
+
+
+def personal_rank():
+    """email -> rank for every hand-written personal lead."""
+    global _PERSONAL
+    if _PERSONAL is None:
+        import glob
+        _PERSONAL = {}
+        for f in sorted(glob.glob(str(OUT / "personal_leads_*.csv"))):
+            for r in csv.DictReader(open(f, encoding="utf-8-sig")):
+                e = (r.get("email") or "").strip().lower()
+                if e and e not in _PERSONAL:
+                    try:
+                        _PERSONAL[e] = (f, int(r.get("rank") or 0))
+                    except ValueError:
+                        _PERSONAL[e] = (f, 0)
+    return _PERSONAL
 
 
 def is_ruo(email):
@@ -1256,7 +1286,12 @@ def initial_candidates(sent_rows):
     rest = [r for r in cands if r["email"].strip().lower() not in dids]
     vendors = [r for r in rest if r["audience"] == "vendor"]
     medspas = [r for r in rest if r["audience"] == "medspa"]
-    if AUDIENCE_ONLY:
+    pers = personal_rank()
+    if AUDIENCE_ONLY == "personal":
+        rest = [r for r in rest if r["email"].strip().lower() in pers]
+        drafted = [r for r in drafted if r["email"].strip().lower() in pers]
+        ordered = rest
+    elif AUDIENCE_ONLY:
         # A filter, not a reordering: anything outside the chosen audience is
         # not eligible this week at all, so a thin med spa pool shortens the
         # wave rather than quietly topping it up with vendors.
@@ -1268,8 +1303,10 @@ def initial_candidates(sent_rows):
         ordered = rest
     else:
         ordered = vendors + medspas                               # after the drafts: vendors first, then med spas
-    pri = [r for r in ordered if r["email"].split("@", 1)[1] in PRIORITY_DOMAINS]
-    ordered = drafted + pri + [r for r in ordered if r not in pri]
+    mine = sorted((r for r in ordered if r["email"].strip().lower() in pers),
+                  key=lambda r: pers[r["email"].strip().lower()])
+    pri = [r for r in ordered if r["email"].split("@", 1)[1] in PRIORITY_DOMAINS and r not in mine]
+    ordered = drafted + mine + pri + [r for r in ordered if r not in pri and r not in mine]
     out, seen, brands = [], set(), {brand_key(r["domain"]) for r in sent_rows} - {""}
     for r in ordered:                                             # one contact per domain per campaign
         d = contact_key(r["email"])
@@ -1438,7 +1475,7 @@ def cmd_next(n, out_json):
         e = r["email"].strip().lower()
         name, subj, body, did = r["business_name"], r["subject"], r["body"], dids.get(e, "")
         em_dom = e.split("@", 1)[1]
-        if r["audience"] == "vendor":
+        if r["audience"] == "vendor" and e not in personal_rank():
             # clean_vendor checks the name against the domain we are writing to.
             # For a contact who publishes a Gmail or Outlook address that check is
             # meaningless -- the name will never match "gmail.com" -- and the
