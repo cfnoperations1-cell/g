@@ -64,7 +64,7 @@ def stage_of(status, note, catalog):
 # on the 503A question. The paused med spa backlog stays out of the CRM.
 HOLD_NOTE = {
     "vendor": "Queued: goes out in the daily RUO waves.",
-    "practice": "Queued behind the RUO vendors. Held until Jonathan says to start the practice list.",
+    "practice": "Queued behind the RUO vendors; starts when they run out, best-ranked first.",
     "telehealth": "Held until Jonathan decides how to handle 503A for telehealth.",
 }
 

@@ -47,10 +47,13 @@ DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/
 # personal telehealth copy speaks to that yet. Set AUDIENCE_ONLY=paused to stop
 # every send, or telehealth / medspa / personal to send one deliberately.
 # The practice list (audience "practice", scraper/import_medspa_list.py) is
-# queued behind the RUO vendors. Jonathan, Sep 30: "Do not send those yet Q them
-# up behind the other emails." It sends only when AUDIENCE_ONLY=practice is set
-# on his say-so -- never switch to it automatically when the RUO pool runs dry.
-AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "vendor").strip().lower()
+# queued behind the RUO vendors. Jonathan, Sep 30: first "Do not send those yet
+# Q them up behind the other emails", then the go-ahead below.
+# Jonathan, Sep 30: "Yes after RUO brand Que up the best med spas and personal
+# emails make the leads by best." So the default hands off from the last RUO
+# vendor to the practice list, which rank_queue.py orders best-first (peptides
+# seen on the site, med spa / wellness type, the named owner's own address).
+AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "vendor,practice").strip().lower()
 FOCUS_REVIEW_DATE = "none (50/day confirmed 2026-09-29)"
 # RUO_ONLY: with AUDIENCE_ONLY=vendor, only research-peptide brands are eligible.
 # The "vendor" audience is not only RUO brands: the Sep 22 Instagram import filed
@@ -1298,6 +1301,16 @@ def initial_candidates(sent_rows):
         rest = [r for r in rest if r["email"].strip().lower() in pers]
         drafted = [r for r in drafted if r["email"].strip().lower() in pers]
         ordered = rest
+    elif "," in AUDIENCE_ONLY:
+        # An ordered hand-off: "vendor,practice" sends every eligible RUO vendor
+        # first and moves on to the practice list only when none are left. Each
+        # audience keeps its own file order (the queue is ranked best-first).
+        order = [a.strip() for a in AUDIENCE_ONLY.split(",") if a.strip()]
+        ok = lambda r: r["audience"] in order and (r["audience"] != "vendor" or not RUO_ONLY or is_ruo(r["email"]))
+        rank = lambda r: order.index(r["audience"])
+        rest = sorted((r for r in rest if ok(r)), key=rank)
+        drafted = sorted((r for r in drafted if ok(r)), key=rank)
+        ordered = rest
     elif AUDIENCE_ONLY:
         # A filter, not a reordering: anything outside the chosen audience is
         # not eligible this week at all, so a thin med spa pool shortens the
@@ -1501,14 +1514,14 @@ def cmd_next(n, out_json):
                       "body": body, "draftId": did})
     Path(out_json).write_text(json.dumps(items), encoding="utf-8")
     fu = sum(1 for i in items if i["kind"] == "fu"); ini = len(items) - fu
-    focus = (f", audience={AUDIENCE_ONLY}{' (RUO brands)' if AUDIENCE_ONLY == 'vendor' and RUO_ONLY else ''} only" if AUDIENCE_ONLY else "") + f", cap review {FOCUS_REVIEW_DATE}"
+    focus = (f", audience={AUDIENCE_ONLY}{' (RUO brands)' if AUDIENCE_ONLY.startswith('vendor') and RUO_ONLY else ''} only" if AUDIENCE_ONLY else "") + f", cap review {FOCUS_REVIEW_DATE}"
     print(f"BATCH {len(items)}  fu={fu} initial={ini}  (budget_left_today={budget}, cap={DAILY_CAP}{focus})")
     bad = [i["to"] for i in items if "{" in i["subject"] or "{" in i["body"]]
     if bad:
         print("!!! PLACEHOLDER LEFTOVERS:", bad)
     for i, it in enumerate(items, 1):
         kind = f"FU{it['stage']}" if it["kind"] == "fu" else "INIT"
-        aud = "MS" if it["audience"] == "medspa" else "VN"
+        aud = {"medspa": "MS", "practice": "PR", "telehealth": "TH"}.get(it["audience"], "VN")
         print(f"{i}\t{kind}\t{aud}\t{it['to']}\t{it['name']}\t{it['peps']}\t{it['draftId'] or '-'}")
 
 

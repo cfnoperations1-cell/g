@@ -29,12 +29,12 @@ styles = getSampleStyleSheet()
 cell = ParagraphStyle("cell", parent=styles["Normal"], fontName="Helvetica", fontSize=6.6, leading=8)
 head = ParagraphStyle("head", parent=cell, fontName="Helvetica-Bold", textColor=colors.white)
 P = lambda t, st=cell: Paragraph(clean(t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"), st)
-out = "exports/practice_queue_2026-09-30.pdf"
+out = "exports/practice_queue_ranked_2026-09-30.pdf"
 doc = SimpleDocTemplate(out, pagesize=landscape(letter), leftMargin=0.4*inch, rightMargin=0.4*inch,
                         topMargin=0.45*inch, bottomMargin=0.45*inch, title="Practice List Queue", author="Marinexis Biologics")
 story = [Paragraph("Practice list queue (your Medspa_US_2 list)", styles["Title"]),
-         Paragraph(clean(f"{len(rows):,} practices queued, in send order. HELD: none of these send until you say go. "
-             f"They sit behind the RUO vendors (74 left, done Oct 1). At 50/day this list is about {round(len(rows)/50)} days of sending. "
+         Paragraph(clean(f"{len(rows):,} practices queued, ranked best-first, in send order. They start as soon as the RUO vendors run out "
+             f"(74 left, done Oct 1), 50 a day, each addressed to the named owner. At 50/day this list is about {round(len(rows)/50)} days of sending. "
              f"Built {datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC."), styles["Normal"]), Spacer(1, 10)]
 c = collections.Counter(r[2] for r in rows)
 summ = [[P("Practice type", head), P("Queued", head)]] + [[P(k), P(f"{v:,}")] for k, v in c.most_common()] + [[P("Total"), P(f"{len(rows):,}")]]
@@ -54,7 +54,7 @@ t.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,0),colors.HexColor("#0b6e6d")),("
 story.append(t)
 def footer(canv, d):
     canv.saveState(); canv.setFont("Helvetica", 7); canv.setFillColor(colors.HexColor("#4a5b5a"))
-    canv.drawString(0.4*inch, 0.25*inch, "Marinexis Biologics - practice list queue (held)")
+    canv.drawString(0.4*inch, 0.25*inch, "Marinexis Biologics - practice list queue (ranked best first)")
     canv.drawRightString(landscape(letter)[0]-0.4*inch, 0.25*inch, f"Page {d.page}")
     canv.restoreState()
 doc.build(story, onFirstPage=footer, onLaterPages=footer)

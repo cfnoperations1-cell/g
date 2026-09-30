@@ -119,7 +119,85 @@ def followers_by_email():
     return out
 
 
+# PRACTICE LIST ranking. Jonathan, Sep 30: "after RUO brand Que up the best med
+# spas and personal emails make the leads by best." These rows come from his
+# purchased list (scraper/import_medspa_list.py), so what is known about each is
+# the list's own practice type and contact, plus anything earlier crawls and
+# directories recorded for the same domain. Evidence only, weighted:
+#   peptides   an earlier crawl of this domain found peptide / GLP-1 terms -- the
+#              strongest sign the practice buys what we sell
+#   type       med spas and weight-loss / wellness / hormone practices over
+#              plastic surgery, dermatology and general medical
+#   person     the address is the named contact's own (shelley@...), not info@,
+#              and the contact is the owner / founder / CEO
+#   rating     a star rating a directory published for the domain
+PRACTICE_TYPE_PTS = {
+    "med spa": 30, "weight-loss": 28, "wellness": 26, "aesthetics": 24, "urology and men's health": 24,
+    "integrative and naturopathic": 22, "women's health": 20, "hair restoration": 18,
+    "cosmetic surgery": 16, "sports medicine": 16, "dermatology": 14, "plastic surgery": 12,
+    "orthopedic and sports medicine": 12, "medical": 10,
+}
+DECIDER = re.compile(r"owner|founder|ceo|chief executive|president|principal|medical director|partner", re.I)
+_PRACTICE = None
+
+
+def practice_info():
+    global _PRACTICE
+    if _PRACTICE is None:
+        _PRACTICE = {}
+        for f in glob.glob(str(ROOT / "scraper" / "hunts" / "practice_list_*.csv")):
+            if f.endswith(("_rejected.csv", "_catchall.csv")):
+                continue
+            for r in csv.DictReader(open(f, encoding="utf-8")):
+                _PRACTICE[r["email"].strip().lower()] = r
+    return _PRACTICE
+
+
+_DOM_HITS = {}
+
+
+def domain_peptide_hits(hunts):
+    """Best peptide_hits any earlier crawl recorded for each domain (computed once)."""
+    if id(hunts) in _DOM_HITS:
+        return _DOM_HITS[id(hunts)]
+    out = _DOM_HITS[id(hunts)] = {}
+    for r in hunts.values():
+        d = (r.get("domain") or "").strip().lower().removeprefix("www.")
+        h = (r.get("peptide_hits") or "").strip()
+        if d and h.isdigit():
+            out[d] = max(out.get(d, 0), int(h))
+    return out
+
+
+def practice_score(row, info, dom_hits, ratings):
+    em = row["email"].strip().lower()
+    local, dom = em.split("@", 1)
+    p = info.get(em, {})
+    s, why = 0.0, []
+    hits = dom_hits.get(p.get("domain") or dom, 0)
+    if hits:
+        s += 25 + min(10, 2 * hits); why.append(f"peptides seen on site ({hits})")
+    t = (p.get("practice") or "").lower()
+    s += PRACTICE_TYPE_PTS.get(t, 8); why.append(t or "type unknown")
+    first = (p.get("first_name") or "").lower()
+    if first and first in local:
+        s += 12; why.append("personal address")
+    elif first:
+        s += 4
+    if DECIDER.search(p.get("position") or ""):
+        s += 8; why.append(p.get("position"))
+    if dom not in FREEMAIL:
+        s += 3
+    d = p.get("domain") or dom
+    if d in ratings:
+        pts, wr = rating_points(*ratings[d])
+        s += pts; why.append(f"rated {wr:.2f}")
+    return s, "; ".join(why)
+
+
 def score(row, hunts, exports, followers, ratings):
+    if row.get("audience") == "practice":
+        return practice_score(row, practice_info(), domain_peptide_hits(hunts), ratings)
     em = row["email"].strip().lower()
     dom = em.split("@", 1)[1] if "@" in em else ""
     h = hunts.get(em) or {}
