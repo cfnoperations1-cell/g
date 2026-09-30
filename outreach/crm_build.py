@@ -45,6 +45,8 @@ def stage_of(status, note, catalog):
         return "bounced"
     if re.match(r"(DECLINED|NOT INTERESTED|UNSUBSCRIBE|PRICE REJECTED)", n):
         return "declined"
+    if "ORDERED:" in n:
+        return "ordered"
     if n.startswith("READY TO BUY"):
         return "negotiating"
     if catalog or "CATALOG SENT" in n:
