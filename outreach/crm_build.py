@@ -58,6 +58,55 @@ def stage_of(status, note, catalog):
     return "contacted"
 
 
+# Queued leads shown in the CRM (Jonathan, Sep 30: "break it down into the CRM").
+# Only the audiences still in play: the RUO vendors the sender will reach, the
+# practice list he supplied (held behind them), and the telehealth leads held
+# on the 503A question. The paused med spa backlog stays out of the CRM.
+HOLD_NOTE = {
+    "vendor": "Queued: goes out in the daily RUO waves.",
+    "practice": "Queued behind the RUO vendors. Held until Jonathan says to start the practice list.",
+    "telehealth": "Held until Jonathan decides how to handle 503A for telehealth.",
+}
+
+
+def queued_leads(already):
+    import glob, sys
+    sys.path.insert(0, str(OUT))
+    import serve_send as ss
+    info = {}
+    for f in sorted(glob.glob(str(ROOT / "scraper" / "hunts" / "practice_list_*.csv"))):
+        if f.endswith(("_rejected.csv", "_catchall.csv")):
+            continue
+        for r in csv.DictReader(open(f, encoding="utf-8")):
+            addr = (r.get("address") or "").split(",")
+            city = ", ".join(x.strip() for x in addr[-3:-1]) if len(addr) >= 3 else ""
+            info[r["email"].strip().lower()] = {
+                "person": " ".join(x for x in (r.get("first_name", ""), r.get("last_name", "")) if x).strip(),
+                "role": r.get("position", ""), "ptype": r.get("practice", "").capitalize() if r.get("practice") else "",
+                "phone": r.get("phone", ""), "city": re.sub(r"\s+\d{5}(-\d{4})?$", "", city)}
+    for f in sorted(glob.glob(str(OUT / "personal_leads_*.csv"))):
+        for r in csv.DictReader(open(f, encoding="utf-8")):
+            info.setdefault(r["email"].strip().lower(), {"person": r.get("person", ""), "role": r.get("role", "")})
+    out, seen = [], set(already)
+    saved = ss.AUDIENCE_ONLY
+    try:
+        for aud in ("vendor", "practice", "telehealth"):
+            ss.AUDIENCE_ONLY = aud
+            for r in ss.initial_candidates(ss.load_sent()):
+                e = r["email"].strip().lower()
+                if e in seen:
+                    continue
+                seen.add(e)
+                row = {"email": e, "domain": e.split("@", 1)[1], "name": r.get("business_name") or e,
+                       "audience": aud, "sent": "", "last": "", "fu": 0, "status": "queued",
+                       "reply": "", "catalog": None, "stage": "queued", "hold": HOLD_NOTE[aud]}
+                row.update({k: v for k, v in info.get(e, {}).items() if v})
+                out.append(row)
+    finally:
+        ss.AUDIENCE_ONLY = saved
+    return out
+
+
 def main():
     names = {}
     for r in rows("draft_queue.csv"):
@@ -91,6 +140,8 @@ def main():
             "reply": note, "catalog": ({k: v for k, v in cat.items() if k != "company"} if cat else None),
             "stage": stage_of(r.get("status", ""), note, cat),
         })
+
+    contacts += queued_leads({c["email"] for c in contacts})
 
     data = {"built": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "contacts": contacts}
     blob = json.dumps(data, separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")

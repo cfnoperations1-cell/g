@@ -144,6 +144,7 @@
   <div class="bar">
     <input type="search" id="q" placeholder="Search business, email, domain or note" aria-label="Search">
     <div class="seg" id="aud" role="group" aria-label="Audience"></div>
+    <select id="type" aria-label="Practice type"><option value="">All types</option></select>
     <select id="sort" aria-label="Sort">
       <option value="recent">Latest activity first</option>
       <option value="first">First contacted first</option>
@@ -175,6 +176,7 @@
 const DATA = /*__DATA__*/null;
 
 const STAGES = [
+  {k:"queued",      l:"Queued",         c:"--faint"},
   {k:"contacted",   l:"Emailed",        c:"--queue"},
   {k:"replied",     l:"Replied",        c:"--accent"},
   {k:"interested",  l:"Interested",     c:"--run"},
@@ -185,7 +187,9 @@ const STAGES = [
   {k:"bounced",     l:"Bounced",        c:"--block"},
 ];
 const STAGE = Object.fromEntries(STAGES.map(s=>[s.k,s]));
-const AUD = [["all","All"],["vendor","RUO brands"],["medspa","Med spas"],["telehealth","Telehealth"]];
+const AUD = [["all","All"],["vendor","RUO brands"],["practice","Practices"],["telehealth","Telehealth"],["medspa","Med spas"]];
+const AUD_SHORT = {vendor:"RUO", practice:"Practice", medspa:"Med spa", telehealth:"Telehealth"};
+const AUD_LONG = {vendor:"RUO brand", practice:"Practice (your list)", medspa:"Med spa", telehealth:"Telehealth"};
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -195,7 +199,7 @@ const docId = email => email.toLowerCase().replace(/[^a-z0-9_\-.~:@+]/g, "_");
 
 let edits = {};             // docId -> saved account doc from the db
 let db = null, canWrite = true;
-let state = {stage:null, aud:"all", q:"", sort:"recent", shown:100, open:null};
+let state = {stage:null, aud:"all", type:"", q:"", sort:"recent", shown:100, open:null};
 try { const s = JSON.parse(localStorage.getItem("crm.view")||"{}"); if (s.aud) state.aud = s.aud; if (s.sort) state.sort = s.sort; } catch(e) {}
 
 function acct(c){
@@ -215,7 +219,8 @@ function filtered(list){
   return list.filter(a =>
     (state.aud==="all" || a.audience===state.aud) &&
     (!state.stage || a.stage===state.stage) &&
-    (!q || (a.name+" "+a.email+" "+a.domain+" "+a.reply+" "+a.notes).toLowerCase().includes(q)));
+    (!state.type || a.ptype===state.type) &&
+    (!q || (a.name+" "+a.email+" "+a.domain+" "+a.reply+" "+a.notes+" "+(a.person||"")+" "+(a.ptype||"")+" "+(a.city||"")).toLowerCase().includes(q)));
 }
 function sorted(list){
   const by = {
@@ -228,12 +233,13 @@ function sorted(list){
 }
 
 function renderPipe(list){
-  const inAud = list.filter(a => state.aud==="all" || a.audience===state.aud);
+  const inAud = list.filter(a => (state.aud==="all" || a.audience===state.aud) && (!state.type || a.ptype===state.type));
   const n = k => inAud.filter(a=>a.stage===k).length;
   $("pipe").innerHTML = STAGES.map(s => `<button class="stage" type="button" data-k="${s.k}" aria-pressed="${state.stage===s.k}">
       <span class="n">${n(s.k).toLocaleString()}</span><span class="l"><span class="dot" style="background:var(${s.c})"></span>${esc(s.l)}</span></button>`).join("");
   const rev = inAud.reduce((a,x)=>a+x.total,0), buyers = inAud.filter(a=>a.orders.length).length;
-  $("subline").innerHTML = `<b class="mono">${inAud.length.toLocaleString()}</b> businesses emailed · <b class="mono">${buyers}</b> ordered · <b class="mono">${money(rev)}</b> in recorded orders`;
+  const emailed = inAud.filter(a=>a.stage!=="queued").length, queued = inAud.length - emailed;
+  $("subline").innerHTML = `<b class="mono">${emailed.toLocaleString()}</b> businesses emailed · <b class="mono">${queued.toLocaleString()}</b> queued · <b class="mono">${buyers}</b> ordered · <b class="mono">${money(rev)}</b> in recorded orders`;
 }
 
 function render(){
@@ -243,9 +249,9 @@ function render(){
   $("count").textContent = `${rows.length.toLocaleString()} account${rows.length===1?"":"s"}` + (state.stage ? ` · ${STAGE[state.stage].l}` : "");
   $("asof").textContent = `Contact history as of ${DATA.built}`;
   $("rows").innerHTML = rows.slice(0, state.shown).map(a => `<tr tabindex="0" data-e="${esc(a.email)}">
-      <td><div class="nm">${esc(a.name)}${a.edited?'<span class="edited">edited</span>':""}</div><div class="em">${esc(a.email)}</div></td>
+      <td><div class="nm">${esc(a.name)}${a.edited?'<span class="edited">edited</span>':""}</div><div class="em">${esc(a.person?a.person+" · ":"")}${esc(a.email)}</div></td>
       <td>${pill(a.stage)}</td>
-      <td><span class="aud">${esc({vendor:"RUO",medspa:"Med spa",telehealth:"Telehealth"}[a.audience]||a.audience)}</span></td>
+      <td><span class="aud">${esc(AUD_SHORT[a.audience]||a.audience)}</span>${a.ptype?`<div class="em">${esc(a.ptype)}</div>`:""}</td>
       <td class="mono">${esc(day(a.sent))}</td>
       <td class="num">${a.fu||0}</td>
       <td class="note"><div class="clip">${esc(a.notes || a.reply || (a.catalog? "Catalog sent "+a.catalog.date : ""))}</div></td>
@@ -268,9 +274,12 @@ function renderDrawer(){
     <dl class="facts">
       <dt>Email</dt><dd><span class="mono">${esc(a.email)}</span><button class="copy" type="button" data-copy="${esc(a.email)}">Copy</button></dd>
       ${site?`<dt>Website</dt><dd><a href="${esc(site)}" target="_blank" rel="noopener">${esc(a.domain)}</a></dd>`:""}
-      <dt>Audience</dt><dd>${esc({vendor:"RUO brand",medspa:"Med spa",telehealth:"Telehealth"}[a.audience]||a.audience)}</dd>
-      <dt>First email</dt><dd class="mono">${esc(day(a.sent))}</dd>
-      <dt>Last touch</dt><dd class="mono">${esc(day(a.last))} · ${a.fu||0} follow-up${a.fu==1?"":"s"}</dd>
+      ${a.person?`<dt>Contact</dt><dd>${esc(a.person)}${a.role?" · "+esc(a.role):""}</dd>`:""}
+      ${a.phone?`<dt>Phone</dt><dd><span class="mono">${esc(a.phone)}</span><button class="copy" type="button" data-copy="${esc(a.phone)}">Copy</button></dd>`:""}
+      ${a.city?`<dt>Location</dt><dd>${esc(a.city)}</dd>`:""}
+      <dt>Audience</dt><dd>${esc(AUD_LONG[a.audience]||a.audience)}${a.ptype?" · "+esc(a.ptype):""}</dd>
+      ${a.sent?`<dt>First email</dt><dd class="mono">${esc(day(a.sent))}</dd>
+      <dt>Last touch</dt><dd class="mono">${esc(day(a.last))} · ${a.fu||0} follow-up${a.fu==1?"":"s"}</dd>`:`<dt>First email</dt><dd>Not sent yet. ${esc(a.hold||"Queued.")}</dd>`}
       <dt>Send status</dt><dd>${esc(a.status)}</dd>
       <dt>Inbox</dt><dd><a href="${esc(gmail)}" target="_blank" rel="noopener">Open this thread in Gmail</a></dd>
     </dl>
@@ -347,6 +356,12 @@ document.addEventListener("keydown", e => {
 });
 let qt; $("q").addEventListener("input", e => { clearTimeout(qt); qt = setTimeout(()=>{ state.q = e.target.value; state.shown = 100; render(); }, 120); });
 $("sort").addEventListener("change", e => { state.sort = e.target.value; remember(); render(); });
+$("type").addEventListener("change", e => { state.type = e.target.value; state.shown = 100; render(); });
+{
+  const tc = {}; DATA.contacts.forEach(c => { if (c.ptype) tc[c.ptype] = (tc[c.ptype]||0) + 1; });
+  $("type").innerHTML = '<option value="">All practice types</option>' + Object.entries(tc).sort((a,b)=>b[1]-a[1])
+    .map(([t,n])=>`<option value="${esc(t)}">${esc(t)} (${n.toLocaleString()})</option>`).join("");
+}
 function remember(){ try{ localStorage.setItem("crm.view", JSON.stringify({aud:state.aud, sort:state.sort})); }catch(e){} }
 
 $("aud").innerHTML = AUD.map(([k,l])=>`<button type="button" data-k="${k}">${l}</button>`).join("");

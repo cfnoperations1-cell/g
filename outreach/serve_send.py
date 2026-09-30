@@ -46,6 +46,10 @@ DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/
 # says telehealth buyers need a 503A pharmacy, and neither the standard nor the
 # personal telehealth copy speaks to that yet. Set AUDIENCE_ONLY=paused to stop
 # every send, or telehealth / medspa / personal to send one deliberately.
+# The practice list (audience "practice", scraper/import_medspa_list.py) is
+# queued behind the RUO vendors. Jonathan, Sep 30: "Do not send those yet Q them
+# up behind the other emails." It sends only when AUDIENCE_ONLY=practice is set
+# on his say-so -- never switch to it automatically when the RUO pool runs dry.
 AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "vendor").strip().lower()
 FOCUS_REVIEW_DATE = "none (50/day confirmed 2026-09-29)"
 # RUO_ONLY: with AUDIENCE_ONLY=vendor, only research-peptide brands are eligible.
