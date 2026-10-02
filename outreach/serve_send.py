@@ -981,6 +981,12 @@ DECLINED_CONTACTS = {"amelia.tide518@gmail.com",  # the only address for "Wingem
                                             # of the Chinese sellers declined Sep 24-26
                      "fei90757@gmail.com",      # PrimeRx: same operator as LeanRx (fei90789@outlook.com),
                                             # declined Sep 24 as a Chinese trader with no US signal
+                     "sarah.arthur@novanthealth.org",  # Novant Health, a hospital system: Director of
+                                            # Community Health, not a practice owner who buys stock.
+                                            # Held Oct 2 from Jonathan's practice list
+                     "warner.thomas@sutterhealth.org",  # Sutter Health's system CEO, attached by the
+                                            # list to one surgeon's office (Amirsheybani, Modesto).
+                                            # Not a buyer; held Oct 2 from the practice list
                      "yumingy594@gmail.com"}    # Zhiyuan Peptides: Chinese trading name on a Chinese-name
                                             # gmail; Ptidebio, the same pattern, bounced 550 5.2.1 on Sep 26   # BOC Peptide (boc-peptide.com): every address on its
                                             # page is a QQ-style number or coco./lluna-style gmail
