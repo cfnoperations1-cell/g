@@ -1,0 +1,405 @@
+# US metros for med spa discovery, roughly by population. One per line.
+New York NY
+Los Angeles CA
+Chicago IL
+Dallas TX
+Houston TX
+Washington DC
+Philadelphia PA
+Miami FL
+Atlanta GA
+Boston MA
+Phoenix AZ
+San Francisco CA
+Riverside CA
+Detroit MI
+Seattle WA
+Minneapolis MN
+San Diego CA
+Tampa FL
+Denver CO
+Baltimore MD
+St Louis MO
+Orlando FL
+Charlotte NC
+San Antonio TX
+Portland OR
+Sacramento CA
+Pittsburgh PA
+Austin TX
+Las Vegas NV
+Cincinnati OH
+Kansas City MO
+Columbus OH
+Indianapolis IN
+Cleveland OH
+Nashville TN
+San Jose CA
+Virginia Beach VA
+Providence RI
+Jacksonville FL
+Milwaukee WI
+Oklahoma City OK
+Raleigh NC
+Memphis TN
+Richmond VA
+Louisville KY
+New Orleans LA
+Salt Lake City UT
+Hartford CT
+Buffalo NY
+Birmingham AL
+Rochester NY
+Grand Rapids MI
+Tucson AZ
+Honolulu HI
+Tulsa OK
+Fresno CA
+Worcester MA
+Omaha NE
+Bridgeport CT
+Greenville SC
+Albuquerque NM
+Bakersfield CA
+Knoxville TN
+Albany NY
+New Haven CT
+Oxnard CA
+Baton Rouge LA
+Charleston SC
+Columbia SC
+North Port FL
+Cape Coral FL
+Boise ID
+Greensboro NC
+Little Rock AR
+Stockton CA
+Colorado Springs CO
+Winston-Salem NC
+Des Moines IA
+Lakeland FL
+Madison WI
+Deltona FL
+Akron OH
+Ogden UT
+Wichita KS
+Syracuse NY
+Augusta GA
+Palm Bay FL
+Toledo OH
+Jackson MS
+Harrisburg PA
+Spokane WA
+Chattanooga TN
+Scranton PA
+Youngstown OH
+Lancaster PA
+Fayetteville AR
+Portland ME
+Lexington KY
+Springfield MA
+Modesto CA
+Pensacola FL
+Lansing MI
+Myrtle Beach SC
+Visalia CA
+Reno NV
+Santa Rosa CA
+Port St Lucie FL
+Huntsville AL
+Fort Wayne IN
+Corpus Christi TX
+Asheville NC
+Salinas CA
+Fort Collins CO
+Flint MI
+Mobile AL
+Rockford IL
+Naples FL
+Savannah GA
+Peoria IL
+Eugene OR
+Salem OR
+Shreveport LA
+Gulfport MS
+Tallahassee FL
+Ann Arbor MI
+Beaumont TX
+Trenton NJ
+Boulder CO
+Green Bay WI
+Fargo ND
+Sioux Falls SD
+Lubbock TX
+Roanoke VA
+Wilmington NC
+Killeen TX
+Kalamazoo MI
+Duluth MN
+Lincoln NE
+Amarillo TX
+Charleston WV
+Evansville IN
+Waco TX
+Clarksville TN
+Columbus GA
+Hickory NC
+Olympia WA
+Fort Smith AR
+Erie PA
+South Bend IN
+Tuscaloosa AL
+Springfield MO
+Lafayette LA
+Rochester MN
+Bremerton WA
+Yakima WA
+Appleton WI
+Bellingham WA
+Manchester NH
+Gainesville FL
+Ocala FL
+Provo UT
+Santa Maria CA
+Reading PA
+Atlantic City NJ
+Anchorage AK
+Spartanburg SC
+Chico CA
+Montgomery AL
+Fayetteville NC
+Brownsville TX
+Merced CA
+Topeka KS
+Bend OR
+Redding CA
+Burlington VT
+Wausau WI
+Billings MT
+Bozeman MT
+Sarasota FL
+Scottsdale AZ
+Irvine CA
+Plano TX
+Frisco TX
+The Woodlands TX
+Bellevue WA
+Naperville IL
+Alpharetta GA
+Franklin TN
+Cary NC
+Carlsbad CA
+Newport Beach CA
+Boca Raton FL
+Fort Lauderdale FL
+West Palm Beach FL
+Jupiter FL
+Bethesda MD
+McLean VA
+Greenwich CT
+Tempe AZ
+Mesa AZ
+Chandler AZ
+Gilbert AZ
+Peoria AZ
+Henderson NV
+Summerlin NV
+Santa Monica CA
+Beverly Hills CA
+Pasadena CA
+Glendale CA
+Long Beach CA
+Anaheim CA
+Huntington Beach CA
+Costa Mesa CA
+Laguna Niguel CA
+Mission Viejo CA
+Temecula CA
+Palm Springs CA
+Santa Barbara CA
+San Luis Obispo CA
+Walnut Creek CA
+Palo Alto CA
+Mountain View CA
+Berkeley CA
+Marin County CA
+Roseville CA
+Folsom CA
+Danville CA
+Encinitas CA
+La Jolla CA
+Coronado CA
+Highlands Ranch CO
+Littleton CO
+Aurora CO
+Lakewood CO
+Vail CO
+Aspen CO
+Park City UT
+Lehi UT
+St George UT
+Draper UT
+Meridian ID
+Coeur d'Alene ID
+Missoula MT
+Jackson WY
+Cheyenne WY
+Sioux City IA
+Cedar Rapids IA
+Davenport IA
+Bloomington IL
+Champaign IL
+Springfield IL
+Schaumburg IL
+Oak Brook IL
+Evanston IL
+Highland Park IL
+Carmel IN
+Fishers IN
+Bloomington IN
+Fort Mitchell KY
+Bowling Green KY
+Murfreesboro TN
+Brentwood TN
+Germantown TN
+Huntsville TX
+Sugar Land TX
+Katy TX
+Round Rock TX
+Cedar Park TX
+Georgetown TX
+Southlake TX
+Grapevine TX
+McKinney TX
+Allen TX
+Flower Mound TX
+Midland TX
+Odessa TX
+El Paso TX
+Laredo TX
+McAllen TX
+Tyler TX
+Abilene TX
+College Station TX
+Conroe TX
+New Braunfels TX
+Edmond OK
+Norman OK
+Broken Arrow OK
+Bentonville AR
+Rogers AR
+Springdale AR
+Metairie LA
+Lake Charles LA
+Hattiesburg MS
+Tupelo MS
+Auburn AL
+Dothan AL
+Panama City FL
+Destin FL
+Fort Walton Beach FL
+Tallahassee FL
+Gainesville FL
+St Augustine FL
+Daytona Beach FL
+Melbourne FL
+Vero Beach FL
+Stuart FL
+Delray Beach FL
+Coral Gables FL
+Aventura FL
+Doral FL
+Kendall FL
+Key West FL
+Bradenton FL
+Clearwater FL
+St Petersburg FL
+Brandon FL
+Winter Park FL
+Altamonte Springs FL
+Kissimmee FL
+The Villages FL
+Marietta GA
+Roswell GA
+Sandy Springs GA
+Buckhead GA
+Athens GA
+Macon GA
+Valdosta GA
+Mount Pleasant SC
+Hilton Head SC
+Rock Hill SC
+Huntersville NC
+Concord NC
+Chapel Hill NC
+Durham NC
+Fayetteville NC
+Greenville NC
+Boone NC
+Virginia Beach VA
+Alexandria VA
+Arlington VA
+Reston VA
+Fairfax VA
+Charlottesville VA
+Lynchburg VA
+Annapolis MD
+Columbia MD
+Frederick MD
+Rockville MD
+Towson MD
+Newark DE
+Rehoboth Beach DE
+Princeton NJ
+Hoboken NJ
+Morristown NJ
+Cherry Hill NJ
+Paramus NJ
+Red Bank NJ
+Westchester NY
+White Plains NY
+Brooklyn NY
+Queens NY
+Long Island NY
+Hamptons NY
+Stamford CT
+Norwalk CT
+Westport CT
+Cambridge MA
+Newton MA
+Wellesley MA
+Nantucket MA
+Portsmouth NH
+Nashua NH
+Burlington VT
+Portland OR
+Bend OR
+Lake Oswego OR
+Tacoma WA
+Kirkland WA
+Redmond WA
+Vancouver WA
+Boulder City NV
+Scottsdale AZ
+Sedona AZ
+Flagstaff AZ
+Santa Fe NM
+Las Cruces NM
+Wichita Falls TX
+Overland Park KS
+Lawrence KS
+Columbia MO
+Springfield MO
+St Charles MO
+Naperville IL
+Bloomfield Hills MI
+Royal Oak MI
+Traverse City MI
+Brookfield WI
+Eau Claire WI
+Rochester MI
+Dublin OH
+Westerville OH
+Beachwood OH
+Strongsville OH
+Mason OH

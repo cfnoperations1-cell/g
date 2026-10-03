@@ -1,0 +1,27 @@
+Subject: {business_name} - US-made peptide supply, wholesale
+
+Hi there,
+
+My name is Jonathan Cole with Marinexis Biologics. I came across {business_name}
+and wanted to reach out -- we manufacture peptides here in the US and supply
+brands and labs wholesale, so we may be a fit as a domestic source for you.
+
+We run four US labs on green-list API, every batch ships with a third-party
+COA, and we can supply both bulk API and finished vials with a one-week
+turnaround even on large runs. A lot of the brands we work with were sourcing
+overseas and moved to us for US-made product at comparable pricing -- no
+customs risk, cold-chain to your door, and consistent purity batch to batch.
+
+If you'd like, I'll send our wholesale catalog with per-vial and per-mg
+pricing so you can compare it against your current cost. Just reply here or
+grab five minutes on my calendar.
+
+Thanks,
+Jonathan Cole
+Marinexis Biologics
+{sender_email}
+
+--
+{sender_company}
+{sender_postal_address}
+{unsubscribe_line}

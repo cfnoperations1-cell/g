@@ -1,0 +1,26 @@
+Subject: {business_name} - what are you paying per vial?
+
+Hi there,
+
+My name is Jonathan Cole with Marinexis Biologics. I noticed {business_name}
+offers {peptides}, and I'll get straight to the point: most practices we talk
+to are paying a distributor markup on product that started in a lab like ours.
+
+We run four US labs and sell direct to practices. Same compounds, third-party
+COA on every batch, cold-chain from our facility, and per-vial pricing that
+usually comes in under what a middleman charges -- on office-use stock and
+patient-specific orders alike.
+
+If you send me the three products you move the most of, I'll send back a
+per-vial quote the same day so you can compare it against your current cost.
+No commitment, just numbers.
+
+Thanks,
+Jonathan Cole
+Marinexis Biologics
+{sender_email}
+
+--
+{sender_company}
+{sender_postal_address}
+{unsubscribe_line}

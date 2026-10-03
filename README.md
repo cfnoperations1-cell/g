@@ -274,3 +274,17 @@ python -m scraper.resolve_vendors --country "United States"
 
 One search per name, scored by how well each candidate domain matches the
 company name, so directories and blogs don't get through.
+
+## Med spa / clinic / vendor lead bot (`peptide-lead-bot/`)
+
+A separate, self-contained scraper that lives in `peptide-lead-bot/` and
+targets a different audience from the vendor pipeline above: med spas and
+wellness/hormone clinics that *offer* peptides (searched city by city via
+Google Places), plus a national vendor mode. It keeps its own SQLite store
+and writes CSVs rather than feeding the CRM. Run it from inside that folder;
+setup, commands, and output columns are in `peptide-lead-bot/CLAUDE.md`.
+
+```bash
+cd peptide-lead-bot
+python -m bot run --mode medspa --cities "Las Vegas, NV" --limit 5
+```

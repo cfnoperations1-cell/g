@@ -1,0 +1,24 @@
+vendor,domain,email,all_emails,us_signal,status,evidence_url,audience,peptides,peptide_hits
+Clarion Peptides,clarionpeptides.com,support@clarionpeptides.com,you@institution.edu; you@lab.org; support@clarionpeptides.com,yes,ok,https://clarionpeptides.com,vendor,"bpc-157, tb-500, retatrutide, semaglutide, tirzepatide, nad+",16
+Complete Wellness & Aesthetics,completewellnessnw.com,info@completewellnessnw.com,info@completewellnessnw.com,yes,ok,https://completewellnessnw.com,medspa,"bpc-157, retatrutide, semaglutide, tirzepatide, nad+, ipamorelin",7
+Remedy Meds,remedymeds.com,support@remedymeds.com,support@remedymeds.com; legal@remedymeds.com,yes,ok,https://remedymeds.com,medspa,"semaglutide, tirzepatide",2
+Vessel Men's Health,vesselmenshealth.com,info@vesselmenshealth.com,info@vesselmenshealth.com,yes,ok,https://vesselmenshealth.com,medspa,"bpc-157, semaglutide, tirzepatide, nad+, ipamorelin, pt-141",7
+City Spa Medical,cityspamedical.com,,,yes,no_email,https://cityspamedical.com,medspa,"semaglutide, tirzepatide",2
+Concierge MD,conciergemdla.com,,,,unreachable,,,,
+Henry Meds,henrymeds.com,ask@henrymeds.com,ask@henrymeds.com; house.js@0.0.ddppriun.mjs,yes,no_peptides,https://henrymeds.com,medspa,,0
+Hourglass Medspa,hourglassmedspa.com,,,,no_email,,vendor,,0
+Integrative Medicine of Idaho,imidaho.net,,,yes,no_email,https://imidaho.net,medspa,,0
+IVIM Health,ivimhealth.com,media@ivimhealth.com,media@ivimhealth.com,,no_us_signal,https://ivimhealth.com,medspa,"semaglutide, tirzepatide, nad+, pt-141, sermorelin",5
+Levity,joinlevity.com,care@joinlevity.com,care@joinlevity.com,yes,no_peptides,https://joinlevity.com,vendor,,0
+Just Melt Med Spa,justmelt.com,,,,unreachable,,,,
+Michael Aziz MD,michaelazizmd.com,,,yes,no_email,https://michaelazizmd.com,medspa,"bpc-157, retatrutide, semaglutide, tirzepatide, nad+, ipamorelin",13
+NY Surgical Arts,nysurgicalarts.com,,,yes,no_email,https://nysurgicalarts.com,medspa,"semaglutide, tirzepatide",2
+Peptide Balance Clinic,peptidebalanceclinic.com,,,,no_email,https://peptidebalanceclinic.com,vendor,,0
+Peptides.org,peptides.org,,,,no_email,https://peptides.org,vendor,"bpc-157, tb-500, semaglutide, tirzepatide, nad+, ipamorelin",22
+Peptide Stack,peptidestack.io,,,,no_email,https://peptidestack.io,medspa,"bpc-157, tb-500, retatrutide, semaglutide, tirzepatide, nad+",27
+Peptide Vault,peptidevault.com,,,,no_email,,vendor,,0
+Renu Medispa,renumedispa.com,,,yes,no_email,https://renumedispa.com,medspa,,0
+SoVous Med Spa,sovous.com,hello@sovous.com,hello@sovous.com,yes,no_peptides,https://sovous.com,medspa,,0
+The Lab Aesthetics & Wellness,thelabaw.com,info@thelabaw.com,info@thelabaw.com,yes,no_peptides,https://thelabaw.com,medspa,,0
+StudioMD,thestudiomd.com,,,,unreachable,,,,
+TREAT Medspa,treatmedspa.com,,,yes,no_email,https://treatmedspa.com,medspa,semaglutide,1

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Med Spa Pipeline</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --card:#fff; --ink:#15181d; --muted:#6b7280; --line:#e5e7eb;
+    --accent:#2f6f4e; --accent-soft:#e6f0ea; --warn:#b45309;
+  }
+  :root:not([data-theme="light"]) { }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0f1115; --card:#171a20; --ink:#e8eaed; --muted:#9aa2ae; --line:#272b33;
+      --accent:#5fbf8e; --accent-soft:#1b2c24; --warn:#d9a441;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0f1115; --card:#171a20; --ink:#e8eaed; --muted:#9aa2ae; --line:#272b33;
+    --accent:#5fbf8e; --accent-soft:#1b2c24; --warn:#d9a441;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 -apple-system,BlinkMacSystemFont,
+        "Segoe UI",Roboto,Helvetica,Arial,sans-serif; padding:32px 16px 64px; }
+  .wrap { max-width:1000px; margin:0 auto; }
+  h1 { font-size:24px; margin:0 0 4px; letter-spacing:-.01em; }
+  h2 { font-size:15px; margin:0 0 14px; font-weight:600; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+  .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-bottom:24px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .kpi .v { font-size:28px; font-weight:650; letter-spacing:-.02em; }
+  .kpi .l { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-top:2px; }
+  .kpi .h { color:var(--muted); font-size:12px; margin-top:6px; }
+  .accent .v { color:var(--accent); }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:16px; }
+  .chart { display:flex; align-items:flex-end; gap:8px; height:160px; }
+  .bar { flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%; }
+  .bar-fill { width:100%; background:var(--accent); border-radius:4px 4px 0 0; min-height:3px; }
+  .bar-n { font-size:11px; color:var(--muted); margin-top:4px; }
+  .bar-d { font-size:10px; color:var(--muted); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+       color:var(--muted); font-weight:600; padding:0 8px 8px 0; border-bottom:1px solid var(--line); }
+  td { padding:8px 8px 8px 0; border-bottom:1px solid var(--line); }
+  td.num { font-variant-numeric:tabular-nums; }
+  .mini { height:8px; background:var(--accent-soft); border:1px solid var(--accent); border-radius:4px; }
+  .muted { color:var(--muted); }
+  .two { display:grid; gap:16px; grid-template-columns:1fr 1fr; }
+  @media (max-width:720px) { .two { grid-template-columns:1fr; } }
+</style></head><body><div class="wrap">
+
+<h1>Med spa pipeline</h1>
+<div class="sub">Marinexis Biologics &middot; refreshed 2026-09-16 23:36 UTC</div>
+
+<div class="grid">
+  <div class="card kpi"><div class="v">0</div><div class="l">Emailed</div>
+    <div class="h">0 today</div></div>
+  <div class="card kpi accent"><div class="v">0</div><div class="l">Replied</div>
+    <div class="h">0.0% of sends</div></div>
+  <div class="card kpi"><div class="v">0</div><div class="l">Bounced</div>
+    <div class="h">0 unsubscribed</div></div>
+  <div class="card kpi"><div class="v">429</div><div class="l">Queue left</div>
+    <div class="h">verified, not yet emailed</div></div>
+</div>
+
+<div class="panel"><h2>Sends per day (last 14 active days)</h2>
+  <div class="chart"><p class="muted">No sends yet.</p></div></div>
+
+<div class="two">
+  <div class="panel"><h2>Queue by state</h2>
+    <table><thead><tr><th>State</th><th>Leads</th><th></th></tr></thead>
+    <tbody><tr><td>FL</td><td class="num">73</td><td><div class="mini" style="width:100%"></div></td></tr><tr><td>CA</td><td class="num">58</td><td><div class="mini" style="width:79%"></div></td></tr><tr><td>TX</td><td class="num">46</td><td><div class="mini" style="width:63%"></div></td></tr><tr><td>AZ</td><td class="num">25</td><td><div class="mini" style="width:34%"></div></td></tr><tr><td>NY</td><td class="num">18</td><td><div class="mini" style="width:25%"></div></td></tr><tr><td>NV</td><td class="num">17</td><td><div class="mini" style="width:23%"></div></td></tr><tr><td>MO</td><td class="num">17</td><td><div class="mini" style="width:23%"></div></td></tr><tr><td>CO</td><td class="num">16</td><td><div class="mini" style="width:22%"></div></td></tr><tr><td>NC</td><td class="num">15</td><td><div class="mini" style="width:21%"></div></td></tr><tr><td>IL</td><td class="num">10</td><td><div class="mini" style="width:14%"></div></td></tr></tbody></table></div>
+  <div class="panel"><h2>Replies</h2>
+    <table><thead><tr><th>Practice</th><th>Address</th><th>Last touch</th></tr></thead>
+    <tbody><tr><td colspan="3" class="muted">No replies yet.</td></tr></tbody></table></div>
+</div>
+
+</div></body></html>

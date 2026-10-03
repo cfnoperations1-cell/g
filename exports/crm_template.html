@@ -1,0 +1,385 @@
+<title>Marinexis CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Layout: a pipeline strip on top, a filterable account ledger below, and a
+     detail drawer that opens over the ledger for one account. Same tokens as
+     the Peptide Lead Pipeline dashboard so the two read as one system. */
+  :root{
+    --ground:#eef3f2; --surface:#ffffff; --surface-2:#f4f8f7;
+    --ink:#0c1a19; --muted:#4a5b5a; --faint:#7d8f8e;
+    --border:#d3e0de; --border-strong:#b7c9c7;
+    --accent:#0b6e6d; --accent-soft:#d5e9e8; --accent-ink:#084f4e;
+    --done:#1c7a4d; --done-soft:#d6ecdf;
+    --run:#a25c00; --run-soft:#f6e6cf;
+    --block:#a83535; --block-soft:#f3d9d9;
+    --queue:#5a6b6a; --queue-soft:#e2e9e8;
+    --gold:#8a6a00; --gold-soft:#f3ead0;
+    --scrim:rgba(12,26,25,.35);
+    --shadow:0 1px 2px rgba(12,26,25,.05), 0 6px 20px -12px rgba(12,26,25,.18);
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --disp:"Archivo","IBM Plex Sans",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#0a1413; --surface:#0f1c1b; --surface-2:#12211f;
+    --ink:#e8f1f0; --muted:#9db1af; --faint:#6f8280;
+    --border:#213230; --border-strong:#2d423f;
+    --accent:#3fb9b4; --accent-soft:#123230; --accent-ink:#7fd6d1;
+    --done:#4fc487; --done-soft:#0f2a1f;
+    --run:#e0a44b; --run-soft:#2c2210;
+    --block:#e07070; --block-soft:#2e1616;
+    --queue:#93a5a3; --queue-soft:#1a2725;
+    --gold:#e3c15a; --gold-soft:#2a2410;
+    --scrim:rgba(0,0,0,.55);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -14px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --ground:#0a1413; --surface:#0f1c1b; --surface-2:#12211f;
+    --ink:#e8f1f0; --muted:#9db1af; --faint:#6f8280;
+    --border:#213230; --border-strong:#2d423f;
+    --accent:#3fb9b4; --accent-soft:#123230; --accent-ink:#7fd6d1;
+    --done:#4fc487; --done-soft:#0f2a1f;
+    --run:#e0a44b; --run-soft:#2c2210;
+    --block:#e07070; --block-soft:#2e1616;
+    --queue:#93a5a3; --queue-soft:#1a2725;
+    --gold:#e3c15a; --gold-soft:#2a2410;
+    --scrim:rgba(0,0,0,.55);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -14px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font:14px/1.45 var(--sans);margin:0}
+  .wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:18px}
+  header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:10px}
+  h1{font:800 26px/1.1 var(--disp);letter-spacing:-.01em;margin:0;text-wrap:balance}
+  .sub{color:var(--muted);font-size:13px}
+  .sub b{color:var(--ink);font-weight:600}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .sync{font:500 12px var(--mono);color:var(--faint)}
+  .sync.ok{color:var(--done)} .sync.bad{color:var(--block)}
+
+  /* pipeline strip: every stage is a filter */
+  .pipe{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px}
+  .stage{appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:10px;
+    padding:10px 12px;text-align:left;cursor:pointer;display:grid;gap:2px;font:inherit}
+  .stage:hover{border-color:var(--border-strong)}
+  .stage:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,tr:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .stage[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+  .stage .n{font:700 22px/1 var(--disp);font-variant-numeric:tabular-nums}
+  .stage .l{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .stage .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .bar input[type=search]{flex:1 1 220px;min-width:0}
+  input,select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:8px 10px}
+  textarea{width:100%;min-height:88px;resize:vertical}
+  .seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden}
+  .seg button{appearance:none;border:0;background:var(--surface);color:var(--muted);padding:8px 12px;font:500 13px var(--sans);cursor:pointer}
+  .seg button+button{border-left:1px solid var(--border)}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+  .btn{appearance:none;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 12px;font:600 13px var(--sans);cursor:pointer}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  .ledger{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+  .ledger-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--border);color:var(--muted);font-size:12px}
+  .scroll{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;min-width:760px}
+  th{font:600 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface-2);position:sticky;top:0;cursor:pointer;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:var(--surface-2)}
+  td .nm{font-weight:600}
+  td .em{font:12px var(--mono);color:var(--muted);word-break:break-all}
+  td.note{color:var(--muted);font-size:13px;max-width:360px}
+  .clip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 9px;font:600 12px var(--sans);white-space:nowrap}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .aud{font:500 11px var(--mono);color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:1px 6px;white-space:nowrap}
+  .edited{font:500 10px var(--mono);color:var(--accent);margin-left:4px}
+  .more{display:flex;justify-content:center;padding:12px}
+  .empty{padding:28px;text-align:center;color:var(--muted)}
+
+  /* drawer */
+  .scrim{position:fixed;inset:0;background:var(--scrim);z-index:5}
+  aside{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--surface);z-index:6;border-left:1px solid var(--border);
+    box-shadow:var(--shadow);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 24px);display:grid;gap:16px;align-content:start}
+  aside h2{font:700 20px/1.2 var(--disp);margin:0;text-wrap:balance}
+  .dhead{display:flex;justify-content:space-between;gap:12px;align-items:start}
+  .facts{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
+  .facts dt{color:var(--faint);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+  .facts dd{margin:0;min-width:0;word-break:break-word}
+  .sec{display:grid;gap:8px}
+  .sec h3{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0}
+  .quote{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;white-space:pre-wrap}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .row>*{min-width:0}
+  .orders{display:grid;gap:6px}
+  .order{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px}
+  .order .x{appearance:none;border:0;background:none;color:var(--faint);cursor:pointer;font-size:16px}
+  .ofield{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+  label.f{display:grid;gap:4px;font-size:12px;color:var(--muted)}
+  .msg{font-size:12px;color:var(--muted)}
+  .msg.bad{color:var(--block)}
+  .copy{appearance:none;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);border-radius:6px;font:500 11px var(--sans);padding:2px 7px;cursor:pointer;margin-left:6px}
+  a{color:var(--accent)}
+  @media (prefers-reduced-motion:no-preference){aside{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(16px);opacity:.6}}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div style="display:grid;gap:4px">
+      <h1>Marinexis CRM</h1>
+      <div class="sub" id="subline">Every business we have emailed, what they said, and who has ordered.</div>
+    </div>
+    <div class="sync" id="sync">Connecting to saved notes…</div>
+  </header>
+
+  <div class="pipe" id="pipe" role="group" aria-label="Filter by stage"></div>
+
+  <div class="bar">
+    <input type="search" id="q" placeholder="Search business, email, domain or note" aria-label="Search">
+    <div class="seg" id="aud" role="group" aria-label="Audience"></div>
+    <select id="type" aria-label="Practice type"><option value="">All types</option></select>
+    <select id="sort" aria-label="Sort">
+      <option value="recent">Latest activity first</option>
+      <option value="first">First contacted first</option>
+      <option value="name">Business A–Z</option>
+      <option value="revenue">Order total</option>
+    </select>
+  </div>
+
+  <section class="ledger" aria-label="Accounts">
+    <div class="ledger-head"><span id="count"></span><span id="asof"></span></div>
+    <div class="scroll">
+      <table>
+        <thead><tr>
+          <th scope="col">Business</th><th scope="col">Stage</th><th scope="col">Audience</th>
+          <th scope="col">First email</th><th scope="col">Follow-ups</th><th scope="col">Latest note</th><th scope="col" class="num">Orders</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="empty" hidden>No accounts match these filters.</div>
+    <div class="more" id="morewrap" hidden><button class="btn" id="more" type="button">Show 100 more</button></div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside id="drawer" hidden aria-labelledby="d-name" role="dialog"></aside>
+
+<script>
+const DATA = /*__DATA__*/null;
+
+const STAGES = [
+  {k:"queued",      l:"Queued",         c:"--faint"},
+  {k:"contacted",   l:"Emailed",        c:"--queue"},
+  {k:"replied",     l:"Replied",        c:"--accent"},
+  {k:"interested",  l:"Interested",     c:"--run"},
+  {k:"catalog",     l:"Catalog sent",   c:"--accent"},
+  {k:"negotiating", l:"Negotiating",    c:"--run"},
+  {k:"ordered",     l:"Ordered",        c:"--done"},
+  {k:"declined",    l:"Not interested", c:"--faint"},
+  {k:"bounced",     l:"Bounced",        c:"--block"},
+];
+const STAGE = Object.fromEntries(STAGES.map(s=>[s.k,s]));
+const AUD = [["all","All"],["vendor","RUO brands"],["practice","Practices"],["telehealth","Telehealth"],["medspa","Med spas"]];
+const AUD_SHORT = {vendor:"RUO", practice:"Practice", medspa:"Med spa", telehealth:"Telehealth"};
+const AUD_LONG = {vendor:"RUO brand", practice:"Practice (your list)", medspa:"Med spa", telehealth:"Telehealth"};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = n => "$" + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2});
+const day = s => s ? s.slice(0,10) : "";
+const docId = email => email.toLowerCase().replace(/[^a-z0-9_\-.~:@+]/g, "_");
+
+let edits = {};             // docId -> saved account doc from the db
+let db = null, canWrite = true;
+let state = {stage:null, aud:"all", type:"", q:"", sort:"recent", shown:100, open:null};
+try { const s = JSON.parse(localStorage.getItem("crm.view")||"{}"); if (s.aud) state.aud = s.aud; if (s.sort) state.sort = s.sort; } catch(e) {}
+
+function acct(c){
+  const e = edits[docId(c.email)] || {};
+  const orders = Array.isArray(e.orders) ? e.orders : [];
+  const total = orders.reduce((a,o)=>a+(+o.amount||0),0);
+  let stage = e.stage || c.stage;
+  if (!e.stage && orders.length) stage = "ordered";
+  return {...c, stage, notes:e.notes||"", next:e.next||"", orders, total, edited:!!(e.stage||e.notes||e.next||orders.length), updated:e.updated||""};
+}
+function all(){ return DATA.contacts.map(acct); }
+
+function pill(k){ const s = STAGE[k]||STAGE.contacted; return `<span class="pill" style="color:var(${s.c});background:color-mix(in srgb, var(${s.c}) 14%, transparent)">${esc(s.l)}</span>`; }
+
+function filtered(list){
+  const q = state.q.trim().toLowerCase();
+  return list.filter(a =>
+    (state.aud==="all" || a.audience===state.aud) &&
+    (!state.stage || a.stage===state.stage) &&
+    (!state.type || a.ptype===state.type) &&
+    (!q || (a.name+" "+a.email+" "+a.domain+" "+a.reply+" "+a.notes+" "+(a.person||"")+" "+(a.ptype||"")+" "+(a.city||"")).toLowerCase().includes(q)));
+}
+function sorted(list){
+  const by = {
+    recent:(a,b)=> (b.updated||b.last||"").localeCompare(a.updated||a.last||""),
+    first:(a,b)=> (a.sent||"").localeCompare(b.sent||""),
+    name:(a,b)=> a.name.localeCompare(b.name),
+    revenue:(a,b)=> b.total-a.total || (b.last||"").localeCompare(a.last||""),
+  }[state.sort];
+  return list.slice().sort(by);
+}
+
+function renderPipe(list){
+  const inAud = list.filter(a => (state.aud==="all" || a.audience===state.aud) && (!state.type || a.ptype===state.type));
+  const n = k => inAud.filter(a=>a.stage===k).length;
+  $("pipe").innerHTML = STAGES.map(s => `<button class="stage" type="button" data-k="${s.k}" aria-pressed="${state.stage===s.k}">
+      <span class="n">${n(s.k).toLocaleString()}</span><span class="l"><span class="dot" style="background:var(${s.c})"></span>${esc(s.l)}</span></button>`).join("");
+  const rev = inAud.reduce((a,x)=>a+x.total,0), buyers = inAud.filter(a=>a.orders.length).length;
+  const emailed = inAud.filter(a=>a.stage!=="queued").length, queued = inAud.length - emailed;
+  $("subline").innerHTML = `<b class="mono">${emailed.toLocaleString()}</b> businesses emailed · <b class="mono">${queued.toLocaleString()}</b> queued · <b class="mono">${buyers}</b> ordered · <b class="mono">${money(rev)}</b> in recorded orders`;
+}
+
+function render(){
+  const list = all();
+  renderPipe(list);
+  const rows = sorted(filtered(list));
+  $("count").textContent = `${rows.length.toLocaleString()} account${rows.length===1?"":"s"}` + (state.stage ? ` · ${STAGE[state.stage].l}` : "");
+  $("asof").textContent = `Contact history as of ${DATA.built}`;
+  $("rows").innerHTML = rows.slice(0, state.shown).map(a => `<tr tabindex="0" data-e="${esc(a.email)}">
+      <td><div class="nm">${esc(a.name)}${a.edited?'<span class="edited">edited</span>':""}</div><div class="em">${esc(a.person?a.person+" · ":"")}${esc(a.email)}</div></td>
+      <td>${pill(a.stage)}</td>
+      <td><span class="aud">${esc(AUD_SHORT[a.audience]||a.audience)}</span>${a.ptype?`<div class="em">${esc(a.ptype)}</div>`:""}</td>
+      <td class="mono">${esc(day(a.sent))}</td>
+      <td class="num">${a.fu||0}</td>
+      <td class="note"><div class="clip">${esc(a.notes || a.reply || (a.catalog? "Catalog sent "+a.catalog.date : ""))}</div></td>
+      <td class="num">${a.orders.length ? money(a.total) : "—"}</td></tr>`).join("");
+  $("empty").hidden = rows.length>0;
+  $("morewrap").hidden = rows.length <= state.shown;
+  document.querySelectorAll("#aud button").forEach(b => b.setAttribute("aria-pressed", b.dataset.k===state.aud));
+  if (state.open) renderDrawer();
+}
+
+function renderDrawer(){
+  const c = DATA.contacts.find(x=>x.email===state.open); if (!c) return closeDrawer();
+  const a = acct(c);
+  const gmail = "https://mail.google.com/mail/u/0/#search/" + encodeURIComponent(a.email);
+  const site = a.domain ? "https://" + a.domain : "";
+  const ro = !db || !canWrite;
+  $("drawer").innerHTML = `
+    <div class="dhead"><div style="display:grid;gap:6px;min-width:0"><h2 id="d-name">${esc(a.name)}</h2><div>${pill(a.stage)}</div></div>
+      <button class="btn" type="button" id="d-close">Close</button></div>
+    <dl class="facts">
+      <dt>Email</dt><dd><span class="mono">${esc(a.email)}</span><button class="copy" type="button" data-copy="${esc(a.email)}">Copy</button></dd>
+      ${site?`<dt>Website</dt><dd><a href="${esc(site)}" target="_blank" rel="noopener">${esc(a.domain)}</a></dd>`:""}
+      ${a.person?`<dt>Contact</dt><dd>${esc(a.person)}${a.role?" · "+esc(a.role):""}</dd>`:""}
+      ${a.phone?`<dt>Phone</dt><dd><span class="mono">${esc(a.phone)}</span><button class="copy" type="button" data-copy="${esc(a.phone)}">Copy</button></dd>`:""}
+      ${a.city?`<dt>Location</dt><dd>${esc(a.city)}</dd>`:""}
+      <dt>Audience</dt><dd>${esc(AUD_LONG[a.audience]||a.audience)}${a.ptype?" · "+esc(a.ptype):""}</dd>
+      ${a.sent?`<dt>First email</dt><dd class="mono">${esc(day(a.sent))}</dd>
+      <dt>Last touch</dt><dd class="mono">${esc(day(a.last))} · ${a.fu||0} follow-up${a.fu==1?"":"s"}</dd>`:`<dt>First email</dt><dd>Not sent yet. ${esc(a.hold||"Queued.")}</dd>`}
+      <dt>Send status</dt><dd>${esc(a.status)}</dd>
+      <dt>Inbox</dt><dd><a href="${esc(gmail)}" target="_blank" rel="noopener">Open this thread in Gmail</a></dd>
+    </dl>
+    ${a.reply?`<div class="sec"><h3>What they said</h3><div class="quote">${esc(a.reply)}</div></div>`:""}
+    ${a.catalog?`<div class="sec"><h3>Catalog</h3><div class="quote">Sent ${esc(a.catalog.date)}${a.catalog.pkg?" · "+esc(a.catalog.pkg):""}${a.catalog.note?"\n"+esc(a.catalog.note):""}</div></div>`:""}
+    <div class="sec"><h3>Stage</h3>
+      <div class="row"><select id="d-stage" ${ro?"disabled":""}>${STAGES.map(s=>`<option value="${s.k}" ${s.k===a.stage?"selected":""}>${esc(s.l)}</option>`).join("")}</select>
+      <span class="msg">${a.edited && edits[docId(a.email)]?.stage ? "Set by you" : "From the email record"}</span></div></div>
+    <div class="sec"><h3>Next step</h3><input id="d-next" value="${esc(a.next)}" placeholder="e.g. Call Tue, send revised pricing" ${ro?"disabled":""}></div>
+    <div class="sec"><h3>Your notes</h3><textarea id="d-notes" placeholder="Calls, pricing discussed, what they buy now…" ${ro?"disabled":""}>${esc(a.notes)}</textarea></div>
+    <div class="sec"><h3>Orders ${a.orders.length?`· <span class="mono">${money(a.total)}</span>`:""}</h3>
+      <div class="orders">${a.orders.length? a.orders.map((o,i)=>`<div class="order"><span class="mono">${esc(o.date)}</span><span>${esc(o.items||"")}</span><span class="mono">${money(+o.amount||0)}</span>${ro?"<span></span>":`<button class="x" type="button" data-del="${i}" aria-label="Remove order">×</button>`}</div>`).join("") : '<div class="msg">No orders recorded yet.</div>'}</div>
+      ${ro?"":`<div class="ofield">
+        <label class="f">Date<input type="date" id="o-date" value="${new Date().toISOString().slice(0,10)}"></label>
+        <label class="f">Amount (USD)<input type="number" id="o-amt" min="0" step="0.01" placeholder="0.00"></label>
+        <label class="f" style="grid-column:1/-1">Products<input id="o-items" placeholder="e.g. 200 × BPC-157 10mg, 100 × GHK-Cu"></label>
+      </div><div><button class="btn" type="button" id="o-add">Add order</button></div>`}
+    </div>
+    <div class="row"><button class="btn primary" type="button" id="d-save" ${ro?"disabled":""}>Save</button><span class="msg" id="d-msg">${ro? (db? "You can view this account but not change it." : "Saving is unavailable in this view.") : (a.updated? "Last saved "+esc(a.updated.replace("T"," ").slice(0,16))+" UTC":"")}</span></div>`;
+  pendingOrders = a.orders.slice();
+}
+let pendingOrders = [];
+
+function openDrawer(email){ state.open = email; $("drawer").hidden = false; $("scrim").hidden = false; renderDrawer(); $("d-close")?.focus(); }
+function closeDrawer(){ state.open = null; $("drawer").hidden = true; $("scrim").hidden = true; }
+
+async function save(extraOrders){
+  const c = DATA.contacts.find(x=>x.email===state.open); if (!c || !db) return;
+  const msg = $("d-msg"); const btn = $("d-save");
+  const body = {
+    email: c.email, name: c.name, audience: c.audience,
+    stage: $("d-stage").value === c.stage && !(edits[docId(c.email)]?.stage) ? "" : $("d-stage").value,
+    next: $("d-next").value.trim(), notes: $("d-notes").value.trim(),
+    orders: extraOrders || pendingOrders, updated: new Date().toISOString(),
+  };
+  btn.disabled = true; msg.className = "msg"; msg.textContent = "Saving…";
+  try {
+    await db.doc("accounts/" + docId(c.email)).set(body);
+    edits[docId(c.email)] = body; msg.textContent = "Saved";
+    render();
+  } catch (e) {
+    btn.disabled = false; msg.className = "msg bad";
+    msg.textContent = e && e.code === "invalid_argument" ? "You don't have permission to change this account." :
+      e && e.code === "quota_exceeded" ? "The notes store is full. Clear notes on old accounts, then save again." :
+      "Couldn't save. Check your connection and press Save again.";
+    if (e && e.code === "invalid_argument") { canWrite = false; }
+  }
+}
+
+document.addEventListener("click", e => {
+  const st = e.target.closest(".stage"); if (st){ state.stage = state.stage===st.dataset.k ? null : st.dataset.k; state.shown = 100; render(); return; }
+  const au = e.target.closest("#aud button"); if (au){ state.aud = au.dataset.k; state.shown = 100; remember(); render(); return; }
+  const tr = e.target.closest("tbody tr"); if (tr){ openDrawer(tr.dataset.e); return; }
+  if (e.target.id==="more"){ state.shown += 100; render(); return; }
+  if (e.target.id==="d-close" || e.target.id==="scrim"){ closeDrawer(); return; }
+  if (e.target.id==="d-save"){ save(); return; }
+  if (e.target.id==="o-add"){
+    const amt = parseFloat($("o-amt").value), date = $("o-date").value, items = $("o-items").value.trim();
+    if (!(amt >= 0) || !date){ const m=$("d-msg"); m.className="msg bad"; m.textContent="Enter the order date and amount, then press Add order."; return; }
+    pendingOrders = pendingOrders.concat([{date, amount: amt, items}]);
+    if ($("d-stage").value !== "ordered") $("d-stage").value = "ordered";
+    save(pendingOrders); return;
+  }
+  const del = e.target.closest("[data-del]"); if (del){ pendingOrders = pendingOrders.filter((_,i)=>i!==+del.dataset.del); save(pendingOrders); return; }
+  const cp = e.target.closest("[data-copy]"); if (cp){
+    const t = cp.dataset.copy;
+    Promise.resolve().then(()=>navigator.clipboard.writeText(t)).then(()=>{cp.textContent="Copied"},()=>{
+      const r=document.createRange(); r.selectNodeContents(cp.previousElementSibling); const s=getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent="Selected";});
+  }
+});
+document.addEventListener("keydown", e => {
+  if (e.key==="Escape" && state.open) closeDrawer();
+  if (e.key==="Enter" && e.target.matches("tbody tr")) openDrawer(e.target.dataset.e);
+});
+let qt; $("q").addEventListener("input", e => { clearTimeout(qt); qt = setTimeout(()=>{ state.q = e.target.value; state.shown = 100; render(); }, 120); });
+$("sort").addEventListener("change", e => { state.sort = e.target.value; remember(); render(); });
+$("type").addEventListener("change", e => { state.type = e.target.value; state.shown = 100; render(); });
+{
+  const tc = {}; DATA.contacts.forEach(c => { if (c.ptype) tc[c.ptype] = (tc[c.ptype]||0) + 1; });
+  $("type").innerHTML = '<option value="">All practice types</option>' + Object.entries(tc).sort((a,b)=>b[1]-a[1])
+    .map(([t,n])=>`<option value="${esc(t)}">${esc(t)} (${n.toLocaleString()})</option>`).join("");
+}
+function remember(){ try{ localStorage.setItem("crm.view", JSON.stringify({aud:state.aud, sort:state.sort})); }catch(e){} }
+
+$("aud").innerHTML = AUD.map(([k,l])=>`<button type="button" data-k="${k}">${l}</button>`).join("");
+$("sort").value = state.sort;
+render();
+
+(async () => {
+  const sync = $("sync");
+  try {
+    db = await (window.claude?.use ? window.claude.use("db") : null);
+    if (!db){ sync.textContent = "Notes and orders can't load in this view"; sync.className = "sync bad"; return; }
+    try { const u = await window.claude.use("user"); const w = u && await u.can("data.write"); if (w === false) canWrite = false; } catch(e) {}
+    db.collection("accounts").onSnapshot(snap => {
+      const next = {}; snap.docs.forEach(d => { if (d.exists) next[d.id] = d.data(); });
+      edits = next; sync.textContent = `${snap.size} account${snap.size===1?"":"s"} with your notes or orders`; sync.className = "sync ok";
+      if (state.open && document.activeElement && document.activeElement.closest("#drawer") && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { renderPipe(all()); return; }
+      render();
+    }, err => { sync.textContent = "Lost connection to saved notes. Reload to reconnect."; sync.className = "sync bad"; });
+  } catch (e) { sync.textContent = "Notes and orders can't load in this view"; sync.className = "sync bad"; }
+})();
+</script>

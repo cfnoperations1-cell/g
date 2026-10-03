@@ -1,0 +1,15 @@
+# Secrets and local identity -- never commit
+.env
+
+# Transient files from a single wave
+.wave.json
+wave.json
+
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Note: medspa/candidates.csv, medspa/enriched.csv and outreach/*.csv ARE
+# committed on purpose. They are this agent's entire memory -- who has been
+# found, who has been emailed, who replied. A fresh container with an empty
+# sent_log will happily email everyone a second time.

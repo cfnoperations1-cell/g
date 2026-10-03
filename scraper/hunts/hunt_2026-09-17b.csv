@@ -1,0 +1,13 @@
+vendor,domain,email,all_emails,us_signal,status,evidence_url,audience,peptides,peptide_hits
+Palm Beach Weight Loss & Med Spa,pbweightloss.com,staff@pbweightloss.com,staff@pbweightloss.com; %20staff@pbweightloss.com,yes,ok,https://pbweightloss.com,medspa,"semaglutide, tirzepatide, nad+, sermorelin, glutathione",23
+US Chem Labs,uschemlabs.com,ugb@xq.gabwxp,ugb@xq.gabwxp,yes,ok,https://uschemlabs.com,vendor,"tirzepatide, retatrutide, bpc-157, nad+, ipamorelin, tesamorelin",17
+Florida Weight Loss MD,floridaweightlossmd.com,,,,unreachable,,,,
+Opulence Medical Spa,opulencepalmbeach.com,,,yes,no_email,https://opulencepalmbeach.com,medspa,"semaglutide, tirzepatide, glutathione",9
+West Palm Beach Weight Loss,westpalmbeachweightloss.com,,,yes,no_email,https://westpalmbeachweightloss.com,medspa,"semaglutide, tirzepatide, nad+",16
+TREAT Medspa,treatmedspa.com,hello@treatmedspa.com,hello@treatmedspa.com,yes,ok,https://treatmedspa.com,medspa,semaglutide,4
+City Spa Medical,cityspamedical.com,,,yes,no_email,https://cityspamedical.com,medspa,"semaglutide, tirzepatide, glutathione",8
+Just Melt Med Spa,justmelt.com,,,,unreachable,,,,
+Michael Aziz MD,michaelazizmd.com,,,yes,no_email,https://michaelazizmd.com,medspa,"semaglutide, tirzepatide, retatrutide, liraglutide, bpc-157, nad+",28
+NY Surgical Arts,nysurgicalarts.com,,,yes,no_email,https://nysurgicalarts.com,medspa,"semaglutide, tirzepatide",8
+SoVous Med Spa,sovous.com,hello@sovous.com,hello@sovous.com,yes,no_peptides,https://sovous.com,medspa,,0
+StudioMD,thestudiomd.com,,,,unreachable,,,,
