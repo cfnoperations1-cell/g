@@ -53,7 +53,12 @@ DAILY_CAP = int(os.environ.get("DAILY_CAP", "50"))       # Jonathan, Sep 22: 50/
 # emails make the leads by best." So the default hands off from the last RUO
 # vendor to the practice list, which rank_queue.py orders best-first (peptides
 # seen on the site, med spa / wellness type, the named owner's own address).
-AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "vendor,practice").strip().lower()
+# Jonathan, Oct 3: "Let's do telehealth tomorrow", with Miller's Pharmacy
+# (Wyckoff, NJ) as the 503A partner. Each personal telehealth email now carries
+# "For patient-specific prescriptions, we fill through our 503A compounding
+# pharmacy partner, Miller's Pharmacy in Wyckoff, NJ." Telehealth goes first,
+# then the verified practice list resumes.
+AUDIENCE_ONLY = os.environ.get("AUDIENCE_ONLY", "telehealth,vendor,practice").strip().lower()
 FOCUS_REVIEW_DATE = "none (50/day confirmed 2026-09-29)"
 # RUO_ONLY: with AUDIENCE_ONLY=vendor, only research-peptide brands are eligible.
 # The "vendor" audience is not only RUO brands: the Sep 22 Instagram import filed

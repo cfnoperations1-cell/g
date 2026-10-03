@@ -67,7 +67,7 @@ def stage_of(status, note, catalog):
 HOLD_NOTE = {
     "vendor": "Queued: goes out in the daily RUO waves.",
     "practice": "Queued behind the RUO vendors; starts when they run out, best-ranked first.",
-    "telehealth": "Held until Jonathan decides how to handle 503A for telehealth.",
+    "telehealth": "Queued first from Oct 4; fills patient-specific orders through Miller's Pharmacy (503A, Wyckoff NJ).",
 }
 
 

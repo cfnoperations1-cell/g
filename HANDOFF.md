@@ -25,7 +25,7 @@ Two audiences are live:
 
 Held, not sending:
 
-- **Telehealth** (96 personal emails plus a 429-row hunt). Jonathan said telehealth buyers need a **503A** pharmacy. Nothing goes out until he decides how to handle that.
+- **Telehealth** (96 personal emails): **sending first from Oct 4** (Jonathan, Oct 3: "Let's do telehealth tomorrow"). Each carries the line "For patient-specific prescriptions, we fill through our 503A compounding pharmacy partner, Miller's Pharmacy in Wyckoff, NJ." Verify telehealth rows against `outreach/personal_leads_2026-09-29.csv` (body must match exactly), not the practice template. The 429-row telehealth hunt is not queued.
 - **The old med spa backlog.** Jonathan said "MedSpa is truly don't work" for the earlier generic list. His own list is the exception.
 
 ## Rules (Jonathan's, all still in force)
